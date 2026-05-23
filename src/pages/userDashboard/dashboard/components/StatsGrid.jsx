@@ -1,0 +1,36 @@
+import React from 'react';
+
+const StatsGrid = ({ stats }) => (
+  <section className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4'>
+    {stats.map((stat) => {
+      const Icon = stat.icon;
+      return (
+        <div
+          key={stat.label}
+          className='relative overflow-hidden rounded-2xl border border-[#ebe5db] bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
+        >
+          <div className='absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#f5f3f0]' />
+
+          <div className='relative z-10'>
+            <div className='mb-5 flex h-[42px] w-[42px] items-center justify-center rounded-xl bg-[#E4E9E3]'>
+              <Icon size={20} className='text-[#464E46]' />
+            </div>
+            <div>
+              <p className='mb-1 text-base text-[#070707]'>{stat.label}</p>
+              <p className='text-2xl font-semibold text-[#1a1a1a]'>
+                {stat.value}
+                {stat.sub && (
+                  <span className='ml-2 text-sm font-normal text-[#808080]'>
+                    {stat.sub}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </section>
+);
+
+export default StatsGrid;

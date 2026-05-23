@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+:root {
+  --page-bg: #f4efe6;
+  --page-surface: #fffaf3;
+  --sage-bg: #dde4d8;
+  --sage-strong: #c9d1bf;
+  --olive: #4f5b4d;
+  --olive-deep: #3f493f;
+  --accent: #dca7a3;
+  --primary-text-color: #373737;
+  --primary-text-heading-color: #111111;
+  --secondary-text-color: #ffffff;
+  --ternary-text-color: #5b5b55;
+  --button-bg: #4f5b4d;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--primary-text-color);
+}
+
+button {
+  cursor: pointer;
+}
+
+@keyframes nav-arrow {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@layer utility {
+  .animate-nav-arrow {
+    animation: nav-arrow 1.2s ease-in-out infinite;
+  }
+}
+
+/* Nav link font utility */
+.nav-link {
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Utility class to match Tailwind-style font utilities */
+.font-raleway {
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Playfair Display utility for headings and serif text */
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
