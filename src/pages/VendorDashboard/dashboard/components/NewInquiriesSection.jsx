@@ -1,8 +1,17 @@
-
 const NewInquiriesSection = ({ inquiries }) => {
   const sampleInquiries = inquiries || [
-    { name: 'Clara M.', service: 'Wedding Planning', note: '"Looking for a full-service planner for...', time: '2h ago' },
-    { name: 'David L.', service: 'Floral Design', note: '"Inquiry regarding availability for a...', time: '3h ago' }
+    {
+      name: "Clara M.",
+      service: "Wedding Planning",
+      note: '"Looking for a full-service planner for...',
+      time: "2h ago",
+    },
+    {
+      name: "David L.",
+      service: "Floral Design",
+      note: '"Inquiry regarding availability for a...',
+      time: "3h ago",
+    },
   ];
 
   return (
@@ -28,15 +37,19 @@ const NewInquiriesSection = ({ inquiries }) => {
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-1.5 font-raleway text-[15px] text-[#707070]">
-                  <span className="font-semibold text-[#1c1c1c] text-lg">{item.name}</span>
+                  <span className="font-semibold text-[#1c1c1c] text-lg">
+                    {item.name}
+                  </span>
                   <span>•</span>
-                  <span className="font-medium text-[#707070]">{item.service}</span>
+                  <span className="font-medium text-[#707070]">
+                    {item.service}
+                  </span>
                 </div>
-                
+
                 <p className="mt-2.5 font-raleway text-base italic font-medium tracking-wide text-[#7e857e]">
                   {item.note}
                 </p>
-                
+
                 <button
                   type="button"
                   className="mt-4 inline-flex items-center rounded-lg bg-[#434d42] px-5 py-2.5 font-raleway text-sm font-semibold tracking-wide text-white transition-colors hover:bg-[#343c33]"
