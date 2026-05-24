@@ -1,12 +1,16 @@
-import { ChevronDown, SquareX } from 'lucide-react';
+import { ChevronDown, SquareX, X } from 'lucide-react';
 import ModalShell from './ModalShell';
 
 const NewBookingModal = ({ formData, onChange, onClose, onSubmit, packageOptions }) => (
   <ModalShell onClose={onClose} widthClass='max-w-lg'>
     <div className='flex items-center justify-between border-b border-[#d7dce6] px-5 py-4'>
       <h2 className='font-playfair text-[26px] text-[#212121]'>New Booking</h2>
-      <button aria-label='Close new booking modal' onClick={onClose} className='text-[#24324b]'>
-        <SquareX size={26} />
+      <button
+        aria-label='Close new booking modal'
+        onClick={onClose}
+        className='border-none bg-transparent p-0 text-[#24324b] outline-none ring-0 focus:outline-none focus:ring-0'
+      >
+        <X size={26} />
       </button>
     </div>
 
