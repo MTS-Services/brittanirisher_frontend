@@ -2,7 +2,7 @@ import { ChevronDown, SquareX } from 'lucide-react';
 import ModalShell from './ModalShell';
 
 const NewBookingModal = ({ formData, onChange, onClose, onSubmit, packageOptions }) => (
-  <ModalShell onClose={onClose} widthClass='max-w-[447px]'>
+  <ModalShell onClose={onClose} widthClass='max-w-lg'>
     <div className='flex items-center justify-between border-b border-[#d7dce6] px-5 py-4'>
       <h2 className='font-playfair text-[26px] text-[#212121]'>New Booking</h2>
       <button aria-label='Close new booking modal' onClick={onClose} className='text-[#24324b]'>
@@ -26,8 +26,7 @@ const NewBookingModal = ({ formData, onChange, onClose, onSubmit, packageOptions
             value={formData[field.key]}
             onChange={(event) => onChange(field.key, event.target.value)}
             placeholder={field.placeholder}
-            className='w-full rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none placeholder:text-[#9ea6b3]'
-            style={{ height: '35px' }}
+            className='h-8.75 w-full rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none placeholder:text-[#9ea6b3]'
           />
         </label>
       ))}
@@ -39,8 +38,7 @@ const NewBookingModal = ({ formData, onChange, onClose, onSubmit, packageOptions
             <select
               value={formData.packageName}
               onChange={(event) => onChange('packageName', event.target.value)}
-              className='w-full appearance-none rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none'
-              style={{ height: '35px' }}
+              className='h-8.75 w-full appearance-none rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none'
             >
               {packageOptions.map((option) => (
                 <option key={option} value={option}>
@@ -59,8 +57,7 @@ const NewBookingModal = ({ formData, onChange, onClose, onSubmit, packageOptions
             value={formData.price}
             onChange={(event) => onChange('price', event.target.value)}
             placeholder='$1500'
-            className='w-full rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none placeholder:text-[#9ea6b3]'
-            style={{ height: '35px' }}
+            className='h-8.75 w-full rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none placeholder:text-[#9ea6b3]'
           />
         </label>
       </div>

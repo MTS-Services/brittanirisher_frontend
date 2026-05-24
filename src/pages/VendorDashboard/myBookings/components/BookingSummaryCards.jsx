@@ -3,8 +3,7 @@ const BookingSummaryCards = ({ cards }) => (
     {cards.map((card) => (
       <div
         key={card.label}
-        className='relative overflow-hidden rounded-2xl border border-[#00000029] bg-white px-5 py-5 shadow-[0_1px_0_rgba(0,0,0,0.03)]'
-        style={{ minHeight: '135px' }}
+        className='relative min-h-33.75 overflow-hidden rounded-2xl border border-[#00000029] bg-white px-5 py-5 shadow-[0_1px_0_rgba(0,0,0,0.03)]'
       >
         <div className='absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#f2edea]' />
         <div className='relative flex h-full flex-col justify-between'>

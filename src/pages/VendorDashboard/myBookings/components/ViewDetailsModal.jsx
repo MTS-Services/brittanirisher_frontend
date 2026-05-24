@@ -28,7 +28,6 @@ const ViewDetailsModal = ({ booking, onClose }) => {
           <div className='relative'>
             <div
               className='flex h-20.5 w-20.5 items-center justify-center rounded-full border-[3px] border-[#cfd6ea] bg-[#b8b3b3] text-[22px] text-[#4a2e35]'
-              style={{ height: '82px', width: '82px' }}
             >
               {booking.initials}
             </div>
