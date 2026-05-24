@@ -8,7 +8,7 @@ const PackagesPricingSection = ({ packages }) => {
     <>
       <section className="mt-6">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-playfair text-2xl text-[#2b221d]">
+          <h2 className="font-playfair text-2xl lg:text-3xl text-[#2b221d]">
             Packages & Pricing
           </h2>
           <button

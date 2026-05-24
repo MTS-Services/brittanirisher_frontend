@@ -2,8 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, ImagePlus } from "lucide-react";
 
 const ProfileDetailsLeftPanel = ({ portfolio = [] }) => {
+  const defaultProfileImage =
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80";
+  const [profileImage, setProfileImage] = useState(defaultProfileImage);
   const [portfolioImages, setPortfolioImages] = useState(portfolio);
+  const profileImageInputRef = useRef(null);
   const fileInputRef = useRef(null);
+  const createdProfileImageRef = useRef(null);
   const createdImageUrlsRef = useRef([]);
 
   useEffect(() => {
@@ -12,9 +17,33 @@ const ProfileDetailsLeftPanel = ({ portfolio = [] }) => {
 
   useEffect(() => {
     return () => {
+      if (createdProfileImageRef.current) {
+        URL.revokeObjectURL(createdProfileImageRef.current);
+      }
       createdImageUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     };
   }, []);
+
+  const handleProfileImageClick = () => {
+    profileImageInputRef.current?.click();
+  };
+
+  const handleProfileImageUpload = (event) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) {
+      return;
+    }
+
+    if (createdProfileImageRef.current) {
+      URL.revokeObjectURL(createdProfileImageRef.current);
+    }
+
+    const imageUrl = URL.createObjectURL(selectedFile);
+    createdProfileImageRef.current = imageUrl;
+    setProfileImage(imageUrl);
+    event.target.value = "";
+  };
 
   const handleAddImageClick = () => {
     fileInputRef.current?.click();
@@ -43,14 +72,26 @@ const ProfileDetailsLeftPanel = ({ portfolio = [] }) => {
     <div className="mt-2 flex items-center gap-3">
       <div className="relative">
         <img
-          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80"
+          src={profileImage}
           alt="Profile"
-          className="h-14 w-14 rounded-full object-cover"
+          className="h-28 w-28 rounded-full object-cover"
         />
-        <span className="absolute -bottom-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#cdd5cd] bg-white text-[#5f6661]">
+        <button
+          type="button"
+          onClick={handleProfileImageClick}
+          className="absolute -bottom-1 -right-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#cdd5cd] bg-white text-[#5f6661]"
+          aria-label="Upload profile image"
+        >
           <Camera size={10} />
-        </span>
+        </button>
       </div>
+      <input
+        ref={profileImageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleProfileImageUpload}
+        className="hidden"
+      />
     </div>
 
     <div className="mt-4 space-y-3">

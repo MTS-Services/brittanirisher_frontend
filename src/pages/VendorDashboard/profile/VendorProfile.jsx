@@ -66,9 +66,11 @@ const portfolio = [
 const VendorProfile = () => (
 
     <section className='w-full font-raleway text-[#2e322f]'>
-      <ProfileHeroSection />
+    <div className='space-y-10'>
+        <ProfileHeroSection />
       <ProfileDetailsSection portfolio={portfolio} />
       <PackagesPricingSection packages={packages} />
+    </div>
     </section>
 
 );
