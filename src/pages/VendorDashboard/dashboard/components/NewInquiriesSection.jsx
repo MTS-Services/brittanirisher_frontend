@@ -6,7 +6,7 @@ const NewInquiriesSection = ({ inquiries }) => {
   ];
 
   return (
-    <aside className="rounded-[20px] border border-[#f0f0f0] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+    <aside className="rounded-lg border border-[#f0f0f0] bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
       <div className="flex items-baseline justify-between mb-6">
         <h2 className="font-playfair text-[28px] font-medium tracking-wide text-[#1c1c1c]">
           New Inquiries
