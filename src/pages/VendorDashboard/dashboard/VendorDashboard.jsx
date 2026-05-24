@@ -73,10 +73,10 @@ const VendorDashboard = () => {
 
       <StatsCardsSection cards={statCards} />
 
-      <section className='mt-8 grid grid-cols-1 gap-5 xl:grid-cols-[1.45fr_0.9fr]'>
-        <UpcomingWeddingsSection weddings={upcomingWeddings} />
-        <NewInquiriesSection inquiries={inquiries} />
-      </section>
+     <section className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[1.55fr_0.85fr]">
+      <UpcomingWeddingsSection weddings={upcomingWeddings} />
+      <NewInquiriesSection inquiries={inquiries} />
+    </section>
 
       <TotalLeadsSection data={leadBars} />
     </main>

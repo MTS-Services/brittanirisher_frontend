@@ -8,15 +8,13 @@ export default function SubscriptionBanner({
   expiryDate = "5/12/2026",
   description = "Manage your subscription, keep your profile active, and continue receiving quality leads from brides.",
   onUpgrade,
-  // Pass your exported pattern image via this prop
+
   patternImageSrc = "/pattern-bg.png" 
 }) {
   return (
     <section className="relative flex w-full overflow-hidden rounded-lg border border-[#ebe5db] bg-[#F7F5F1] px-4 py-4 shadow-sm sm:px-6 sm:py-6 lg:px-8 lg:py-8">
       
-      {/* Right Side Image 
-        Using absolute positioning so it bleeds to the edges perfectly 
-      */}
+   
       <div className="absolute inset-y-0 right-0 z-0 hidden w-1/2 lg:block">
         <img
           src="/right.webp"

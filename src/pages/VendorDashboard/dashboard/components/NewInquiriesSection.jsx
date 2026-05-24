@@ -1,49 +1,59 @@
-const NewInquiriesSection = ({ inquiries }) => (
-  <aside className='rounded-xl bg-white p-4 shadow-[0_8px_22px_rgba(0,0,0,0.08)]'>
-    <div className='flex items-center justify-between'>
-      <h2 className='font-playfair text-[28px] leading-none text-[#2d2d2d]'>
-        New Inquiries
-      </h2>
-      <button
-        type='button'
-        className='font-raleway text-[12px] leading-4 text-[#807a74]'
-      >
-        See all inquiries
-      </button>
-    </div>
 
-    <div className='mt-4 space-y-4'>
-      {inquiries.map((item) => (
-        <article
-          key={item.name}
-          className='border-b border-[#edf0ec] pb-4 last:border-b-0 last:pb-0'
+const NewInquiriesSection = ({ inquiries }) => {
+  const sampleInquiries = inquiries || [
+    { name: 'Clara M.', service: 'Wedding Planning', note: '"Looking for a full-service planner for...', time: '2h ago' },
+    { name: 'David L.', service: 'Floral Design', note: '"Inquiry regarding availability for a...', time: '3h ago' }
+  ];
+
+  return (
+    <aside className="rounded-[20px] border border-[#f0f0f0] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+      <div className="flex items-baseline justify-between mb-6">
+        <h2 className="font-playfair text-[28px] font-medium tracking-wide text-[#1c1c1c]">
+          New Inquiries
+        </h2>
+        <button
+          type="button"
+          className="font-raleway text-[12px] tracking-wide text-[#707070] underline underline-offset-4 hover:text-[#1c1c1c]"
         >
-          <div className='flex items-start justify-between gap-4'>
-            <div className='min-w-0 flex-1'>
-              <div className='flex items-center gap-1 font-raleway text-[14px] leading-5 text-[#4a5154]'>
-                <span className='font-semibold text-[#2d2d2d]'>{item.name}</span>
-                <span>•</span>
-                <span>{item.service}</span>
-              </div>
-              <p className='mt-2 font-raleway text-[14px] italic leading-5 text-[#807a74]'>
-                {item.note}
-              </p>
-              <button
-                type='button'
-                className='mt-3 inline-flex items-center rounded-md bg-[#596158] px-3 py-1.5 font-inter text-[14px] font-medium leading-5 text-white'
-              >
-                See Details
-              </button>
-            </div>
+          See all inquiries
+        </button>
+      </div>
 
-            <div className='shrink-0 text-right font-raleway text-[12px] font-medium leading-4 text-[#4a5154]'>
-              {item.time}
+      <div className="space-y-6">
+        {sampleInquiries.map((item, idx) => (
+          <article
+            key={idx}
+            className="border-b border-[#ececec] pb-6 last:border-b-0 last:pb-0"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-baseline gap-1.5 font-raleway text-[15px] text-[#707070]">
+                  <span className="font-bold text-[#1c1c1c] text-[17px]">{item.name}</span>
+                  <span>•</span>
+                  <span className="font-medium">{item.service}</span>
+                </div>
+                
+                <p className="mt-2.5 font-raleway text-[15px] italic font-medium tracking-wide text-[#7e857e]">
+                  {item.note}
+                </p>
+                
+                <button
+                  type="button"
+                  className="mt-4 inline-flex items-center rounded-lg bg-[#434d42] px-5 py-2.5 font-raleway text-[14px] font-bold tracking-wide text-white transition-colors hover:bg-[#343c33]"
+                >
+                  See Details
+                </button>
+              </div>
+
+              <div className="shrink-0 pt-0.5 text-right font-raleway text-[13px] font-bold text-[#222222]">
+                {item.time}
+              </div>
             </div>
-          </div>
-        </article>
-      ))}
-    </div>
-  </aside>
-);
+          </article>
+        ))}
+      </div>
+    </aside>
+  );
+};
 
 export default NewInquiriesSection;
