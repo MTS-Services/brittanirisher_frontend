@@ -47,7 +47,7 @@ const savedVendorData = [
   {
     id: 5,
     name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1519225495810-7512c696505a?w=600&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=600&auto=format&fit=crop&q=80',
     rating: 4,
     reviews: '4 - 78',
     location: 'San Francisco, CA',
@@ -57,7 +57,7 @@ const savedVendorData = [
   {
     id: 6,
     name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1507504038482-76214343e500?w=600&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80',
     rating: 5,
     reviews: '5 - 88',
     location: 'San Francisco, CA',
@@ -77,7 +77,7 @@ const savedVendorData = [
   {
     id: 8,
     name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1494955850428-153ad3a95175?w=600&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
     rating: 5,
     reviews: '5 - 115',
     location: 'San Francisco, CA',
