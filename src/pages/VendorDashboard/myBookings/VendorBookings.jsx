@@ -296,7 +296,7 @@ const VendorBookings = () => {
   };
 
   return (
-    <main className="font-playfair">
+    <main className="font-raleway ">
       <BookingsHeader
         vendorName="Studio Bella"
         subtitle="Your dream wedding is coming together beautifully"
