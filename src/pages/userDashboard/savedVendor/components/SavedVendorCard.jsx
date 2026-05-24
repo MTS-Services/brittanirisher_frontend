@@ -14,7 +14,7 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
           }}
         />
 
-        <span className='absolute left-3 top-3 inline-flex items-center rounded-full bg-[#d9a46a] px-3 py-1 text-sm font-medium text-white'>
+        <span className='absolute font-playfair left-3 top-3 inline-flex items-center rounded-full bg-[#d9a46a] px-3 py-1 text-sm font-medium text-white'>
           98% match
         </span>
 
@@ -45,17 +45,17 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
 
         <div className='mb-2 flex items-center gap-2 text-sm text-[#303030]'>
           <DollarSign size={16} className='text-[#6a6a6a]' />
-          <span>{vendor.priceRange}</span>
+          <span className='font-raleway'>{vendor.priceRange}</span>
         </div>
 
         <div className='mb-4 flex items-center gap-2 text-sm text-[#303030]'>
           <MapPin size={16} className='text-[#6a6a6a]' />
-          <span>{vendor.location}</span>
+          <span className='font-raleway'>{vendor.location}</span>
         </div>
 
         <button
           type='button'
-          className='w-full rounded-xl bg-[#9dad9a] px-4 py-2.5 text-sm font-medium text-[#435241] transition hover:bg-[#8fa18d]'
+          className='w-full rounded-xl bg-[#9dad9a] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#8fa18d]'
         >
           View Profile
         </button>

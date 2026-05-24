@@ -111,7 +111,7 @@ const SavedVendor = () => {
   };
 
   return (
-    <section className='w-full text-[#171717] font-playfair '>
+    <section className='w-full text-[#171717] font-raleway '>
       <SavedVendorHeader />
       <SavedVendorsGrid
         vendors={savedVendorData}
