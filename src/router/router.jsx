@@ -30,12 +30,12 @@ const Dashboard = lazy(() => import('../pages/admin/dashboard/Dashboard'));
 const VendorDashboard = lazy(() => import('../pages/VendorDashboard/dashboard/VendorDashboard'));
 const VendorLeads = lazy(() => import('../pages/VendorDashboard/VendorLeads/VendorLeads'));
 const VendorBookings = lazy(
-  () => import('../pages/VendorDashboard/VendorBookings'),
+  () => import('../pages/VendorDashboard/myBookings/VendorBookings'),
 );
 const VendorAvailability = lazy(
   () => import('../pages/VendorDashboard/VendorAvailability/VendorAvailability'),
 );
-const VendorProfile = lazy(() => import('../pages/VendorDashboard/VendorProfile'));
+const VendorProfile = lazy(() => import('../pages/VendorDashboard/profile/VendorProfile'));
 const UserDashboard = lazy(() => import('../pages/userDashboard/dashboard/UserDashboard'));
 const UserBudgetTracker = lazy(() => import('../pages/userDashboard/budgetTracker/BudgetTracker'));
 const UserChecklist = lazy(() => import('../pages/userDashboard/checklist/Checklist'));
