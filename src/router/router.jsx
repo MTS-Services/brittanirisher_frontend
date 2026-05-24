@@ -34,7 +34,7 @@ const VendorBookings = lazy(
 const VendorAvailability = lazy(
   () => import('../pages/VendorDashboard/VendorAvailability/VendorAvailability'),
 );
-const VendorProfile = lazy(() => import('../pages/VendorDashboard/VendorProfile'));
+const VendorProfile = lazy(() => import('../pages/VendorDashboard/profile/VendorProfile'));
 const UserDashboard = lazy(() => import('../pages/userDashboard/dashboard/UserDashboard'));
 const UserBudgetTracker = lazy(() => import('../pages/userDashboard/budgetTracker/BudgetTracker'));
 const UserChecklist = lazy(() => import('../pages/userDashboard/checklist/Checklist'));
