@@ -1,0 +1,80 @@
+import { ChevronDown, SquareX } from 'lucide-react';
+import ModalShell from './ModalShell';
+
+const NewBookingModal = ({ formData, onChange, onClose, onSubmit, packageOptions }) => (
+  <ModalShell onClose={onClose} widthClass='max-w-[447px]'>
+    <div className='flex items-center justify-between border-b border-[#d7dce6] px-5 py-4'>
+      <h2 className='font-playfair text-[26px] text-[#212121]'>New Booking</h2>
+      <button aria-label='Close new booking modal' onClick={onClose} className='text-[#24324b]'>
+        <SquareX size={26} />
+      </button>
+    </div>
+
+    <form className='space-y-4 px-5 py-5' onSubmit={onSubmit}>
+      {[
+        { key: 'coupleName', label: 'Couple Name', placeholder: 'Enter Couple Name here' },
+        { key: 'email', label: 'E-mail', placeholder: 'Enter E-mail here', type: 'email' },
+        { key: 'phone', label: 'Phone Number', placeholder: 'Enter Phone Number Here' },
+        { key: 'venueName', label: 'Venue Name', placeholder: 'Enter Venue name' },
+        { key: 'location', label: 'Location', placeholder: 'Enter Location' },
+        { key: 'weddingDate', label: 'Wedding Date', placeholder: 'mm/dd/yyyy', type: 'date' },
+      ].map((field) => (
+        <label key={field.key} className='block'>
+          <span className='mb-2 block text-[15px] text-[#1f1f1f]'>{field.label}</span>
+          <input
+            type={field.type || 'text'}
+            value={formData[field.key]}
+            onChange={(event) => onChange(field.key, event.target.value)}
+            placeholder={field.placeholder}
+            className='w-full rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none placeholder:text-[#9ea6b3]'
+            style={{ height: '35px' }}
+          />
+        </label>
+      ))}
+
+      <div className='grid grid-cols-2 gap-4'>
+        <label className='block'>
+          <span className='mb-2 block text-[15px] text-[#1f1f1f]'>Package</span>
+          <div className='relative'>
+            <select
+              value={formData.packageName}
+              onChange={(event) => onChange('packageName', event.target.value)}
+              className='w-full appearance-none rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none'
+              style={{ height: '35px' }}
+            >
+              {packageOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={16} className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#68707d]' />
+          </div>
+        </label>
+
+        <label className='block'>
+          <span className='mb-2 block text-[15px] text-[#1f1f1f]'>Price</span>
+          <input
+            type='text'
+            value={formData.price}
+            onChange={(event) => onChange('price', event.target.value)}
+            placeholder='$1500'
+            className='w-full rounded-sm border border-[#dfe5ef] bg-[#fafcff] px-3 text-[13px] text-[#3c3f44] outline-none placeholder:text-[#9ea6b3]'
+            style={{ height: '35px' }}
+          />
+        </label>
+      </div>
+
+      <div className='flex items-center justify-end gap-3 pt-2'>
+        <button type='button' onClick={onClose} className='h-10 rounded-sm border border-[#e0e6ef] bg-white px-5 text-[14px] text-[#7a7f87]'>
+          Cancel
+        </button>
+        <button type='submit' className='h-10 rounded-sm bg-[#6f7969] px-6 text-[14px] text-white'>
+          Add Booking
+        </button>
+      </div>
+    </form>
+  </ModalShell>
+);
+
+export default NewBookingModal;
