@@ -23,18 +23,18 @@ const Footer = memo(() => {
          <img
         src="/Footer_img.png"
         alt="decor left"
-        className="hidden sm:block absolute -left-4 -top-60 w-80 z-0 pointer-events-none"
+        className="hidden sm:block absolute left-0 -top-72 w-80 z-0 pointer-events-none"
       />
       <img
         src="/Footer_img2.png"
         alt="decor right"
-        className="hidden sm:block absolute -right-2 -top-60 w-80 z-0 pointer-events-none"
+        className="hidden sm:block absolute right-0 -top-72 w-80 z-0 pointer-events-none"
       />
       <div className="mx-auto container px-4 pb-4 pt-6 sm:px-6 relative z-10 lg:px-8 ">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] z-9999">
           <div>
             <div className="flex items-center gap-3">
-              <img src="/Footer_logo.png" alt="logo" className="" />
+              <img src="/Footer_logo.png" alt="logo" className=" w-30 h-25" />
             </div>
             <p className="mt-6 max-w-sm text-sm leading-7 text-white">
               Helping brides plan their dream wedding while connecting with
@@ -94,7 +94,7 @@ const Footer = memo(() => {
           </div>
         </div>
 
-        <div className=" text-center text-sm text-white">
+        <div className=" text-center text-sm text-white mt-2 py-2">
           &copy; {new Date().getFullYear()} {APP_CONFIG.NAME}. All rights
           reserved.
         </div>

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { MapPin, Star } from 'lucide-react';
+import VendorCard from '../../vendors/VendorCard';
 
 const VENDORS = [
   {
@@ -44,57 +44,9 @@ const VENDORS = [
   },
 ];
 
-const VendorCard = memo(({ vendor }) => (
-  <article className='overflow-hidden rounded-sm bg-white shadow-sm p-4 md:p-5'>
-  
-  {/* Image */}
-  <div className='aspect-[4/3] overflow-hidden bg-[#eee4d6]'>
-    <img
-      src={vendor.image||"/dummy-image-square.jpg"}
-      alt={vendor.name}
-      className='h-full w-full object-cover transition-transform '
-      loading='lazy'
-    />
-  </div>
-
-  {/* Details */}
-  <div className=' pt-3 '>
-    
-    {/* Name + Category row */}
-    <div className='flex items-center justify-between gap-2'>
-      <div>
-        <h3 className='tect-lg md:text-xl font-serif font-medium text-[#201c18] leading-snug'>
-          {vendor.name}
-        </h3>
-        <p className='mt-0.5 text-base font-raleway text-[#606060]'>{vendor.category}</p>
-      </div>
-      {/* Rating */}
-      <div className='inline-flex items-center gap-0.5 text-base font-medium text-[#544d43] mt-0.5'>
-        <Star size={14} className='fill-[#FFBF10] text-[#FFBF10]' />
-        {vendor.rating}
-      </div>
-    </div>
-
-    {/* Divider */}
-    {/* <div className='my-2.5 border-t border-[#f0ebe3]' /> */}
-
-    {/* Location + Price */}
-    <div className='flex items-center justify-between text-base text-[#6d6357]'>
-      <span className='inline-flex items-center gap-1 text-[#070707] font-raleway font-medium'>
-        {vendor.location}
-      </span>
-      <span className='font-playfair font-bold text-[#070707] text-lg'>{vendor.price}</span>
-    </div>
-
-  </div>
-</article>
-));
-
-VendorCard.displayName = 'VendorCard';
-
 const FeaturedVendorsSection = memo(() => {
   return (
-    <section id='vendors' className='relative z-0  bg-[#f5f1eb] py-14 sm:py-20'>
+    <section id='vendors' className='relative z-0 bg-[#f5f1eb] py-14 sm:py-20'>
       {/* <div className='absolute left-0 top-10 h-40 w-40 rounded-full bg-[#e2dccf] blur-3xl' />
       <div className='absolute right-0 top-24 h-40 w-40 rounded-full bg-[#d8e1d6] blur-3xl' /> */}
 
@@ -109,7 +61,7 @@ const FeaturedVendorsSection = memo(() => {
 
         <div className='mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4'>
           {VENDORS.map((vendor) => (
-            <VendorCard key={vendor.id} vendor={vendor} />
+            <VendorCard key={vendor.id} vendor={vendor} variant='featured' />
           ))}
         </div>
       </div>

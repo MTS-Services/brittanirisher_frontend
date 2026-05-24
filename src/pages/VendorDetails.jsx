@@ -11,6 +11,7 @@ import {
   Mail,
   Phone,
   ChevronRight,
+  BadgeCheck,
 } from "lucide-react";
 import ALL_VENDORS from "../data/vendors";
 import { useSEO } from "../hooks/useSEO";
@@ -205,7 +206,10 @@ const VendorDetails = () => {
   const availableSet = new Set(vendor.availableDates || []);
   const bookedSet = new Set(vendor.bookedDates || []);
   const serviceHighlights = vendor.serviceHighlights || [];
-  const portfolioImages = vendor.portfolio || [];
+  const portfolioImages = (vendor.portfolio || []).map((src, index) => ({
+    src,
+    alt: `${vendor.name} portfolio ${index + 1}`,
+  }));
   const days = buildMonthMatrix(month.getFullYear(), month.getMonth());
 
   const prevMonth = () =>
@@ -254,7 +258,7 @@ const VendorDetails = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="text-sm text-[#4A4A4A] inline-flex items-center gap-1.5"
+            className="text-base text-[#4A4A4A] inline-flex items-center gap-1.5"
           >
             <ChevronLeft size={22} /> Back
           </button>
@@ -262,7 +266,7 @@ const VendorDetails = () => {
       </div>
 
       {/* Hero */}
-      <div className="overflow-hidden rounded-md bg-white shadow mb-6">
+      <div className="overflow-hidden rounded-md  shadow-sm mb-6">
         <div className="relative">
           <img
             src={vendor.image}
@@ -287,7 +291,7 @@ const VendorDetails = () => {
             <div className="py-1.5 mt-2 px-4 bg-[#e8dfd3] inline-flex rounded-full">
               <span className="text-base">{vendor.category}</span>
             </div>
-            <div className="flex items-center gap-3 mt-2 text-sm text-[#857F7A]">
+            <div className="flex font-raleway items-center gap-3 mt-4 text-sm md:text-base text-[#6B6B6B]">
               <span><MapPin size={20} /></span>
               <span>{vendor.location}</span>
               <span><Mail size={20} /></span>
@@ -299,18 +303,18 @@ const VendorDetails = () => {
           <div>
             <div className="flex items-center gap-3">
               <button
-                className="flex items-center gap-2 px-3 py-1.5 bg-white border rounded text-sm"
+                className="flex items-center gap-2 px-1 py-1 bg-white  rounded text-sm"
                 onClick={() => setIsFavorite((s) => !s)}
               >
                 <Heart
-                  size={14}
-                  className={`text-${isFavorite ? "rose-500" : "gray-400"}`}
+                  size={29}
+                  className={`text-[#D4A574] bg-isFavorite ? '#D4A574' : 'transparent' rounded-full p-0.5 transition-colors'}`}
                 />
-                Save
+               
               </button>
               <a
                 href="#enquiry"
-                className="px-4 py-2 bg-[#d6bfae] text-[#3a3028] rounded text-sm"
+                className="px-4 py-2 font-raleway bg-[#D4A574] text-[#FFFFFF] rounded text-base"
               >
                 Send Enquiry
               </a>
@@ -327,106 +331,112 @@ const VendorDetails = () => {
         <PricingGrid />
       </section>
 
-      {/* About / Calendar / Enquiry */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+  {/* About / Calendar / Enquiry */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-14 md:pb-20">
 
         {/* About Me */}
         <div className="bg-[#faf9f6] rounded-md shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-[#1a1a1a] mb-4">About Me</h2>
-          <p className="text-[13px] text-[#4a3f35] leading-relaxed">
+          <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2 ">About Me</h2>
+          <p className="text-base font-raleway text-[#4a3f35] leading-relaxed">
             {vendor.about}
           </p>
         </div>
 
         {/* Available Date */}
-        <div className="bg-[#faf9f6] rounded-md shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-[#1a1a1a]">
-              Available Date
-            </h2>
-            <div className="flex items-center gap-3 text-[11px] text-[#6b5e52]">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-[#b0a89c] inline-block" />
-                Booked
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-6 font-raleway flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
+                Available Date
+              </h2>
+              <div className="flex items-center gap-3 text-[11px] text-[#6b5e52]">
+                <span className="flex items-center gap-1 text-sm">
+                  <span className="w-2 h-2 rounded-full bg-[#b0a89c] inline-block" />
+                  Booked
+                </span>
+                <span className="flex items-center gap-1 text-sm ">
+                  <span className="w-2 h-2 rounded-full bg-[#5c6e58] inline-block" />
+                  Available
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={prevMonth}
+                className="text-[#4a3f35] px-2 hover:opacity-70 bg-transparent border-none"
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <span className="text-lg md:text-2xl font-playfair font-semibold text-[#828282]">
+                {monthLabel(month)}
               </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-[#5c6e58] inline-block" />
-                Available
-              </span>
+              <button
+                onClick={nextMonth}
+                className="text-[#4a3f35] px-2 hover:opacity-70 bg-transparent border-none"
+              >
+                <ChevronRight size={22} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 text-center text-sm font-raleway text-[#8a7a6a] font-semibold mb-2 tracking-wide">
+              {["SUN", "MO", "TU", "WED", "TH", "FR", "SA"].map((d) => (
+                <div key={d} className="py-1">{d}</div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-0.5 text-sm">
+              {days.map((dt, i) => {
+                if (!dt) return <div key={`blank-${i}`} className="py-3" />;
+                const iso = dt.toISOString().slice(0, 10);
+                const isAvailable = availableSet.has(iso);
+                const isBooked = bookedSet.has(iso);
+                const isSelected = selectedDate === iso;
+
+                if (isSelected) {
+                  return (
+                    <div
+                      key={iso}
+                      className="flex items-center justify-center py-1"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-[#6b7c65] text-white text-sm font-semibold flex items-center justify-center cursor-pointer">
+                        {dt.getDate()}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    key={iso}
+                    onClick={() => { if (isAvailable) setSelectedDate(iso); }}
+                    disabled={!isAvailable}
+                    className={`text-center py-2 text-base font-raleway rounded ${
+                      isBooked
+                        ? "text-[#c8bfb5]  cursor-default font-raleway"
+                        : isAvailable
+                        ? "text-[#4a3f35] font-semibold hover:bg-[#f0ede6]"
+                        : "text-[#c8bfb5] cursor-default"
+                    }`}
+                  >
+                    {dt.getDate()}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={prevMonth}
-              className="text-[#4a3f35] px-2 hover:opacity-70 bg-transparent border-none"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <span className="text-lg font-semibold text-[#1a1a1a]">
-              {monthLabel(month)}
-            </span>
-            <button
-              onClick={nextMonth}
-              className="text-[#4a3f35] px-2 hover:opacity-70 bg-transparent border-none"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-7 text-center text-[11px] text-[#8a7a6a] font-semibold mb-2 tracking-wide">
-            {["SUN", "MO", "TU", "WED", "TH", "FR", "SA"].map((d) => (
-              <div key={d} className="py-1">{d}</div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-7 gap-0.5 text-sm">
-            {days.map((dt, i) => {
-              if (!dt) return <div key={`blank-${i}`} className="py-3" />;
-              const iso = dt.toISOString().slice(0, 10);
-              const isAvailable = availableSet.has(iso);
-              const isBooked = bookedSet.has(iso);
-              const isSelected = selectedDate === iso;
-
-              if (isSelected) {
-                return (
-                  <div
-                    key={iso}
-                    className="flex items-center justify-center py-1"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-[#6b7c65] text-white text-[13px] font-semibold flex items-center justify-center cursor-pointer">
-                      {dt.getDate()}
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <button
-                  key={iso}
-                  onClick={() => { if (isAvailable) setSelectedDate(iso); }}
-                  disabled={!isAvailable}
-                  className={`text-center py-2 text-[13px] rounded ${
-                    isBooked
-                      ? "text-[#c8bfb5] cursor-default"
-                      : isAvailable
-                      ? "text-[#4a3f35] hover:bg-[#f0ede6]"
-                      : "text-[#c8bfb5] cursor-default"
-                  }`}
-                >
-                  {dt.getDate()}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-4">
+          <div className="mt-4 space-y-2">
             <button
               onClick={handleBook}
-              className="w-full px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-[13px] font-medium rounded tracking-wide"
+              className="inline-flex w-full items-center justify-center px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm md:text-base font-raleway font-medium rounded tracking-wide transition-colors"
             >
               {bookingStatus === "loading" ? "Requesting..." : "Request Booking"}
             </button>
+            {/* <p className="text-xs text-[#8a7a6a] font-raleway italic text-center">
+              Select an available date from the calendar before requesting booking.
+            </p> */}
           </div>
         </div>
 
@@ -436,18 +446,18 @@ const VendorDetails = () => {
           id="enquiry"
           ref={enquiryRef}
         >
-          <h2 className="text-xl font-semibold text-[#1a1a1a] mb-4">
+          <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
             Send Enquiry
           </h2>
           <form onSubmit={handleSendEnquiry} className="flex flex-col gap-3">
             <div>
-              <label className="block text-[12px] font-semibold text-[#1a1a1a] mb-1">
+              <label className="block text-sm font-raleway font-semibold text-[#1a1a1a] mb-1">
                 Name
               </label>
               <input
                 name="name"
                 placeholder="Enter your full name"
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-[13px] text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
+                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
               />
             </div>
             <div>
@@ -457,7 +467,7 @@ const VendorDetails = () => {
               <input
                 name="phone"
                 placeholder="Enter your phone number"
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-[13px] text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
+                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
               />
             </div>
             <div>
@@ -467,11 +477,11 @@ const VendorDetails = () => {
               <input
                 name="email"
                 placeholder="Enter your email address"
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-[13px] text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
+                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
               />
             </div>
             <div>
-              <label className="block text-[12px] font-semibold text-[#1a1a1a] mb-1">
+              <label className="block text-sm font-raleway font-semibold text-[#1a1a1a] mb-1">
                 Message
               </label>
               <textarea
@@ -481,41 +491,92 @@ const VendorDetails = () => {
                 className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-[13px] text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c] resize-none"
               />
             </div>
-            <button
-              type="submit"
-              className="w-full py-2.5 bg-[#8a9882] hover:bg-[#7a8872] text-white text-[13px] font-medium rounded mt-1 tracking-wide"
-            >
-              Submit
-            </button>
+
+            <div className="mt-2 flex flex-row items-center gap-4">
+              <button
+                type="submit"
+                className="inline-flex flex-1 items-center justify-center px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm md:text-base font-raleway font-medium rounded tracking-wide transition-colors"
+              >
+                Submit
+              </button>
+            </div>
           </form>
         </div>
 
       </section>
 
-      <section className="bg-white p-6 rounded-md shadow mb-8">
-        <h4 className="font-raleway text-xl mb-3">Service Highlights</h4>
-        <div className="flex flex-wrap gap-3">
-          {serviceHighlights.map((h) => (
-            <div
-              key={h}
-              className="px-3 py-1 border rounded text-sm text-[#5a4a3a]"
-            >
-              {h}
+      <section className="relative mb-8 overflow-hidden rounded-3xl border border-[#eadfcd] bg-[#fbf7f0] px-6 py-6 shadow-sm md:px-8 md:py-7">
+        <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edd7c6]/70 blur-2xl" aria-hidden="true" />
+        <div className="absolute right-4 top-3 hidden h-20 w-20 md:block" aria-hidden="true">
+          <div className="absolute right-0 top-0 h-16 w-16 rounded-full border border-[#d9b7a3]/60" />
+          <div className="absolute right-2 top-2 h-12 w-12 rounded-full border border-[#e6cbbf]/70" />
+          <div className="absolute right-5 top-5 h-6 w-6 rounded-full bg-[#d9a6a0]/70" />
+        </div>
+
+        <div className="relative">
+          <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl">
+            Service Highlights
+          </h4>
+
+          <div className="mt-5 grid gap-6 lg:grid-cols-[1.15fr_1fr_1fr]">
+            <div className="space-y-2.5">
+              {serviceHighlights.slice(0, 3).map((h) => (
+                <div key={h} className="flex items-start gap-2 text-[#6b5e52]">
+                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[10px] text-[#e0a15f]">
+                   <Check />
+                  </span>
+                  <span className="font-raleway text-sm leading-6 md:text-[15px]">{h}</span>
+                </div>
+              ))}
             </div>
-          ))}
+
+            <div className="space-y-3">
+              {serviceHighlights.slice(3, 6).map((h) => (
+                <div key={h} className="flex items-start gap-2 text-[#6b5e52]">
+                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[10px] text-[#e0a15f]">
+<Check />                  </span>
+                  <span className="font-raleway text-sm leading-6 md:text-[15px]">{h}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              {serviceHighlights.slice(6, 9).map((h) => (
+                <div key={h} className="flex items-start gap-2 text-[#6b5e52]">
+                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[10px] text-[#e0a15f]">
+                    <Check />
+                  </span>
+                  <span className="font-raleway text-sm leading-6 md:text-[15px]">{h}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-2">
+            <div className="rounded-md bg-white/85 px-4 py-4 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset] ring-1 ring-[#eadfcd]">
+              <p className="text-xs uppercase tracking-widest text-[#a08a76] font-raleway">Experience</p>
+              <p className="mt-1 font-playfair text-xl text-[#2a241e] ">8 years</p>
+            </div>
+            <div className="rounded-md bg-white/85 px-4 py-4 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset] ring-1 ring-[#eadfcd]">
+              <p className="text-xs uppercase tracking-widest text-[#a08a76] font-raleway">Specialty</p>
+              <p className="mt-1 font-playfair text-lg text-[#2a241e] md:text-xl">Romantic &amp; Editorial</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Portfolio */}
       <section className="mb-16">
-        <h4 className="font-semibold mb-4">Portfolio</h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          {portfolioImages.map((img, i) => (
-            <div key={img + i} className="overflow-hidden rounded-md bg-white">
+        <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
+          Portfolio
+        </h4>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
+          {portfolioImages.map((item, i) => (
+            <div key={item.alt} className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-[#eadfcd]">
               <img
-                src={img}
-                alt={`${vendor.name}-${i}`}
-                className="w-full h-24 object-cover"
+                src={item.src}
+                alt={item.alt}
+                className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-36"
               />
             </div>
           ))}

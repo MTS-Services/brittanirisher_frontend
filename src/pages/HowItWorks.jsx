@@ -104,7 +104,7 @@ const StepCard = memo(({ icon, title, text, theme = 'light' }) => (
 StepCard.displayName = 'StepCard';
 
 const WhyChooseCard = memo(({ icon, title, text }) => (
-  <article className='bg-[#f0e9e1] rounded-lg'>
+  <article className='bg-[#f0e9e1] rounded-lg '>
     <div className='flex flex-col lg:flex-row gap-6 p-6 lg:p-8 items-center lg:items-start'>
       <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#DAC3B4]'>
         <img src={icon} alt='' aria-hidden='true' className='h-6 w-6' />
@@ -209,13 +209,13 @@ const HowItWorks = memo(() => {
       </section>
 
       {/* Why Choose Section */}
-      <section className='relative overflow-hidden bg-[#f4f0ea] px-4  sm:px-6 lg:px-8 py-14 md:py-20'  >
-        <div className='mx-auto max-w-384'>
+      <section className='relative overflow-hidden bg-[#f4f0ea] px-4  sm:px-6 lg:px-8 py-14 md:py-20 '  >
+        <div className='mx-auto max-w-384 '>
           <h2 className='text-center font-playfair text-[44px] leading-tight text-[#2d2d2d]'>
             Why Choose Vow &amp; Vendor
           </h2>
 
-          <div className='mt-10 grid gap-5 lg:grid-cols-3'>
+          <div className='mt-10 grid gap-5 lg:grid-cols-3 z-10'>
             {WHY_CHOOSE_ITEMS.map((item) => (
               <WhyChooseCard key={item.title} {...item} />
             ))}

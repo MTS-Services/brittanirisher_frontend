@@ -128,13 +128,13 @@ const ContactPage = memo(() => {
         />
       </section>
 
-      <section className="relative px-4 pb-16 pt-16 sm:px-6 lg:px-48 lg:pb-20 lg:pt-20">
+      <section className="relative px-4  sm:px-6 lg:px-8 py-14 md:py-20">
         <div style={{ maxWidth: 1536 }} className="mx-auto">
-          <div className="grid gap-5 md:grid-cols-3">
+          {/* <div className="grid gap-5 md:grid-cols-3">
             {CONTACT_METHODS.map(method => (
               <ContactBlock key={method.title} {...method} />
             ))}
-          </div>
+          </div> */}
 
           <div className="mt-6 grid gap-5 lg:grid-cols-[1.55fr_0.9fr]">
             <article className="rounded-[14px] bg-[#f0e9e1] px-6 py-6 sm:px-8 sm:py-8">

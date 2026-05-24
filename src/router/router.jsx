@@ -12,6 +12,7 @@ import AdminLayout from '../components/layout/Layout';
 import DummyRoutePage from '../components/DummyRoutePage';
 import { ROUTES } from '../config';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
+import NotFound from '../pages/NotFound';
 
 const Home = lazy(() => import('../components/home/HomeContent'));
 const BrowseVendors = lazy(() => import('../pages/BrowseVendors'));
@@ -76,19 +77,6 @@ const userSeg = segFor(ROUTES.USER);
 const PageLoader = () => (
   <div className='flex items-center justify-center min-h-screen'>
     <div className='w-8 h-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent' />
-  </div>
-);
-
-const NotFound = () => (
-  <div className='flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center'>
-    <h1 className='text-6xl font-bold text-gray-800'>404</h1>
-    <p className='text-xl text-gray-500'>Page not found</p>
-    <a
-      href={ROUTES.HOME}
-      className='mt-2 text-sm font-medium text-blue-600 hover:underline'
-    >
-      Back to Home
-    </a>
   </div>
 );
 

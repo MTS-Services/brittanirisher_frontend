@@ -1,8 +1,9 @@
 import { memo, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import ALL_VENDORS from '../data/vendors';
+import VendorCard from '../components/vendors/VendorCard';
 
 const CATEGORIES = [
   'All Categories',
@@ -192,7 +193,7 @@ const BrowseVendors = memo(() => {
 
       <aside
         className={`
-          fixed inset-y-0 top-20 left-0 w-[290px] z-50
+          fixed inset-y-0 top-20 left-0 w-72.5 z-50
           bg-[#f0e9e1] shadow-xl border-r border-[#e8e0d8]
           transform transition-transform duration-300 ease-in-out
           md:hidden
@@ -222,7 +223,7 @@ const BrowseVendors = memo(() => {
       </aside>
 
     
-      <aside className="hidden md:flex flex-col w-64 shrink-0 sticky top-8 mt-8 mb-8 self-start px-5 py-5 bg-[#f0e9e1] shadow-sm border border-[#e8e0d8] rounded-sm max-h-[calc(100vh-4rem)] overflow-y-auto">
+      <aside className="hidden md:flex flex-col w-64 shrink-0 sticky  z-10 top-8 mt-8 mb-8 self-start px-5 py-5 bg-[#f0e9e1] shadow-sm border border-[#e8e0d8] rounded-sm max-h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex items-center gap-2 mb-5">
           <SlidersHorizontal size={17} className="text-[#7a6050]" />
           <h2 className="text-base font-semibold text-[#3a3a3a]">Filters</h2>
@@ -231,7 +232,7 @@ const BrowseVendors = memo(() => {
       </aside>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 px-5 md:px-7 pt-8 pb-16 min-w-0">
+      <main className="flex-1 px-5 md:px-7 pt-8 pb-16 min-w-0 z-10">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="font-serif text-4xl text-[#201c18] sm:text-5xl">Browse Vendors</h1>
@@ -261,7 +262,7 @@ const BrowseVendors = memo(() => {
 
         {/* Active filter chips */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4 z-100">
             {selectedCategory !== 'All Categories' && (
               <span className="inline-flex items-center gap-1 bg-[#e8dfd6] text-[#5a4030] text-xs font-raleway px-3 py-1 rounded-full">
                 {selectedCategory}
@@ -293,41 +294,11 @@ const BrowseVendors = memo(() => {
         {paginatedVendors.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedVendors.map((vendor) => (
-              <article
-                  key={vendor.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => navigate(`/vendors/${vendor.id}`)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/vendors/${vendor.id}`); }}
-                  className="overflow-hidden rounded-sm bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                >
-                <div className="aspect-[4/3] overflow-hidden bg-[#eee4d6]">
-                  <img
-                    src={vendor.image}
-                    alt={vendor.name}
-                    className="h-full w-full object-cover transition-transform "
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <h3 className="text-base md:text-lg font-serif font-medium text-[#201c18] leading-snug truncate">
-                        {vendor.name}
-                      </h3>
-                      <p className="mt-0.5 text-xs font-raleway text-[#888]">{vendor.category}</p>
-                    </div>
-                    <div className="inline-flex items-center gap-0.5 text-sm font-medium text-[#544d43] shrink-0">
-                      <Star size={13} className="fill-[#FFBF10] text-[#FFBF10]" />
-                      {vendor.rating}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-2 text-sm">
-                    <span className="font-raleway text-[#606060] truncate">{vendor.location}</span>
-                    <span className="font-semibold text-[#201c18] shrink-0 ml-2">{vendor.priceDisplay}</span>
-                  </div>
-                </div>
-              </article>
+              <VendorCard
+                key={vendor.id}
+                vendor={vendor}
+                onClick={() => navigate(`/vendors/${vendor.id}`)}
+              />
             ))}
           </div>
         ) : (

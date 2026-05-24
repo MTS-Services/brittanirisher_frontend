@@ -1,3 +1,22 @@
+const weddingPortfolio = [
+  'https://images.unsplash.com/photo-1529634806980-b8f0f6ae1f24?w=800&q=80',
+  'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80',
+  'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?w=800&q=80',
+  'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&q=80',
+  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80',
+  'https://images.unsplash.com/photo-1523438097201-512ae7d59d9a?w=800&q=80',
+  'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=80',
+  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1522673607200-164d1b3d6d1f?w=800&q=80',
+  'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=80',
+  'https://images.unsplash.com/photo-1523438097201-512ae7d59d9a?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1523438097201-512ae7d59d9a?w=800&q=80&sat=-20',
+  'https://images.unsplash.com/photo-1484156818044-c040038b0719?w=800&q=80',
+  'https://images.unsplash.com/photo-1507914372368-b6a8d4c4c05b?w=800&q=80',
+  'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=800&q=80',
+  'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80',
+];
+
 const baseDetails = {
   availableDates: ['2026-06-10', '2026-06-18', '2026-07-02'],
   bookedDates: ['2026-06-12'],
@@ -28,14 +47,7 @@ const baseDetails = {
     },
   ],
   serviceHighlights: ['Fast response', 'Custom packages', 'On-time delivery', 'Friendly support'],
-  portfolio: [
-    'https://images.unsplash.com/photo-1505577058444-a3dab0f0c6d6?w=800&q=80',
-    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80',
-    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80',
-    'https://images.unsplash.com/photo-1490806840354-4f7c9b62b2b6?w=800&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
-    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80',
-  ],
+  portfolio: weddingPortfolio,
 };
 
 const makeVendor = (vendor, extras = {}) => ({
@@ -48,7 +60,9 @@ const makeVendor = (vendor, extras = {}) => ({
   },
   packages: extras.packages || baseDetails.packages,
   serviceHighlights: extras.serviceHighlights || baseDetails.serviceHighlights,
-  portfolio: extras.portfolio || baseDetails.portfolio,
+  portfolio: extras.portfolio
+    ? [...extras.portfolio, ...weddingPortfolio.slice(extras.portfolio.length)]
+    : weddingPortfolio,
   availableDates: extras.availableDates || baseDetails.availableDates,
   bookedDates: extras.bookedDates || baseDetails.bookedDates,
 });
