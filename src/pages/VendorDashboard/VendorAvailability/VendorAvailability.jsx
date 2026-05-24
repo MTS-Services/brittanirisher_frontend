@@ -138,15 +138,15 @@ const VendorAvailability = () => {
     <div className='w-full text-[#2c241f]'>
       <main className='flex w-full flex-col'>
         <header>
-          <h1 className='font-playfair text-4xl leading-[1.12] text-[#2b221d] sm:text-5xl lg:text-6xl'>Set Your Availability</h1>
-          <p className='mt-3 max-w-4xl text-base leading-[1.6] text-[#706761] sm:text-lg lg:text-[30px]'>
+          <h1 className='mb-3 text-2xl font-playfair text-[#1a1a1a] md:text-4xl'>Set Your Availability</h1>
+          <p className='mt-2.5 font-raleway text-base font-light text-[#606060]'>
             Brides will see your available dates when they browse your profile.
           </p>
         </header>
 
         <section className='mt-8 w-full flex-1'>
           <div className='flex items-center justify-between gap-4'>
-            <h2 className='font-playfair text-[28px] leading-none text-[#2b221d] sm:text-[36px] lg:text-[42px]'>{monthLabel}</h2>
+            <h2 className='font-playfair text-2xl leading-none text-[#2b221d]  lg:text-3xl'>{monthLabel}</h2>
             <div className='flex items-center gap-3'>
               <button
                 type='button'
@@ -170,7 +170,7 @@ const VendorAvailability = () => {
           <div className='mt-5 overflow-hidden rounded-sm border border-[#bfd0b8]'>
             <div className='grid grid-cols-7 border-b border-[#bfd0b8] bg-white'>
               {weekdayLabels.map((label) => (
-                <div key={label} className='border-r border-[#bfd0b8] py-3 text-center text-[16px] font-medium tracking-wide text-[#2b221d] sm:py-4 sm:text-[18px] lg:py-5 lg:text-[20px] last:border-r-0'>
+                <div key={label} className='border-r border-[#bfd0b8] py-3 text-center text-[16px] font-medium tracking-wide text-[#2b221d] sm:py-4  lg:py-5  last:border-r-0'>
                   {label}
                 </div>
               ))}
@@ -215,10 +215,10 @@ const VendorAvailability = () => {
             <button
               type='button'
               onClick={handleSave}
-              className='inline-flex h-14 w-full items-center justify-center gap-3 rounded-[28px] bg-[#556151] px-7 text-[18px] text-white shadow-[0_6px_16px_rgba(85,97,81,0.25)] transition hover:bg-[#465146] sm:h-16 sm:w-auto sm:min-w-55 sm:px-8 sm:text-[20px]'
+              className='inline-flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-[#556151] px-4 text-base text-white shadow-[0_6px_16px_rgba(85,97,81,0.25)] transition hover:bg-[#465146] sm:h-16 sm:w-auto sm:min-w-55 sm:px-6 ]'
             >
               <span>Save &amp; Publish</span>
-              <span className='text-[26px] leading-none'>→</span>
+              <span className='text-base leading-none'>→</span>
             </button>
             {saveState ? <p className='text-[16px] text-[#62715f]'>{saveState}</p> : null}
           </div>
