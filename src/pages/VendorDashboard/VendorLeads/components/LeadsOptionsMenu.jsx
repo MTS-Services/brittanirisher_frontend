@@ -1,4 +1,11 @@
+import { CheckCircle2, Clock3, Eye, Trash2 } from 'lucide-react';
+
 const STATUS_OPTIONS = [ 'Pending', 'Contracted'];
+
+const statusIconMap = {
+  Pending: Clock3,
+  Contracted: CheckCircle2,
+};
 
 const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStatusChange }) => (
   <div
@@ -10,16 +17,18 @@ const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStat
     <button
       type='button'
       onClick={() => onSeeDetails(lead)}
-      className='w-full px-4 py-2.5 text-left text-[14px] text-[#555] hover:bg-[#f7f7f7]'
+      className='flex w-full items-center gap-2 px-4 py-2.5 text-left text-[14px] text-[#555] hover:bg-[#f7f7f7]'
     >
-      See Details
+      <Eye size={14} className='text-[#6b7280]' />
+      <span>See Details</span>
     </button>
     <button
       type='button'
       onClick={() => onDelete(lead.id)}
-      className='w-full px-4 py-2.5 text-left text-[14px] text-[#555] hover:bg-[#f7f7f7]'
+      className='flex w-full items-center gap-2 px-4 py-2.5 text-left text-[14px] text-[#555] hover:bg-[#f7f7f7]'
     >
-      Delete
+      <Trash2 size={14} className='text-[#6b7280]' />
+      <span>Delete</span>
     </button>
 
     {STATUS_OPTIONS.map((status) => (
@@ -27,9 +36,13 @@ const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStat
         key={status}
         type='button'
         onClick={() => onStatusChange(lead.id, status)}
-        className={`w-full px-4 py-1.5 text-left text-[14px] hover:bg-[#f7f7f7] ${lead.status === status ? 'text-[#111]' : 'text-[#666]'}`}
+        className={`flex w-full items-center gap-2 px-4 py-1.5 text-left text-[14px] hover:bg-[#f7f7f7] ${lead.status === status ? 'text-[#111]' : 'text-[#666]'}`}
       >
-        {status}
+        {(() => {
+          const Icon = statusIconMap[status];
+          return Icon ? <Icon size={14} className={lead.status === status ? 'text-[#111]' : 'text-[#6b7280]'} /> : null;
+        })()}
+        <span>{status}</span>
       </button>
     ))}
   </div>
