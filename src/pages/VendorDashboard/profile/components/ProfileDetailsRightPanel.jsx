@@ -1,8 +1,8 @@
 import FieldDisplay from './FieldDisplay';
 
 const ProfileDetailsRightPanel = () => (
-  <div className='space-y-4 rounded-lg border border-[#e2e7e2] bg-[#f7f9f7] p-4 sm:p-5'>
-    <div className='space-y-3'>
+  <div className='space-y-5'>
+    <div className='space-y-3 rounded-lg border border-[#e2e7e2] bg-[#f7f9f7] p-4 sm:p-5'>
       <FieldDisplay label='Company Name' value='SantAmbrogio Clinic' />
       <FieldDisplay label='Location' value='Washington' />
       <FieldDisplay label='Specialty' value='Plastic and Reconstructive Surgeon' />
@@ -14,8 +14,8 @@ const ProfileDetailsRightPanel = () => (
       />
     </div>
 
-    <div className='rounded-lg border border-[#e2e7e2] bg-[#f2f5f2] p-3 sm:p-4'>
-      <p className='mb-3 font-playfair text-[36px] text-[#1f2522]'>Set Your Password</p>
+    <div className='rounded-lg border border-[#e2e7e2] bg-[#eef2ee] p-3 sm:p-4'>
+      <p className='mb-3 font-playfair text-2xl text-[#1f2522]'>Set Your Password</p>
       <div className='space-y-3'>
         <FieldDisplay label='Password' value='****** *****' />
         <FieldDisplay label='Confirm Password' value='****** *****' />
