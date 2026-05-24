@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import LeadsDetailsModal from './components/LeadsDetailsModal';
+import LeadsMobileList from './components/LeadsMobileList';
 import LeadsTable from './components/LeadsTable';
 import VendorLeadsPagination from './components/VendorLeadsPagination';
 import VendorLeadsHeader from './components/VendorLeadsHeader';
@@ -125,6 +126,15 @@ export default function VendorLeads() {
       <VendorLeadsHeader />
 
       <section className='rounded-xl border border-gray-100 bg-white'>
+        <LeadsMobileList
+          leads={pagedLeads}
+          openMenuId={openMenuId}
+          onMenuToggle={handleMenuToggle}
+          onSeeDetails={handleSeeDetails}
+          onDelete={handleDelete}
+          onStatusChange={handleStatusChange}
+        />
+
         <LeadsTable
           leads={pagedLeads}
           openMenuId={openMenuId}
