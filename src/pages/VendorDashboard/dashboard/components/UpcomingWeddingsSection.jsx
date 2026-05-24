@@ -13,7 +13,7 @@ const UpcomingWeddingsSection = ({ weddings }) => {
         </h2>
         <button
           type="button"
-          className="shrink-0 font-raleway text-[12px] tracking-wide text-[#707070] underline underline-offset-4 hover:text-[#1c1c1c]"
+          className="shrink-0 font-raleway text-sm tracking-wide text-[#707070] hover:text-[#1c1c1c]"
         >
           View Calendar
         </button>
@@ -33,10 +33,10 @@ const UpcomingWeddingsSection = ({ weddings }) => {
                   className="h-40 w-full rounded-[14px] object-cover sm:h-30 sm:w-30 sm:shrink-0"
                 />
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-playfair text-[32px] font-medium leading-none text-[#222222] sm:text-[24px] sm:leading-tight">
+                  <h3 className="font-playfair text-xl font-medium leading-none text-[#222222] sm:text-3xl sm:leading-tight">
                     {wedding.couple}
                   </h3>
-                  <p className="mt-2 font-raleway text-[16px] leading-relaxed font-medium tracking-wide text-[#7a827a] sm:mt-1.5 sm:text-[15px]">
+                  <p className="mt-2 font-raleway text-base leading-relaxed font-medium tracking-wide text-[#7a827a] sm:mt-1.5 sm:text-lg">
                     <span className="block sm:inline">{wedding.date}</span>
                     <span className="hidden sm:inline"> • </span>
                     <span className="block sm:inline">{wedding.venue}</span>
