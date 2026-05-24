@@ -9,7 +9,8 @@ const statCards = [
   { label: 'New Leads', value: '32', icon: Mail },
   {
     label: 'Upcoming Wedding Program',
-    value: '12 Days Remaining',
+    value: '12',
+    sub: 'Days Remaining',
     icon: CalendarDays,
   },
   { label: 'Total Booking', value: '120', icon: BookCopy },
@@ -67,7 +68,7 @@ const leadBars = leadsData.map((item, index) => ({
 
 const VendorDashboard = () => {
   return (
-    <main className='font-playfair text-[#0c0c0c]'>
+    <main className='font-raleway text-[#0c0c0c]'>
       <SubscriptionBanner />
 
       <StatsCardsSection cards={statCards} />
