@@ -15,11 +15,11 @@ const BookingCard = ({ booking, onViewDetails }) => {
             {booking.initials}
           </div>
           <div>
-            <h3 className='text-[18px] leading-tight text-neutral-800'>{booking.name}</h3>
-            <p className='text-[16px] text-neutral-600'>{booking.event}</p>
+            <h3 className='text-lg leading-tight text-neutral-800'>{booking.name}</h3>
+            <p className='text-base text-neutral-600'>{booking.event}</p>
           </div>
         </div>
-        <div className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-semibold ${badgeClass}`}>
+        <div className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ${badgeClass}`}>
           <span className='h-2 w-2 rounded-full bg-current' />
           {badgeText}
         </div>
@@ -29,12 +29,12 @@ const BookingCard = ({ booking, onViewDetails }) => {
 
       <div className='grid grid-cols-2 gap-6'>
         <div>
-          <p className='text-[18px] uppercase tracking-[0.02em] text-neutral-500'>Date</p>
-          <p className='mt-2 text-[20px] text-neutral-800'>{booking.date}</p>
+          <p className='text-base uppercase tracking-[0.02em] text-neutral-500'>Date</p>
+          <p className='mt-2 text-lg text-neutral-800'>{booking.date}</p>
         </div>
         <div className='text-right'>
-          <p className='text-[18px] uppercase tracking-[0.02em] text-neutral-500'>Value</p>
-          <p className='mt-2 text-[20px] text-neutral-800'>{booking.value}</p>
+          <p className='text-base uppercase tracking-[0.02em] text-neutral-500'>Value</p>
+          <p className='mt-2 text-lg text-neutral-800'>{booking.price}</p>
         </div>
       </div>
 

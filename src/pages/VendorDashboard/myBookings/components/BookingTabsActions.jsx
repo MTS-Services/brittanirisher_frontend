@@ -10,12 +10,12 @@ const BookingTabsActions = ({ tabs, activeTab, onTabChange, onCreate }) => (
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className='relative pb-3 text-left'
+            className='relative pb-1 text-left'
           >
-            <span className={`text-[23px] ${isActive ? 'font-semibold text-[#6f7969]' : 'text-[#565656]'}`}>
+            <span className={`text-lg ${isActive ? 'font-semibold text-[#6f7969]' : 'text-[#565656]'}`}>
               {tab.label}
             </span>
-            <span className={`ml-2 rounded-full px-2.5 py-0.5 text-[12px] ${isActive ? 'bg-[#aab9a2] text-white' : 'bg-[#d7e0d1] text-[#6d7a67]'}`}>
+            <span className={`ml-2 rounded-full px-2.5 py-0.5 text-sm ${isActive ? 'bg-[#aab9a2] text-white' : 'bg-[#d7e0d1] text-[#6d7a67]'}`}>
               {tab.count}
             </span>
             <span
@@ -29,11 +29,11 @@ const BookingTabsActions = ({ tabs, activeTab, onTabChange, onCreate }) => (
 
     <button
       type='button'
-      className='inline-flex items-center justify-center gap-3 rounded-xl bg-[#6f7969] px-8 py-4 text-[18px] text-white shadow-[0_12px_26px_rgba(95,105,89,0.22)] transition hover:bg-[#5f6959]'
-      style={{ minWidth: '214px' }}
+      className='inline-flex items-center justify-center gap-3 rounded-xl bg-[#6f7969] px-8 py-4 text-sm text-white shadow-[0_12px_26px_rgba(95,105,89,0.22)] transition hover:bg-[#5f6959]'
+    
       onClick={onCreate}
     >
-      <Plus size={22} />
+      <Plus size={18} />
       New Booking
     </button>
   </section>

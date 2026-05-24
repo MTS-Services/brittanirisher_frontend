@@ -22,7 +22,7 @@ const initialBookings = [
     event: "Grand Ballroom",
     status: "completed",
     date: "Oct 24, 2024",
-    value: "৳1,80,000",
+    value: "$1,80,000",
     email: "jackson.graham@example.com",
     phone: "(307) 555-0133",
     venue: "Luxury Cottage Prime Resort",
