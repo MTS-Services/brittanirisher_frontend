@@ -26,7 +26,7 @@ const VendorSignupFlow = lazy(() => import('../pages/VendorSignupFlow'));
 
 const Dashboard = lazy(() => import('../pages/admin/dashboard/Dashboard'));
  const VendorDetailsAdmin = lazy(() => import('../pages/admin/dashboard/VendorDetails'));
-const VendorDashboard = lazy(() => import('../pages/VendorDashboard'));
+const VendorDashboard = lazy(() => import('../pages/VendorDashboard/dashboard/VendorDashboard'));
 const VendorLeads = lazy(() => import('../pages/VendorDashboard/VendorLeads/VendorLeads'));
 const VendorBookings = lazy(
   () => import('../pages/VendorDashboard/VendorBookings'),
