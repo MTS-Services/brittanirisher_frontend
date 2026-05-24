@@ -121,7 +121,7 @@ export default function VendorLeads() {
   };
 
   return (
-    <main className='font-playfair' onClick={closeMenu}>
+    <main className='font-raleway' onClick={closeMenu}>
       <VendorLeadsHeader />
 
       <section className='rounded-xl border border-gray-100 bg-white'>
