@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Eye, EyeOff } from 'lucide-react';
 import { ROUTES } from '../config';
 
 const VendorSignupStep3 = ({ formData, onFormChange }) => {
@@ -8,17 +8,40 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
   const [packages, setPackages] = useState(formData.packages || []);
   const [currentPackage, setCurrentPackage] = useState({
     name: '',
-    features: '',
+    features: [],
     price: '',
   });
+  const featuresRef = useRef([]);
+  const [newFeature, setNewFeature] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState(formData.password || '');
   const [confirmPassword, setConfirmPassword] = useState(formData.confirmPassword || '');
 
   const handleAddPackage = () => {
     if (currentPackage.name && currentPackage.price) {
       setPackages([...packages, currentPackage]);
-      setCurrentPackage({ name: '', features: '', price: '' });
+      setCurrentPackage({ name: '', features: [], price: '' });
+      setNewFeature('');
     }
+  };
+
+  const handleAddFeature = () => {
+    const val = newFeature.trim();
+    if (!val) return;
+    setCurrentPackage((prev) => ({ ...prev, features: [...prev.features, val] }));
+    setNewFeature('');
+    // focus the newly added input after render
+    setTimeout(() => {
+      const idx = featuresRef.current.length - 1;
+      if (featuresRef.current[idx]) featuresRef.current[idx].focus();
+    }, 0);
+  };
+
+  const handleRemoveFeature = (index) => {
+    setCurrentPackage((prev) => ({ ...prev, features: prev.features.filter((_, i) => i !== index) }));
+    // clean up ref
+    featuresRef.current = featuresRef.current.filter((_, i) => i !== index);
   };
 
   const handleNext = () => {
@@ -31,6 +54,10 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
       });
       navigate(ROUTES.LOGIN, { replace: true });
     }
+  };
+
+  const handleRemovePackage = (index) => {
+    setPackages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handlePrevious = () => {
@@ -50,10 +77,10 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
 
         <div className='relative z-10 flex w-full max-w-116.25 flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
           <div className='max-w-116.25 space-y-4'>
-            <h2 className='font-playfair text-[48px] font-semibold leading-none sm:text-[56px]'>
+            <h2 className='font-playfair text-3xl leading-none sm:text-5xl'>
               Begin Your Journey
             </h2>
-            <p className='font-raleway text-[20px] leading-6 text-white/95'>
+            <p className='font-raleway text-base md:text-xl leading-6 text-white/95'>
               Plan every detail of your dream wedding with our professional tools and curated vendor connections.
             </p>
           </div>
@@ -83,7 +110,7 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
         <div className='w-full max-w-162.5 space-y-8'>
           <header className='space-y-4'>
             <div className='flex items-center justify-between'>
-              <h1 className='font-playfair text-[40px] font-semibold leading-none text-[#070707] sm:text-[48px]'>
+              <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
                 Complete your Profile
               </h1>
               <p className='font-raleway text-[14px] text-[#2d3036]'>Step 3 of 3</p>
@@ -93,13 +120,13 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
             </p>
           </header>
 
-          <div className='border-b border-black/10 pb-6'>
+          <div className='border-b border-black/10 pb-3'>
             <p className='font-raleway text-[16px] font-medium text-[#090909]'>Profile Completion</p>
           </div>
 
-          <form className='space-y-6'>
+          <form className='space-y-2'>
             {/* Add Detailed Pricing */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='font-playfair text-[24px] font-medium text-[#1c1c1c]'>Add Detailed Pricing</h3>
 
               {/* Package Name */}
@@ -117,20 +144,40 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
               {/* Package Features */}
               <div className='space-y-2'>
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>Package Features</label>
-                <div className='flex gap-2'>
-                  <input
-                    type='text'
-                    value={currentPackage.features}
-                    onChange={(e) => setCurrentPackage({ ...currentPackage, features: e.target.value })}
-                    placeholder='Enter your company name here'
-                    className='flex-1 rounded-lg border border-[#2d3036] bg-white px-4 py-2 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
-                  />
-                  <button
-                    type='button'
-                    className='flex h-12 items-center justify-center rounded-lg bg-[#f0e9e1] p-2'
-                  >
-                    <Plus size={24} className='text-[#2d3036]' />
-                  </button>
+                <div className='space-y-2'>
+                  {currentPackage.features.map((f, i) => (
+                    <div key={i} className='flex gap-2'>
+                      <input
+                        ref={(el) => (featuresRef.current[i] = el)}
+                        type='text'
+                        value={f}
+                        onChange={(e) => setCurrentPackage((prev) => ({ ...prev, features: prev.features.map((fv, idx) => idx === i ? e.target.value : fv) }))}
+                        placeholder={`Feature ${i + 1}`}
+                        className='flex-1 rounded-lg border border-[#2d3036] bg-white px-4 py-2 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
+                      />
+                      <button type='button' onClick={() => handleRemoveFeature(i)} className='flex h-12 items-center justify-center rounded-lg bg-[#f0e9e1] p-2'>
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+
+                  <div className='flex gap-2'>
+                    <input
+                      type='text'
+                      value={newFeature}
+                      onChange={(e) => setNewFeature(e.target.value)}
+                      placeholder='Type a feature then click +'
+                      className='flex-1 rounded-lg border border-[#2d3036] bg-white px-4 py-2 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
+                    />
+                    <button
+                      type='button'
+                      onClick={handleAddFeature}
+                      className='flex h-12 items-center justify-center rounded-lg bg-[#f0e9e1] p-2'
+                      aria-label='Add new feature'
+                    >
+                      <Plus size={24} className='text-[#2d3036]' />
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -138,12 +185,12 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
               <div className='space-y-2'>
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>Package Price</label>
                 <div className='flex items-center'>
-                  <span className='font-raleway text-[16px] text-[#9ca1aa]'>$</span>
+                  {/* <span className='font-raleway text-[16px] text-[#9ca1aa]'>$</span> */}
                   <input
                     type='number'
                     value={currentPackage.price}
                     onChange={(e) => setCurrentPackage({ ...currentPackage, price: e.target.value })}
-                    placeholder='0.00'
+                    placeholder='$0.00'
                     className='h-12 flex-1 rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                   />
                 </div>
@@ -162,11 +209,23 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
               {packages.length > 0 && (
                 <div className='space-y-2 rounded-lg bg-[#f4f0ea] p-4'>
                   {packages.map((pkg, idx) => (
-                    <div key={idx} className='flex items-center justify-between rounded bg-white p-3'>
-                      <div>
-                        <p className='font-raleway font-medium text-[#2d3036]'>{pkg.name}</p>
-                        <p className='font-raleway text-[14px] text-[#615d58]'>${pkg.price}</p>
+                    <div key={idx} className='rounded bg-white p-3'>
+                      <div className='flex items-start justify-between'>
+                        <div>
+                          <p className='font-raleway font-medium text-[#2d3036]'>{pkg.name}</p>
+                          <p className='font-raleway text-[14px] text-[#615d58]'>${pkg.price}</p>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <button type='button' onClick={() => handleRemovePackage(idx)} className='text-sm text-[#9ca1aa]'>Remove</button>
+                        </div>
                       </div>
+                      {pkg.features && pkg.features.length > 0 && (
+                        <ul className='mt-3 space-y-1'>
+                          {pkg.features.map((f, i) => (
+                            <li key={i} className='text-[14px] text-[#615d58]'>• {f}</li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -177,23 +236,43 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2'>
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>Password</label>
-                <input
-                  type='password'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder='••••••••'
-                  className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
-                />
+                <div className='relative'>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder='••••••••'
+                    className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 pr-12 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
+                  />
+                  <button
+                    type='button'
+                    onClick={() => setShowPassword((s) => !s)}
+                    className='absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#6b6b6b]'
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               <div className='space-y-2'>
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>Confirm Password</label>
-                <input
-                  type='password'
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder='••••••••'
-                  className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
-                />
+                <div className='relative'>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder='••••••••'
+                    className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 pr-12 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
+                  />
+                  <button
+                    type='button'
+                    onClick={() => setShowConfirmPassword((s) => !s)}
+                    className='absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#6b6b6b]'
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
             </div>
           </form>
@@ -202,13 +281,13 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
           <div className='flex items-center justify-between gap-4 pt-6'>
             <button
               onClick={handlePrevious}
-              className='flex h-14 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              className='flex h-14 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
             >
               NEXT
             </button>

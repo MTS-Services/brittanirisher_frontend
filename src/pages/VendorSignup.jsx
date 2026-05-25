@@ -3,7 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { ROUTES } from '../config';
 
-const SERVICE_OPTIONS = ['All Categories', 'Wedding Planning', 'Catering', 'Photography'];
+const SERVICE_OPTIONS = [
+  'Photography',
+  'Videography',
+  'Floral Design',
+  'Catering',
+  'Bartending Specialist',
+  'Bakery',
+  'Venue',
+  'DJ & Music',
+  'Planning',
+  'Hair & Makeup',
+];
 const SPECIALTY_OPTIONS = ['None', 'Bar Service', 'Mixology', 'Signature Cocktails'];
 
 const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false }) => {
@@ -158,7 +169,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
 
         <div className='relative z-10 flex w-full max-w-116.25 flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
           <div className='max-w-116.25 space-y-4'>
-            <h2 className='font-playfair text-[48px] font-semibold leading-none sm:text-[56px]'>
+            <h2 className='font-playfair text-3xl leading-none sm:text-5xl'>
               Begin Your Journey
             </h2>
             <p className='font-raleway text-[20px] leading-6 text-white/95'>
@@ -189,21 +200,21 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
       <section className='flex flex-1 items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10'>
         <div className='w-full max-w-162.5'>
           <header className='space-y-4'>
-            <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
+            <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
               Create an Account
             </h1>
-            <p className='font-raleway text-[20px] leading-6 text-[#615d58]'>
+            <p className='font-raleway text-base md:text-xl leading-6 text-[#615d58]'>
               Please enter your details to continue.
             </p>
           </header>
 
-          <div className='mt-10 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea] p-2'>
+          <div className='mt-8 rounded-full bg-[#efe6db]'>
             <div className='grid grid-cols-2 gap-2'>
               <button
                 type='button'
                 onClick={() => onAudienceChange('couple')}
-                className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-                  audience === 'couple' ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+                className={`rounded-full px-5 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
+                  audience === 'couple' ? 'bg-[#e7dccb] text-[#2d2d2d]' : 'bg-transparent text-[#857f7a]'
                 }`}
               >
                 Couple
@@ -211,8 +222,8 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
               <button
                 type='button'
                 onClick={() => onAudienceChange('vendor')}
-                className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-                  audience === 'vendor' ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+                className={`rounded-full px-5 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
+                  audience === 'vendor' ? 'bg-[#e7dccb] text-[#2d2d2d]' : 'bg-transparent text-[#857f7a]'
                 }`}
               >
                 Vendor
@@ -220,7 +231,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
             </div>
           </div>
 
-          <div className='mt-10'>
+          <div className='mt-4'>
             <div className='flex items-center gap-8 border-b border-black/20 text-[16px] font-medium text-[#6b6b6b]'>
               <button
                 type='button'
@@ -273,12 +284,12 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                   options={SERVICE_OPTIONS}
                 />
 
-                <DropdownField
+                {/* <DropdownField
                   label='BARTENDING SPECIALTIES'
                   value={form.bartendingSpecialties}
                   onChange={updateField('bartendingSpecialties')}
                   options={SPECIALTY_OPTIONS}
-                />
+                /> */}
               </div>
 
               <button
@@ -288,16 +299,16 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 Create Account
               </button>
 
-              <p className='flex items-end justify-center gap-2 text-right font-raleway text-[16px] font-medium text-[#464e46]'>
-                <span>Already have an account?</span>
-                <button
-                  type='button'
-                  onClick={() => navigate(ROUTES.LOGIN)}
-                  className='text-[20px] text-[#090909] underline decoration-[#090909] underline-offset-4'
-                >
-                  Log In
-                </button>
-              </p>
+            <p className='pt-2 text-center font-raleway text-[14px] text-[#857f7a]'>
+                        Already have an account?{' '}
+                        <button
+                          type='button'
+                          onClick={() => navigate(ROUTES.LOGIN)}
+                          className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
+                        >
+                          Log In
+                        </button>
+                      </p>
             </form>
           </div>
         </div>
