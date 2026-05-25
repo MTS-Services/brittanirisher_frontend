@@ -253,7 +253,13 @@ const VendorDetails = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 font-serif px-4">
+    <div className="relative container mx-auto py-8 font-serif px-4">
+      <img
+        src="/Service_Highlights.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute right-10 top-500 z-50 hidden w-56 translate-x-1/4 -translate-y-1/4 md:block lg:w-40"
+      />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <button
@@ -324,12 +330,29 @@ const VendorDetails = () => {
       </div>
 
       {/* Packages */}
-      <section className="my-14 md:my-20">
-        <h2 className="text-xl text-center font-serif mb-6">
-          Packages & Pricing
-        </h2>
-        <PricingGrid />
-      </section>
+      <div className="relative pb-10 overflow-visible ">
+        <img
+          src="/Packages_Pricing_Left.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-22 bottom-70 hidden w-44 -translate-x-1/2 translate-y-1/2 md:block lg:w-68"
+        />
+        <img
+          src="/Packages_Pricing.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 top-1/2 hidden w-40 -translate-y-1/2 translate-x-1/2 md:block lg:w-68"
+        />
+
+        <section className="relative py-14">
+          <div className="relative text-center">
+            <h2 className="mb-8 font-playfair text-2xl text-[#2a241e] md:text-[30px]">
+              Packages &amp; Pricing
+            </h2>
+            <PricingGrid />
+          </div>
+        </section>
+      </div>
 
 
   {/* About / Calendar / Enquiry */}
@@ -506,12 +529,12 @@ const VendorDetails = () => {
       </section>
 
       <section className="relative mb-8 overflow-hidden rounded-3xl border border-[#eadfcd] bg-[#fbf7f0] px-6 py-6 shadow-sm md:px-8 md:py-7">
-        <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edd7c6]/70 blur-2xl" aria-hidden="true" />
+        {/* <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edd7c6]/70 blur-2xl" aria-hidden="true" />
         <div className="absolute right-4 top-3 hidden h-20 w-20 md:block" aria-hidden="true">
           <div className="absolute right-0 top-0 h-16 w-16 rounded-full border border-[#d9b7a3]/60" />
           <div className="absolute right-2 top-2 h-12 w-12 rounded-full border border-[#e6cbbf]/70" />
           <div className="absolute right-5 top-5 h-6 w-6 rounded-full bg-[#d9a6a0]/70" />
-        </div>
+        </div> */}
 
         <div className="relative">
           <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl">

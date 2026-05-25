@@ -1,10 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, X, RefreshCw } from 'lucide-react';
 
 const VendorSignupStep2 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const [previews, setPreviews] = useState(() => {
+    const imgs = formData.portfolioImages || [];
+    return imgs.map((item) => (typeof item === 'string' ? item : URL.createObjectURL(item)));
+  });
+  const createdURLsRef = useRef([]);
+  const replaceFileInputRef = useRef(null);
+  const replaceIndexRef = useRef(null);
 
   const handleAddPhoto = () => {
     fileInputRef.current?.click();
@@ -14,7 +21,55 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
     const files = Array.from(e.target.files);
     const portfolioImages = [...(formData.portfolioImages || []), ...files];
     onFormChange({ ...formData, portfolioImages });
+    const newPreviews = files.map((f) => {
+      const url = URL.createObjectURL(f);
+      createdURLsRef.current.push(url);
+      return url;
+    });
+    setPreviews((p) => [...p, ...newPreviews]);
   };
+
+  const handleReplaceFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const idx = replaceIndexRef.current;
+    const portfolioImages = [...(formData.portfolioImages || [])];
+    // revoke old preview URL if we created it
+    const oldPreview = previews[idx];
+    if (createdURLsRef.current.includes(oldPreview)) {
+      URL.revokeObjectURL(oldPreview);
+      createdURLsRef.current = createdURLsRef.current.filter((u) => u !== oldPreview);
+    }
+    const newUrl = URL.createObjectURL(file);
+    createdURLsRef.current.push(newUrl);
+    const newPreviews = [...previews];
+    newPreviews[idx] = newUrl;
+    setPreviews(newPreviews);
+    // update parent data
+    portfolioImages[idx] = file;
+    onFormChange({ ...formData, portfolioImages });
+    // reset input
+    e.target.value = '';
+    replaceIndexRef.current = null;
+  };
+
+  useEffect(() => {
+    // If parent provides initial images (strings or Files), ensure previews reflect them
+    if (formData.portfolioImages && formData.portfolioImages.length > 0) {
+      const imgs = formData.portfolioImages.map((item) => (typeof item === 'string' ? item : URL.createObjectURL(item)));
+      // track only those we created in this effect so we can revoke later
+      imgs.forEach((url, i) => {
+        if (typeof formData.portfolioImages[i] !== 'string') createdURLsRef.current.push(url);
+      });
+      setPreviews(imgs);
+    }
+    return () => {
+      // revoke created object URLs on unmount
+      createdURLsRef.current.forEach((u) => URL.revokeObjectURL(u));
+      createdURLsRef.current = [];
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleNext = () => {
     navigate('/vendor-signup-flow?step=3');
@@ -37,7 +92,7 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
 
         <div className='relative z-10 flex w-full max-w-116.25 flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
           <div className='max-w-116.25 space-y-4'>
-            <h2 className='font-playfair text-[48px] font-semibold leading-none sm:text-[56px]'>
+            <h2 className='font-playfair text-3xl leading-none sm:text-5xl]'>
               Begin Your Journey
             </h2>
             <p className='font-raleway text-[20px] leading-6 text-white/95'>
@@ -67,10 +122,10 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
 
       {/* Right Section - Form */}
       <section className='flex flex-1 items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10'>
-        <div className='w-full max-w-162.5 space-y-8'>
-          <header className='space-y-4'>
+        <div className='w-full max-w-162.5 space-y-4'>
+          <header className='space-y-2'>
             <div className='flex items-center justify-between'>
-              <h1 className='font-playfair text-[40px] font-semibold leading-none text-[#070707] sm:text-[48px]'>
+              <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
                 Complete your Profile
               </h1>
               <p className='font-raleway text-[14px] text-[#2d3036]'>Step 2 of 3</p>
@@ -84,9 +139,9 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
             <p className='font-raleway text-[16px] font-medium text-[#090909]'>Profile Completion</p>
           </div>
 
-          <div className='space-y-6 rounded-2xl border border-[#e9eaeb] bg-white p-8'>
+          <div className='space-y-3 rounded-2xl border border-[#e9eaeb] bg-white p-4'>
             {/* Add Your Portfolio Images */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='font-playfair text-[24px] font-medium text-[#1c1c1c]'>Add Your Portfolio Images</h3>
 
               {/* Upload Area */}
@@ -108,23 +163,65 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
                 onChange={handleFileChange}
                 className='hidden'
               />
+              <input
+                ref={replaceFileInputRef}
+                type='file'
+                accept='image/*'
+                onChange={handleReplaceFileChange}
+                className='hidden'
+              />
 
               {/* Tip */}
               <p className='font-raleway text-[14px] text-[#6b6b6b]'>
-                💡 Tip: Upload your best work! High-quality portfolio photos get 5x more inquiries.
+                Tip: Upload your best work! High-quality portfolio photos get 5x more inquiries.
               </p>
 
               {/* Preview Images */}
-              {formData.portfolioImages && formData.portfolioImages.length > 0 && (
+              {previews && previews.length > 0 && (
                 <div className='grid grid-cols-2 gap-4'>
-                  {formData.portfolioImages.map((image, idx) => (
-                    <div key={idx} className='h-32 rounded-lg bg-[#c4d0c3]' />
+                  {previews.map((src, idx) => (
+                    <div key={idx} className='relative'>
+                      <img src={src} alt={`preview-${idx}`} className='h-32 w-full rounded-lg object-cover' />
+                      <div className='absolute right-2 top-2 flex gap-2'>
+                        <button
+                          type='button'
+                          onClick={() => {
+                            // remove image
+                            const portfolioImages = [...(formData.portfolioImages || [])];
+                            const removed = previews[idx];
+                            if (createdURLsRef.current.includes(removed)) {
+                              URL.revokeObjectURL(removed);
+                              createdURLsRef.current = createdURLsRef.current.filter((u) => u !== removed);
+                            }
+                            const newPreviews = previews.filter((_, i) => i !== idx);
+                            setPreviews(newPreviews);
+                            portfolioImages.splice(idx, 1);
+                            onFormChange({ ...formData, portfolioImages });
+                          }}
+                          className='rounded bg-white/80 p-1'
+                          aria-label='Remove image'
+                        >
+                          <X size={16} />
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => {
+                            replaceIndexRef.current = idx;
+                            replaceFileInputRef.current?.click();
+                          }}
+                          className='rounded bg-white/80 p-1'
+                          aria-label='Replace image'
+                        >
+                          <RefreshCw size={16} />
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
 
               {/* Placeholder Images */}
-              {(!formData.portfolioImages || formData.portfolioImages.length === 0) && (
+              {(!previews || previews.length === 0) && (
                 <div className='grid grid-cols-2 gap-4'>
                   <div className='h-32 rounded-lg bg-[#c4d0c3]' />
                   <div className='h-32 rounded-lg bg-[#c4d0c3]' />
@@ -137,13 +234,13 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
           <div className='flex items-center justify-between gap-4 pt-6'>
             <button
               onClick={handlePrevious}
-              className='flex h-14 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-4 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              className='flex h-14 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-4 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
             >
               NEXT
             </button>

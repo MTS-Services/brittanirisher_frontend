@@ -5,7 +5,7 @@ const Icons = [Heart, Target, Users, Star];
 
 export default function ValuesSection({ values }) {
   return (
-    <section className='relative px-4 py-14 sm:px-6 lg:px-8 lg:py-20'>
+    <section className='relative px-4 pt-14 sm:px-6 lg:px-8 lg:pt-20'>
       <div  className='mx-auto container text-center'>
         <h2 className='font-playfair text-[48px] leading-none text-[#2d2d2d]'>Our Values</h2>
         <p className='mt-4 font-raleway text-[20px] leading-8 text-[#857f7a]'>The principles that guide everything we do</p>

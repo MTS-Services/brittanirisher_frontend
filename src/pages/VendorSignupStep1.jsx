@@ -13,7 +13,7 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
   };
 
   const handlePrevious = () => {
-    navigate('/vendor-signup');
+    navigate('/signup');
   };
 
   return (
@@ -29,7 +29,7 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
 
         <div className='relative z-10 flex w-full max-w-116.25 flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
           <div className='max-w-116.25 space-y-4'>
-            <h2 className='font-playfair text-[48px] font-semibold leading-none sm:text-[56px]'>
+            <h2 className='font-playfair text-3xl leading-none sm:text-5xl'>
               Begin Your Journey
             </h2>
             <p className='font-raleway text-[20px] leading-6 text-white/95'>
@@ -59,26 +59,26 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
 
       {/* Right Section - Form */}
       <section className='flex flex-1 items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10'>
-        <div className='w-full max-w-162.5 space-y-8'>
-          <header className='space-y-4'>
+        <div className='w-full max-w-162.5 space-y-4'>
+          <header className='space-y-2'>
             <div className='flex items-center justify-between'>
-              <h1 className='font-playfair text-[40px] font-semibold leading-none text-[#070707] sm:text-[48px]'>
+              <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
                 Complete your Profile
               </h1>
               <p className='font-raleway text-[14px] text-[#2d3036]'>Step 1 of 3</p>
             </div>
-            <p className='font-raleway text-[20px] leading-6 text-[#615d58]'>
+            <p className='font-raleway text-base md:text-xl leading-6 text-[#615d58]'>
               Please enter your details to continue.
             </p>
           </header>
 
-          <div className='border-b border-black/10 pb-6'>
+          <div className='border-b border-black/10 pb-2'>
             <p className='font-raleway text-[16px] font-medium text-[#090909]'>Profile Completion</p>
           </div>
 
           <form className='space-y-6'>
             {/* Business Name */}
-            <div className='space-y-2'>
+            <div className='space-y-1'>
               <label className='block font-raleway text-[16px] text-[#2d3036]'>Business Name</label>
               <input
                 type='text'
@@ -90,7 +90,7 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
             </div>
 
             {/* Highlighted Services */}
-            <div className='space-y-2'>
+            <div className='space-y-1'>
               <label className='block font-raleway text-[16px] text-[#2d3036]'>Highlighted Services</label>
               <textarea
                 value={formData.highlightedServices || ''}
@@ -102,7 +102,7 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
             </div>
 
             {/* Experience */}
-            <div className='space-y-2'>
+            <div className='space-y-1'>
               <label className='block font-raleway text-[16px] text-[#2d3036]'>Experience</label>
               <input
                 type='text'
@@ -114,7 +114,7 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
             </div>
 
             {/* Speciality */}
-            <div className='space-y-2'>
+            <div className='space-y-1'>
               <label className='block font-raleway text-[16px] text-[#2d3036]'>Speciality</label>
               <input
                 type='text'
@@ -126,7 +126,7 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
             </div>
 
             {/* About Me */}
-            <div className='space-y-2'>
+            <div className='space-y-1'>
               <label className='block font-raleway text-[16px] text-[#2d3036]'>About Me</label>
               <textarea
                 value={formData.aboutMe || ''}
@@ -139,16 +139,16 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
           </form>
 
           {/* Navigation Buttons */}
-          <div className='flex items-center justify-between gap-4 pt-6'>
+          <div className='flex items-center justify-between gap-4 pt-4'>
             <button
               onClick={handlePrevious}
-              className='flex h-14 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-4 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              className='flex h-14 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-4 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
             >
               NEXT
             </button>

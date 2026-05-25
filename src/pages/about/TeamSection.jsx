@@ -3,7 +3,7 @@ import React from 'react';
 export default function TeamSection({ teamImage }) {
   return (
     <section className='relative px-4  sm:px-6 lg:px-8 '>
-      <div style={{ maxWidth: 614 }} className='mx-auto text-center'>
+      <div  className='mx-auto max-w-7xl text-center'>
         <img src='/VendorPricing-flowers.png' alt='' aria-hidden='true' className='mx-auto w-65 opacity-80' />
         <h2 className='mt-2 font-playfair text-[48px] leading-none text-[#2d2d2d]'>Meet Our Team</h2>
         <p className='mt-4 font-raleway text-[20px] leading-8 text-[#857f7a]'>Passionate people dedicated to creating a joyful planning journey</p>

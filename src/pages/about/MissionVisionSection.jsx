@@ -3,6 +3,12 @@ import React from 'react';
 export default function MissionVisionSection() {
   return (
     <section className='relative bg-[#e2e8e1] px-4 py-16 sm:px-6 lg:px-8 lg:py-20'>
+      <img
+        src='/Our_Vision.png'
+        alt=''
+        aria-hidden='true'
+        className='pointer-events-none absolute right-14 top-35 hidden w-56 -translate-y-1/2 translate-x-1/4 lg:block'
+      />
       <div  className='mx-auto container grid gap-5 lg:grid-cols-2'>
         <article className='rounded-none bg-[#d6ded5] p-8'>
           <h3 className='font-playfair text-[28px] leading-none text-[#2d2d2d]'>Our Mission</h3>

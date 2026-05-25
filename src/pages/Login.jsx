@@ -159,10 +159,10 @@ const Login = ({ initialMode = 'login' }) => {
         </div>
       </section>
 
-      <section className='flex flex-1 items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10'>
-        <div style={{ maxWidth: 560 }} className='w-full'>
+      <section className='flex flex-1 items-center  bg-white px-5 py-10 sm:px-8 lg:px-10'>
+        <div  className='w-full mx-auto max-w-162.5'>
           <div className='mb-5 flex items-center justify-between gap-3'>
-            <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
+            <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
               Sign In
             </h1>
           </div>
@@ -170,7 +170,7 @@ const Login = ({ initialMode = 'login' }) => {
             Enter your details to continue.
           </p>
 
-          <div className='mt-8 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea] p-2'>
+          <div className='mt-8 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea]'>
             <div className='grid grid-cols-2 gap-2'>
               {AUDIENCE_OPTIONS.map((option) => {
                 const active = audience === option.id;

@@ -47,7 +47,7 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange }) => {
           </div>
 
           <div style={{ maxWidth: 420 }}>
-            <h2 className='font-playfair text-[48px] leading-none sm:text-[56px]'>
+            <h2 className='font-playfair text-3xl leading-none sm:text-5xl'>
               Begin Your Journey
             </h2>
             <p className='mx-auto mt-5 font-raleway text-[20px] leading-8 text-white/90'>
@@ -75,18 +75,18 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange }) => {
         </div>
       </section>
 
-      <section className='flex flex-1 items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10'>
-        <div style={{ maxWidth: 560 }} className='w-full'>
-          <div className='mb-5 flex items-center justify-between gap-3'>
-            <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
+      <section className='flex flex-1  items-center bg-white px-5 py-10 '>
+        <div  className='mx-auto max-w-162.5 w-full'>
+            <header className='space-y-4'>
+            <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
               Create an Account
             </h1>
-          </div>
-          <p className='font-raleway text-[20px] leading-8 text-[#615d58]'>
-            Please enter your details to continue.
-          </p>
+            <p className='font-raleway text-base md:text-xl leading-6 text-[#615d58]'>
+              Please enter your details to continue.
+            </p>
+          </header> 
 
-          <div className='mt-8 rounded-full bg-[#efe6db] p-1'>
+          <div className='mt-8 rounded-full bg-[#efe6db]'>
             <div className='grid grid-cols-2 gap-2'>
               <button
                 type='button'
@@ -109,7 +109,7 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange }) => {
             </div>
           </div>
 
-          <div className='mt-6 flex items-center gap-8 border-b border-[#cfc7bc]'>
+          <div className='mt-4 flex items-center gap-8 border-b border-[#cfc7bc]'>
             <button
               type='button'
               onClick={() => navigate(ROUTES.LOGIN)}

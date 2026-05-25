@@ -2,11 +2,17 @@ import React from 'react';
 
 export default function StorySection({ images }) {
   return (
-    <section className='relative  px-4 py-14 sm:px-6 md:py-20  flex items-center overflow-hidden'>
+    <section className='relative px-4 md:mt-6 py-14 sm:px-6 md:py-20 flex items-center overflow-hidden'>
+      <img
+        src="/Our_Story_2.png"
+        alt="decorative flowers"
+        aria-hidden="true"
+        className="pointer-events-none hidden lg:block absolute left-30 top-8 w-90 opacity-90"
+      />
       <div className='mx-auto max-w-7xl w-full'>
         <div className='grid items-center gap-12 lg:grid-cols-2 lg:gap-20'>
           
-          <div className='max-w-xl'>
+          <div className='max-w-xl mt-8'>
             <h2 className='font-serif text-[42px] font-normal leading-tight text-[#2d2d2d] sm:text-[48px]'>
               Our Story
             </h2>
