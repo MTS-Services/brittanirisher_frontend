@@ -6,7 +6,7 @@ import { ROUTES } from '../config';
 const SERVICE_OPTIONS = ['All Categories', 'Wedding Planning', 'Catering', 'Photography'];
 const SPECIALTY_OPTIONS = ['None', 'Bar Service', 'Mixology', 'Signature Cocktails'];
 
-const VendorSignup = ({ audience = 'vendor', onAudienceChange }) => {
+const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false }) => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
@@ -26,6 +26,125 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange }) => {
     event.preventDefault();
     navigate('/vendor-signup-flow?step=1', { replace: true });
   };
+
+  const RightContent = (
+    <div className='w-full max-w-162.5'>
+      <header className='space-y-4'>
+        <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
+          Create an Account
+        </h1>
+        <p className='font-raleway text-[20px] leading-6 text-[#615d58]'>
+          Please enter your details to continue.
+        </p>
+      </header>
+
+      <div className='mt-10 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea] p-2'>
+        <div className='grid grid-cols-2 gap-2'>
+          <button
+            type='button'
+            onClick={() => onAudienceChange('couple')}
+            className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
+              audience === 'couple' ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+            }`}
+          >
+            Couple
+          </button>
+          <button
+            type='button'
+            onClick={() => onAudienceChange('vendor')}
+            className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
+              audience === 'vendor' ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+            }`}
+          >
+            Vendor
+          </button>
+        </div>
+      </div>
+
+      <div className='mt-10'>
+        <div className='flex items-center gap-8 border-b border-black/20 text-[16px] font-medium text-[#6b6b6b]'>
+          <button
+            type='button'
+            onClick={() => navigate(ROUTES.LOGIN)}
+            className='pb-4 font-raleway transition-colors hover:text-[#090909]'
+          >
+            Login
+          </button>
+          <button type='button' className='border-b-2 border-[#090909] pb-4 font-raleway text-[#090909]'>
+            Sign Up
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className='mt-6 space-y-10'>
+          <div className='space-y-5'>
+            <div className='grid gap-3 sm:grid-cols-2'>
+              <FormField
+                label='Name'
+                placeholder='Enter your Full Name here'
+                value={form.name}
+                onChange={updateField('name')}
+              />
+              <FormField
+                label='Phone'
+                placeholder='Enter your phone number'
+                value={form.phone}
+                onChange={updateField('phone')}
+              />
+            </div>
+
+            <div className='grid gap-3 sm:grid-cols-2'>
+              <FormField
+                label='Email'
+                placeholder='Enter your E-mail here'
+                value={form.email}
+                onChange={updateField('email')}
+              />
+              <FormField
+                label='Location'
+                placeholder='Enter your Location here'
+                value={form.location}
+                onChange={updateField('location')}
+              />
+            </div>
+
+            <DropdownField
+              label='Service Category'
+              value={form.serviceCategory}
+              onChange={updateField('serviceCategory')}
+              options={SERVICE_OPTIONS}
+            />
+
+            <DropdownField
+              label='BARTENDING SPECIALTIES'
+              value={form.bartendingSpecialties}
+              onChange={updateField('bartendingSpecialties')}
+              options={SPECIALTY_OPTIONS}
+            />
+          </div>
+
+          <button
+            type='submit'
+            className='flex h-14.75 w-full items-center justify-center rounded-[10px] bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+          >
+            Create Account
+          </button>
+
+          <p className='flex items-end justify-center gap-2 text-right font-raleway text-[16px] font-medium text-[#464e46]'>
+            <span>Already have an account?</span>
+            <button
+              type='button'
+              onClick={() => navigate(ROUTES.LOGIN)}
+              className='text-[20px] text-[#090909] underline decoration-[#090909] underline-offset-4'
+            >
+              Log In
+            </button>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+
+  if (shellMode) return RightContent;
 
   return (
     <div className='min-h-dvh overflow-hidden bg-[#f4f0ea] lg:flex'>
@@ -70,7 +189,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange }) => {
       <section className='flex flex-1 items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10'>
         <div className='w-full max-w-162.5'>
           <header className='space-y-4'>
-            <h1 className='font-playfair text-[40px] font-semibold leading-none text-[#070707] sm:text-[48px]'>
+            <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
               Create an Account
             </h1>
             <p className='font-raleway text-[20px] leading-6 text-[#615d58]'>
