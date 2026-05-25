@@ -284,12 +284,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                   options={SERVICE_OPTIONS}
                 />
 
-                {/* <DropdownField
-                  label='BARTENDING SPECIALTIES'
-                  value={form.bartendingSpecialties}
-                  onChange={updateField('bartendingSpecialties')}
-                  options={SPECIALTY_OPTIONS}
-                /> */}
+           
               </div>
 
               <button
