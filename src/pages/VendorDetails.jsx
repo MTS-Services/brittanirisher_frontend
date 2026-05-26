@@ -183,6 +183,56 @@ const VendorDetails = () => {
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
   const [isFavorite, setIsFavorite] = useState(false);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  const heroImages = useMemo(() => {
+    const arr = [];
+    const seen = new Set();
+
+    // prefer vendor.image first
+    if (vendor?.image) {
+      arr.push(vendor.image);
+      seen.add(vendor.image);
+    }
+
+    // then vendor portfolio unique images
+    const p = vendor?.portfolio || [];
+    for (let i = 0; i < p.length && arr.length < 3; i++) {
+      const src = p[i];
+      if (!seen.has(src)) {
+        arr.push(src);
+        seen.add(src);
+      }
+    }
+
+    // if still short, pull images from other vendors' portfolios (avoid duplicates)
+    if (arr.length < 3) {
+      for (const other of ALL_VENDORS) {
+        if (!other || other.id === vendor?.id) continue;
+        const op = other.portfolio || [];
+        for (let j = 0; j < op.length && arr.length < 3; j++) {
+          const src = op[j];
+          if (!seen.has(src)) {
+            arr.push(src);
+            seen.add(src);
+          }
+        }
+        if (arr.length >= 3) break;
+      }
+    }
+
+    // final fallback to a dummy image
+    while (arr.length < 3) arr.push('/dummy-image-square.jpg');
+
+    return arr.slice(0, 3);
+  }, [vendorId]);
+
+  useEffect(() => {
+    setHeroIndex(0);
+  }, [vendorId]);
+
+  const prevHero = () => setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length);
+  const nextHero = () => setHeroIndex((i) => (i + 1) % heroImages.length);
 
   useEffect(() => {
     setSelectedDate("");
@@ -275,17 +325,22 @@ const VendorDetails = () => {
       <div className="overflow-hidden rounded-md  shadow-sm mb-6">
         <div className="relative">
           <img
-            src={vendor.image}
-            alt={vendor.name}
+            src={heroImages[heroIndex]}
+            alt={`${vendor.name} image ${heroIndex + 1}`}
             className="w-full h-96 object-cover rounded-md"
           />
           <button
-            onClick={() => navigate(-1)}
+            onClick={prevHero}
+            aria-label="Previous image"
             className="absolute left-3 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full"
           >
             <ChevronLeft />
           </button>
-          <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full">
+          <button
+            onClick={nextHero}
+            aria-label="Next image"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full"
+          >
             <ChevronRight />
           </button>
         </div>

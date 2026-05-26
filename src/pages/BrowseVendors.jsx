@@ -232,7 +232,7 @@ const BrowseVendors = memo(() => {
       </aside>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 px-5 md:px-7 pt-8 pb-16 min-w-0 z-10">
+      <main className="flex-1 px-4 md:px-6 py-14 md:py-20 min-w-0 z-10">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="font-serif text-4xl text-[#201c18] sm:text-5xl">Browse Vendors</h1>

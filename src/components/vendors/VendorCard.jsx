@@ -1,21 +1,22 @@
 import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Star } from 'lucide-react';
 
 const VARIANT_STYLES = {
   featured: {
     article: 'overflow-hidden rounded-sm bg-white shadow-sm p-4 md:p-5',
-    title: 'text-lg md:text-xl font-serif font-medium text-[#201c18] leading-snug',
-    category: 'mt-0.5 text-base font-raleway text-[#606060]',
-    metaRow: 'flex items-center justify-between text-base text-[#6d6357]',
+    title: 'text-base md:text-lg font-serif font-medium text-[#201c18] leading-snug',
+    category: 'mt-0.5 text-sm font-raleway text-[#606060]',
+    metaRow: 'flex items-center justify-between text-sm text-[#6d6357]',
     location: 'inline-flex items-center gap-1 text-[#070707] font-raleway font-medium',
     price: 'font-playfair font-bold text-[#070707] text-lg',
     rating: 'inline-flex items-center gap-0.5 text-base font-medium text-[#544d43] mt-0.5',
   },
   grid: {
    article: 'overflow-hidden rounded-sm bg-white shadow-sm p-4 md:p-5',
-    title: 'text-lg md:text-xl font-serif font-medium text-[#201c18] leading-snug',
-    category: 'mt-0.5 text-base font-raleway text-[#606060]',
-    metaRow: 'flex items-center justify-between text-base text-[#6d6357]',
+    title: 'text-base md:text-lg font-serif font-medium text-[#201c18] leading-snug',
+    category: 'mt-0.5 text-sm font-raleway text-[#606060]',
+    metaRow: 'flex items-center justify-between text-sm text-[#6d6357]',
     location: 'inline-flex items-center gap-1 text-[#070707] font-raleway font-medium',
     price: 'font-playfair font-bold text-[#070707] text-lg',
     rating: 'inline-flex items-center gap-0.5 text-base font-medium text-[#544d43] mt-0.5',
@@ -23,14 +24,15 @@ const VARIANT_STYLES = {
 };
 
 const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
+  const navigate = useNavigate();
   const styles = VARIANT_STYLES[variant] || VARIANT_STYLES.grid;
   const priceText = vendor.priceDisplay ?? vendor.price ?? 'Contact for pricing';
 
   const handleKeyDown = (event) => {
-    if (!onClick) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      onClick();
+      if (onClick) return onClick();
+      navigate(`/vendors/${vendor.id}`);
     }
   };
 
@@ -38,7 +40,7 @@ const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
     <article
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      onClick={onClick}
+      onClick={onClick ?? (() => navigate(`/vendors/${vendor.id}`))}
       onKeyDown={handleKeyDown}
       className={styles.article}
     >

@@ -1,8 +1,9 @@
 import React, { memo, useState, useCallback } from 'react';
-import { Outlet, NavLink, Link } from 'react-router-dom';
+import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { LogIn, Menu, X, ChevronDown } from 'lucide-react';
 import Footer from './home/footer/Footer';
 import { APP_CONFIG, ROUTES } from '../config';
+import ScrollToTop from './ScrollToTop';
 
 const NAV_LINKS = [
   { to: ROUTES.HOME, label: 'Home', end: true },
@@ -13,19 +14,29 @@ const NAV_LINKS = [
   { to: ROUTES.CONTACT, label: 'Contact' },
 ];
 
-const navLinkClass = ({ isActive }) =>
-  isActive
-    ? 'nav-link rounded-sm bg-[#A7B9A6] px-3 py-1.5 text-[#464E46] font-medium shadow-sm'
-    : 'nav-link rounded-sm px-3 py-1.5 text-[#414141] transition-colors duration-150 hover:bg-black/5';
-
-const mobileNavLinkClass = ({ isActive }) =>
-  isActive
-    ? 'nav-link block rounded-sm bg-[#A7B9A6] px-4 py-3 text-[#474f47] font-medium'
-    : 'nav-link block rounded-sm px-4 py-3 text-[#4a453d] transition-colors duration-150 hover:bg-black/5';
+const ACTIVE_DESKTOP = 'nav-link rounded-sm bg-[#A7B9A6] px-3 py-1.5 text-[#464E46] font-medium shadow-sm';
+const INACTIVE_DESKTOP = 'nav-link rounded-sm px-3 py-1.5 text-[#414141] transition-colors duration-150 hover:bg-black/5';
+const ACTIVE_MOBILE = 'nav-link block rounded-sm bg-[#A7B9A6] px-4 py-3 text-[#474f47] font-medium';
+const INACTIVE_MOBILE = 'nav-link block rounded-sm px-4 py-3 text-[#4a453d] transition-colors duration-150 hover:bg-black/5';
 
 const Layout = memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const location = useLocation();
+
+  const navLinkClass = (to) => ({ isActive }) => {
+    if (to === ROUTES.BROWSE_VENDORS && location.pathname.startsWith('/vendors')) {
+      return ACTIVE_DESKTOP;
+    }
+    return isActive ? ACTIVE_DESKTOP : INACTIVE_DESKTOP;
+  };
+
+  const mobileNavLinkClass = (to) => ({ isActive }) => {
+    if (to === ROUTES.BROWSE_VENDORS && location.pathname.startsWith('/vendors')) {
+      return ACTIVE_MOBILE;
+    }
+    return isActive ? ACTIVE_MOBILE : INACTIVE_MOBILE;
+  };
 
   const handleNavClick = useCallback(
     (event) => {
@@ -42,6 +53,7 @@ const Layout = memo(() => {
 
   return (
     <div className='min-h-screen flex flex-col bg-(--page-bg) text-[#26221d]'>
+      <ScrollToTop />
       <nav className='sticky top-0 z-9999 bg-[#f5f1eb] backdrop-blur-md'>
         <div className='mx-auto container flex h-20  items-center justify-between px-4 sm:px-6 lg:px-8'>
           <Link to={ROUTES.HOME} className='flex items-center gap-3'>
@@ -59,7 +71,7 @@ const Layout = memo(() => {
               }
 
               return (
-                <NavLink key={to} to={to} end={end} className={navLinkClass}>
+                <NavLink key={to} to={to} end={end} className={navLinkClass(to)}>
                   {label}
                 </NavLink>
               );
@@ -111,7 +123,7 @@ const Layout = memo(() => {
                     to={to}
                     end={end}
                     onClick={closeMenu}
-                    className={mobileNavLinkClass}
+                    className={mobileNavLinkClass(to)}
                   >
                     {label}
                   </NavLink>

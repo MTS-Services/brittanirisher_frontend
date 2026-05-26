@@ -36,7 +36,7 @@ const Footer = memo(() => {
             <div className="flex items-center gap-3">
               <img src="/Footer_logo.png" alt="logo" className=" w-30 h-25" />
             </div>
-            <p className="mt-6 max-w-sm text-sm leading-7 text-white">
+            <p className="text-justify mt-1 max-w-xs text-sm leading-7 text-white">
               Helping brides plan their dream wedding while connecting with
               trusted local vendors. Your journey to a perfect celebration
               starts here.
