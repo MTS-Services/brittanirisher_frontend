@@ -140,7 +140,7 @@ const PricingGrid = () => {
   ];
 
   return (
-    <div className="mt-10 max-w-7xl mx-auto grid gap-8 md:gap-5 lg:grid-cols-3 auto-rows-fr">
+    <div className=" max-w-7xl mx-auto grid gap-8 md:gap-5 lg:grid-cols-3 auto-rows-fr">
       {PLANS.map((plan) => (
         <PricingCard key={plan.id} plan={plan} />
       ))}
@@ -303,12 +303,12 @@ const VendorDetails = () => {
   };
 
   return (
-    <div className="relative container mx-auto py-8 font-serif px-4">
+    <div className="relative container mx-auto pt-8 font-serif px-4">
       <img
         src="/Service_Highlights.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute right-10 top-500 z-50 hidden w-56 translate-x-1/4 -translate-y-1/4 md:block lg:w-40"
+        className="pointer-events-none absolute right-10 top-470 z-50 hidden w-56 translate-x-1/4 -translate-y-1/4 md:block lg:w-40"
       />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
@@ -322,37 +322,38 @@ const VendorDetails = () => {
       </div>
 
       {/* Hero */}
-      <div className="overflow-hidden rounded-md  shadow-sm mb-6">
+      <div className="overflow-hidden rounded-md  shadow-sm ">
         <div className="relative">
           <img
             src={heroImages[heroIndex]}
             alt={`${vendor.name} image ${heroIndex + 1}`}
-            className="w-full h-96 object-cover rounded-md"
+            className="w-full h-70 md:h-96 object-cover rounded-t-md"
           />
           <button
             onClick={prevHero}
             aria-label="Previous image"
-            className="absolute left-3 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full"
+            className="absolute left-1 md:left-3 top-1/2 -translate-y-1/2 bg-white p-1.5 md:p-2 rounded-full"
           >
             <ChevronLeft />
           </button>
           <button
             onClick={nextHero}
             aria-label="Next image"
-            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full"
+            className="absolute right-1 md:right-3 top-1/2 -translate-y-1/2 bg-white p-1.5 md:p-2 rounded-full"
           >
             <ChevronRight />
           </button>
         </div>
-        <div className="p-6 flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-serif text-[#201c18]">
+            
+            <h1 className="text-2xl md:text-3xl font-serif text-[#201c18]">
               {vendor.name}
             </h1>
-            <div className="py-1.5 mt-2 px-4 bg-[#e8dfd3] inline-flex rounded-full">
+            <div className="py-1.5 mt-2 px-2.5 bg-[#e8dfd3] inline-flex rounded-full">
               <span className="text-base">{vendor.category}</span>
             </div>
-            <div className="flex font-raleway items-center gap-3 mt-4 text-sm md:text-base text-[#6B6B6B]">
+            <div className="flex flex-wrap font-raleway items-center gap-2 mt-4 text-sm md:text-base text-[#6B6B6B]">
               <span><MapPin size={20} /></span>
               <span>{vendor.location}</span>
               <span><Mail size={20} /></span>
@@ -385,7 +386,7 @@ const VendorDetails = () => {
       </div>
 
       {/* Packages */}
-      <div className="relative pb-10 overflow-visible ">
+      <div className="relative  overflow-visible ">
         <img
           src="/Packages_Pricing_Left.png"
           alt=""
@@ -401,7 +402,7 @@ const VendorDetails = () => {
 
         <section className="relative py-14">
           <div className="relative text-center">
-            <h2 className="mb-8 font-playfair text-2xl text-[#2a241e] md:text-[30px]">
+            <h2 className=" font-playfair mb-4 text-2xl text-[#2a241e] md:text-[30px]">
               Packages &amp; Pricing
             </h2>
             <PricingGrid />
@@ -411,10 +412,10 @@ const VendorDetails = () => {
 
 
   {/* About / Calendar / Enquiry */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-14 md:pb-20">
+      <section className="grid grid-cols-1 md:grid-cols-3 pb-14 gap-6 ">
 
         {/* About Me */}
-        <div className="bg-[#faf9f6] rounded-md shadow-sm p-6">
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6">
           <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2 ">About Me</h2>
           <p className="text-base font-raleway text-[#4a3f35] leading-relaxed">
             {vendor.about}
@@ -422,7 +423,7 @@ const VendorDetails = () => {
         </div>
 
         {/* Available Date */}
-        <div className="bg-[#faf9f6] rounded-md shadow-sm p-6 font-raleway flex flex-col justify-between">
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
@@ -520,7 +521,7 @@ const VendorDetails = () => {
 
         {/* Send Enquiry */}
         <div
-          className="bg-[#faf9f6] rounded-md shadow-sm p-6"
+          className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6"
           id="enquiry"
           ref={enquiryRef}
         >
@@ -583,13 +584,8 @@ const VendorDetails = () => {
 
       </section>
 
-      <section className="relative mb-8 overflow-hidden rounded-3xl border border-[#eadfcd] bg-[#fbf7f0] px-6 py-6 shadow-sm md:px-8 md:py-7">
-        {/* <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edd7c6]/70 blur-2xl" aria-hidden="true" />
-        <div className="absolute right-4 top-3 hidden h-20 w-20 md:block" aria-hidden="true">
-          <div className="absolute right-0 top-0 h-16 w-16 rounded-full border border-[#d9b7a3]/60" />
-          <div className="absolute right-2 top-2 h-12 w-12 rounded-full border border-[#e6cbbf]/70" />
-          <div className="absolute right-5 top-5 h-6 w-6 rounded-full bg-[#d9a6a0]/70" />
-        </div> */}
+      <section className="relative mb-14 overflow-hidden rounded-md border border-[#eadfcd] bg-[#fbf7f0] px-4 py-6 shadow-sm md:px-6 md:py-7">
+   
 
         <div className="relative">
           <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl">
@@ -644,8 +640,8 @@ const VendorDetails = () => {
       </section>
 
       {/* Portfolio */}
-      <section className="mb-16">
-        <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
+      <section className="mb-14">
+        <h4 className="font-playfair  text-xl font-semibold text-[#2a241e] md:text-2xl pb-4">
           Portfolio
         </h4>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">

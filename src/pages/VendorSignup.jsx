@@ -49,7 +49,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
         </p>
       </header>
 
-      <div className='mt-10 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea] p-2'>
+      <div className='mt-10 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea] '>
         <div className='grid grid-cols-2 gap-2'>
           <button
             type='button'

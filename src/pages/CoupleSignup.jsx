@@ -30,17 +30,17 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
   };
 
   const RightContent = (
-    <div style={{ maxWidth: 560 }} className='w-full'>
-      <div className='mb-5 flex items-center justify-between gap-3'>
+    <div  className='w-full max-w-162.5'>
+        <header className='space-y-4'>
         <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
           Create an Account
         </h1>
-      </div>
-      <p className='font-raleway text-[20px] leading-8 text-[#615d58]'>
-        Please enter your details to continue.
-      </p>
+        <p className='font-raleway text-[20px] leading-6 text-[#615d58]'>
+          Please enter your details to continue.
+        </p>
+      </header>
 
-      <div className='mt-8 rounded-full bg-[#efe6db] p-1'>
+      <div className='mt-10 rounded-full bg-[#efe6db] '>
         <div className='grid grid-cols-2 gap-2'>
           <button
             type='button'
@@ -63,11 +63,11 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
         </div>
       </div>
 
-      <div className='mt-6 flex items-center gap-8 border-b border-[#cfc7bc]'>
+      <div className='mt-10 flex items-center gap-8 border-b border-[#cfc7bc]'>
         <button
           type='button'
           onClick={() => navigate(ROUTES.LOGIN)}
-          className='pb-3 font-raleway text-[16px] font-medium text-[#857f7a] transition-colors'
+          className='pb-4 font-raleway text-[16px] font-medium text-[#857f7a] transition-colors'
         >
           Login
         </button>

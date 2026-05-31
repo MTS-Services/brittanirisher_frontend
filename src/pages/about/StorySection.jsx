@@ -13,7 +13,7 @@ export default function StorySection({ images }) {
         <div className='grid items-center gap-12 lg:grid-cols-2 lg:gap-20'>
           
           <div className='max-w-xl mt-8'>
-            <h2 className='font-serif text-[42px] font-normal leading-tight text-[#2d2d2d] sm:text-[48px]'>
+            <h2 className='font-serif text-3xl md:text-4xl lg:text-5xl font-normal leading-tight text-[#2d2d2d] sm:text-[48px]'>
               Our Story
             </h2>
             

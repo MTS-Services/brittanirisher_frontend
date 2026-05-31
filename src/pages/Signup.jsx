@@ -30,7 +30,7 @@ const Signup = () => {
 
   return (
     <div className='min-h-dvh overflow-hidden bg-[#f4f0ea] lg:flex'>
-      <section className='relative flex min-h-130 items-center justify-center overflow-hidden lg:min-h-dvh lg:flex-[0_0_52%]'>
+      <section className='relative flex min-h-80 md:min-h-130 items-center justify-center overflow-hidden lg:min-h-dvh lg:flex-[0_0_52%]'>
         <img
           src='/Elegant_Photography.jpg'
           alt='Wedding couple holding hands'
@@ -38,12 +38,12 @@ const Signup = () => {
         />
         <div className='absolute inset-0 bg-[rgba(0,0,0,0.4)]' />
 
-        <div className='relative z-10 flex w-full max-w-116.25 flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
-          <div className='max-w-116.25 space-y-4'>
-            <h2 className='font-playfair text-[48px] font-semibold leading-none sm:text-[56px]'>
+        <div className='relative z-10 flex w-full  flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
+          <div className='space-y-4'>
+            <h2 className='font-playfair text-3xl md:text-4xl lg:text-5xl font-semibold leading-none '>
               Begin Your Journey
             </h2>
-            <p className='font-raleway text-[20px] leading-6 text-white/95'>
+            <p className='max-w-116.25 font-raleway text-base md:text-xl leading-6 text-white/95'>
               Plan every detail of your dream wedding with our professional tools and curated vendor connections.
             </p>
           </div>
@@ -61,8 +61,8 @@ const Signup = () => {
               ))}
             </div>
             <div className='text-left text-white'>
-              <p className='font-raleway text-[24px] font-medium leading-none'>Joined by 10,000+</p>
-              <p className='font-raleway text-[16px] leading-6 text-white/90'>Brides & Vendors</p>
+              <p className='font-raleway text-base md:text-xl font-medium leading-none'>Joined by 10,000+</p>
+              <p className='font-raleway text-base md:text-lg leading-6 text-white/90'>Brides & Vendors</p>
             </div>
           </div>
         </div>

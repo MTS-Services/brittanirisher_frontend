@@ -223,7 +223,7 @@ const BrowseVendors = memo(() => {
       </aside>
 
     
-      <aside className="hidden md:flex flex-col w-64 shrink-0 sticky  z-10 top-8 mt-8 mb-8 self-start px-5 py-5 bg-[#f0e9e1] shadow-sm border border-[#e8e0d8] rounded-sm max-h-[calc(100vh-4rem)] overflow-y-auto">
+      <aside className="hidden md:flex flex-col w-64 shrink-0 sticky  z-10 top-22 mt-8 mb-8 self-start px-5 py-5 bg-[#f0e9e1] shadow-sm border border-[#e8e0d8] rounded-sm max-h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex items-center gap-2 mb-5">
           <SlidersHorizontal size={17} className="text-[#7a6050]" />
           <h2 className="text-base font-semibold text-[#3a3a3a]">Filters</h2>
@@ -235,7 +235,7 @@ const BrowseVendors = memo(() => {
       <main className="flex-1 px-4 md:px-6 py-14 md:py-20 min-w-0 z-10">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="font-serif text-4xl text-[#201c18] sm:text-5xl">Browse Vendors</h1>
+          <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#201c18] sm:text-5xl">Browse Vendors</h1>
           <p className="mt-2 md:mt-4 text-base md:text-lg leading-6 text-[#606060] font-raleway">
             Discover premium wedding professionals perfect for your special day
           </p>
@@ -323,9 +323,9 @@ const BrowseVendors = memo(() => {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={safePage === 1}
-              className="px-3 py-1.5 rounded-md border border-[#d4c8bc] bg-white text-[#7a6a5a] text-xs font-raleway disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0e9e1] transition-colors"
+              className="px-3 py-1.5 rounded-md border border-[#d4c8bc] bg-white text-[#7a6a5a] text-sm  disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0e9e1] transition-colors"
             >
-              ← Previous
+              Previous
             </button>
             {getPageNumbers().map((p, i) =>
               p === '...' ? (
@@ -347,18 +347,18 @@ const BrowseVendors = memo(() => {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={safePage === totalPages}
-              className="px-3 py-1.5 rounded-md border border-[#d4c8bc] bg-white text-[#7a6a5a] text-xs font-raleway disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0e9e1] transition-colors"
+              className="px-3 py-1.5 rounded-md border border-[#d4c8bc] bg-white text-[#7a6a5a] text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0e9e1] transition-colors"
             >
-              Next →
+              Next
             </button>
           </div>
         )}
 
-        {totalPages > 1 && (
-          <p className="text-center text-xs text-[#aaa] font-raleway mt-3">
+        {/* {totalPages > 1 && (
+          <p className="text-center text-xs text-[#aaa] mt-3">
             Page {safePage} of {totalPages} — showing {paginatedVendors.length} of {filteredVendors.length} vendors
           </p>
-        )}
+        )} */}
       </main>
     </div>
   );

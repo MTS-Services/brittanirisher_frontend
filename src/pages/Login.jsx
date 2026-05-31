@@ -16,6 +16,7 @@ import {
   CalendarDays,
   Wallet,
   ChevronDown,
+  Home,
 } from 'lucide-react';
 
 const AUDIENCE_OPTIONS = [
@@ -162,7 +163,7 @@ const Login = ({ initialMode = 'login' }) => {
       <section className='flex flex-1 items-center  bg-white px-5 py-10 sm:px-8 lg:px-10'>
         <div  className='w-full mx-auto max-w-162.5'>
           <div className='mb-5 flex items-center justify-between gap-3'>
-            <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
+            <h1 className='font-playfair text-3xl leading-none text-[#070707] md:text-4xl lg:text-5xl'>
               Sign In
             </h1>
           </div>
@@ -312,6 +313,15 @@ const Login = ({ initialMode = 'login' }) => {
                 Sign Up
               </button>
             </p>
+
+            <button
+              type='button'
+              onClick={() => navigate(ROUTES.HOME)}
+              className='mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d4c8bc] bg-white px-4 py-3 font-raleway text-[14px] font-medium text-[#2d2d2d] transition-colors hover:bg-[#f4f0ea]'
+            >
+              <Home size={16} />
+              Go to Home
+            </button>
           </form>
         </div>
       </section>

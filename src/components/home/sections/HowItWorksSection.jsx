@@ -48,7 +48,7 @@ const HowItWorksSection = memo(() => {
       </div>
 
       {/* RIGHT flower — mobile: bottom-right | desktop: bottom-right */}
-      <div className='pointer-events-none absolute bottom-0 z-9995 md:z-0 -right-6 w-[120px] mix-blend-multiply lg:-bottom-1 lg:-right-16 lg:w-[220px] xl:w-[320px]'>
+      <div className='pointer-events-none absolute bottom-0 z-9995 md:z-0 -right-6 md:w-[120px] mix-blend-multiply lg:-bottom-1 lg:-right-16 lg:w-[220px] xl:w-[320px]'>
         <img
           src='/flowers-left.png'
           alt=''

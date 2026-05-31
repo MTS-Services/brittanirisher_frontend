@@ -5,7 +5,7 @@ export default function TeamSection({ teamImage }) {
     <section className='relative px-4  sm:px-6 lg:px-8 '>
       <div  className='mx-auto max-w-7xl text-center'>
         <img src='/VendorPricing-flowers.png' alt='' aria-hidden='true' className='mx-auto w-65 opacity-80' />
-        <h2 className='mt-2 font-playfair text-[48px] leading-none text-[#2d2d2d]'>Meet Our Team</h2>
+        <h2 className='mt-2 font-playfair text-3xl md:text-4xl lg:text-5xl leading-none text-[#2d2d2d]'>Meet Our Team</h2>
         <p className='mt-4 font-raleway text-[20px] leading-8 text-[#857f7a]'>Passionate people dedicated to creating a joyful planning journey</p>
 
         <div style={{ maxWidth: 420 }} className='mx-auto mt-10 overflow-hidden rounded-2xl bg-white shadow-[0_18px_40px_rgba(63,73,63,0.12)]'>

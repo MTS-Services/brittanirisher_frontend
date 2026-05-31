@@ -207,7 +207,7 @@ const PricingPage = memo(() => {
             <div className="mx-auto inline-flex items-center justify-center rounded-full bg-[rgba(255,255,255,0.47)] px-6 py-1.5 font-raleway text-[16px] font-medium leading-6 text-[#414141]">
               Join Our Community
             </div>
-            <h1 className="font-playfair text-[56px] leading-none">
+            <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl leading-none">
               Grow Your Wedding Business
             </h1>
             <p className="font-raleway text-[20px] leading-8">
@@ -320,7 +320,7 @@ const PricingPage = memo(() => {
       <section className="relative px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <div className="">
           <div className="mx-auto text-center  ">
-            <h2 className="font-playfair text-[48px] leading-none text-[#2d2d2d]">
+            <h2 className="font-playfair text-3xl md:text-4xl lg:text-5xl leading-none text-[#2d2d2d]">
               Vendor FAQs
             </h2>
             <p className="mt-4 font-raleway text-[20px] leading-7 text-[#857f7a]">

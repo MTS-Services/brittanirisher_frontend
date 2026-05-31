@@ -115,10 +115,10 @@ const ContactPage = memo(() => {
             <div className="mx-auto inline-flex items-center rounded-full bg-[rgba(255,255,255,0.47)] px-6 py-1.5 font-raleway text-[16px] font-medium leading-6 text-[#414141]">
               Get In Touch
             </div>
-            <h1 className="font-playfair text-[56px] leading-none">
+            <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl leading-none">
               Get in Touch
             </h1>
-            <p className="font-raleway text-[20px] leading-8">
+            <p className="font-raleway text-base md:text-[20px] leading-8">
               Have questions? We&apos;re here to help. Reach out and we&apos;ll
               get back to you as soon as possible.
             </p>
@@ -251,7 +251,7 @@ const ContactPage = memo(() => {
             aria-hidden="true"
             className="pointer-events-none absolute left-1/2 top-16 z-10 block w-110 -translate-x-1/2 -translate-y-1/2 opacity-90"
           />
-          <h2 className="mt-2 font-playfair text-[48px] leading-none text-[#2d2d2d]">
+          <h2 className="mt-2 font-playfair text-3xl md:text-4xl lg:text-5xl leading-none text-[#2d2d2d]">
             Frequently Asked Questions
           </h2>
           <p className="mt-4 font-raleway text-[20px] leading-8 text-[#615d58]">
@@ -280,7 +280,7 @@ const ContactPage = memo(() => {
                   }}
                   className="relative z-10 flex cursor-pointer list-none items-center justify-between gap-6 font-raleway text-[16px] font-medium leading-6 text-black outline-none select-none"
                 >
-                  <span>{item.title}</span>
+                  <span className="text-base md:text-lg">{item.title}</span>
                   <ChevronDown
                     size={16}
                     className="shrink-0 text-[#2B543A] transition-transform duration-300 group-open:rotate-180"
