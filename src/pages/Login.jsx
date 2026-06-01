@@ -45,7 +45,7 @@ const AVATAR_STYLES = [
 const roleDashboardMap = {
   ADMIN: ROUTES.ADMIN_DASHBOARD,
   VENDOR: ROUTES.VENDOR_DASHBOARD,
-  USER: ROUTES.USER_DASHBOARD,
+  COUPLE: ROUTES.USER_DASHBOARD,
 };
 
 const Login = ({ initialMode = 'login' }) => {

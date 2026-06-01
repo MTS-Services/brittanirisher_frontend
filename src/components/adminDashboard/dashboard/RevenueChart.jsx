@@ -28,33 +28,58 @@ import { useGetAdminDashboardChartsQuery } from '../../../store/features/admin/a
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    const value = Number(payload[0]?.value) || 0;
     return (
       <div className='bg-white border border-gray-100 shadow-lg rounded-xl px-3 py-2 text-sm'>
         <p className='text-gray-500 font-medium'>{label}</p>
-        <p className='text-gray-900 font-bold'>
-          ${payload[0].value.toLocaleString()}
-        </p>
+        <p className='text-gray-900 font-bold'>${value.toLocaleString()}</p>
       </div>
     );
   }
   return null;
 };
 
-export default function RevenueChart() {
-  const [period, setPeriod] = useState('This year');
+const PERIOD_OPTIONS = [
+  { label: 'This year', value: 'this_year', points: 12 },
+  { label: 'Last 6 months', value: 'last_6_months', points: 6 },
+  { label: 'Last 3 months', value: 'last_3_months', points: 3 },
+];
 
-  const { data, isLoading } = useGetAdminDashboardChartsQuery(undefined, {
+const toChartLabel = (item, index) => {
+  if (item?.month) return item.month;
+  if (item?.label) return item.label;
+  if (item?.date) {
+    const date = new Date(item.date);
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleString('en-US', { month: 'short' });
+    }
+  }
+  return `P${index + 1}`;
+};
+
+export default function RevenueChart() {
+  const [period, setPeriod] = useState('this_year');
+
+  const { data, isLoading, isError } = useGetAdminDashboardChartsQuery(period, {
     refetchOnMountOrArgChange: true,
     refetchOnWindowFocus: true,
   });
 
-  console.log('Admin Dashboard Charts Data:===============', data?.data);
+  const rawData = Array.isArray(data?.data) ? data.data : [];
 
-  const revenueData =
-    data?.data?.map((item) => ({
-      month: item.month,
-      value: Number(item.revenue) || 0,
-    })) || [];
+  const normalizedData = rawData.map((item, index) => ({
+    month: toChartLabel(item, index),
+    value: Number(item?.revenue ?? item?.value ?? 0),
+  }));
+
+  const selectedPeriod = PERIOD_OPTIONS.find(
+    (option) => option.value === period,
+  );
+  const revenueData = normalizedData.slice(
+    -((selectedPeriod && selectedPeriod.points) || 12),
+  );
+
+  const hasData = revenueData.length > 0;
 
   return (
     <div className='bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6'>
@@ -67,64 +92,93 @@ export default function RevenueChart() {
             Monthly earnings from subscriptions and bookings
           </p>
         </div>
-        <button
-          className='flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 bg-white hover:bg-gray-50 transition shrink-0'
-          onClick={() => {}}
-        >
-          {period}
-          <ChevronDown size={14} className='text-gray-400' />
-        </button>
+        <div className='relative shrink-0'>
+          <ChevronDown
+            size={14}
+            className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400'
+          />
+          <select
+            value={period}
+            onChange={(event) => setPeriod(event.target.value)}
+            className='appearance-none rounded-lg border border-gray-200 bg-white py-1.5 pl-3 pr-8 text-xs text-gray-600 transition hover:bg-gray-50 sm:text-sm'
+            aria-label='Filter revenue period'
+          >
+            {PERIOD_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className='w-full h-52 sm:h-64 lg:h-72'>
-        <ResponsiveContainer width='100%' height='100%'>
-          <AreaChart
-            data={revenueData}
-            margin={{ top: 10, right: 4, left: -30, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id='revenueGrad' x1='0' y1='0' x2='0' y2='1'>
-                <stop offset='0%' stopColor='#4A4A4A' stopOpacity={0.45} />
-                <stop offset='100%' stopColor='#794E0500' stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray='0'
-              stroke='#f0f0ec'
-              vertical={false}
-            />
-            <XAxis
-              dataKey='month'
-              tick={{ fontSize: 14, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 14, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-            />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ stroke: '#794E0500', strokeWidth: 1 }}
-            />
-            <Area
-              type='monotone'
-              dataKey='value'
-              stroke='#4A4A4A'
-              strokeWidth={2}
-              fill='url(#revenueGrad)'
-              dot={false}
-              activeDot={{
-                r: 4,
-                fill: '#4A4A4A',
-                stroke: '#fff',
-                strokeWidth: 2,
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {isLoading ? (
+          <div className='flex h-full items-center justify-center text-sm font-raleway text-gray-500'>
+            Loading chart...
+          </div>
+        ) : isError ? (
+          <div className='flex h-full items-center justify-center rounded-lg border border-red-100 bg-red-50 px-3 text-sm font-raleway text-red-600'>
+            Failed to load revenue chart.
+          </div>
+        ) : !hasData ? (
+          <div className='flex h-full items-center justify-center rounded-lg border border-gray-100 bg-gray-50 px-3 text-sm font-raleway text-gray-500'>
+            No revenue data available for this period.
+          </div>
+        ) : (
+          <ResponsiveContainer width='100%' height='100%'>
+            <AreaChart
+              data={revenueData}
+              margin={{ top: 10, right: 4, left: -30, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id='revenueGrad' x1='0' y1='0' x2='0' y2='1'>
+                  <stop offset='0%' stopColor='#4A4A4A' stopOpacity={0.45} />
+                  <stop
+                    offset='100%'
+                    stopColor='#794E0500'
+                    stopOpacity={0.02}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray='0'
+                stroke='#f0f0ec'
+                vertical={false}
+              />
+              <XAxis
+                dataKey='month'
+                tick={{ fontSize: 14, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 14, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: '#794E0500', strokeWidth: 1 }}
+              />
+              <Area
+                type='monotone'
+                dataKey='value'
+                stroke='#4A4A4A'
+                strokeWidth={2}
+                fill='url(#revenueGrad)'
+                dot={false}
+                activeDot={{
+                  r: 4,
+                  fill: '#4A4A4A',
+                  stroke: '#fff',
+                  strokeWidth: 2,
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
