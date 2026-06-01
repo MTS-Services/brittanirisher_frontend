@@ -1,32 +1,113 @@
 import React, { useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Mail, Phone, MapPin, CalendarDays, Wallet, ChevronDown } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Mail, Phone, MapPin, CalendarDays, Wallet, ChevronDown,Eye, EyeOff } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
+import {
+  useCreateCoupleProfileMutation,
+  useGetWeddingStylesQuery,
+} from '../store/features/auth/authApi';
 import { ROUTES } from '../config';
-
-const STYLE_OPTIONS = ['Minimalist Modern', 'Romantic Classic', 'Garden Luxe', 'Editorial Chic'];
+import { loginSuccess } from '../store/slices/authSlice';
 
 const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [createCoupleProfile, { isLoading }] = useCreateCoupleProfileMutation();
+  const { data: weddingStylesResponse, isLoading: isWeddingStylesLoading } =
+    useGetWeddingStylesQuery(undefined, { skip: audience !== 'couple' });
+
+  const styleOptions = useMemo(
+    () => weddingStylesResponse?.data || [],
+    [weddingStylesResponse],
+  );
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
     location: '',
-    style: STYLE_OPTIONS[0],
+    style: '',
     weddingDate: '2026-12-24',
     budget: '$10,000',
     password: '',
     confirmPassword: '',
   });
+const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (audience !== 'couple') {
+      return;
+    }
+
+    if (!form.style && styleOptions.length > 0) {
+      setForm((current) => ({
+        ...current,
+        style: styleOptions[0].id,
+      }));
+    }
+  }, [audience, form.style, styleOptions]);
 
   const updateField = (field) => (event) => {
     const { value } = event.target;
     setForm((current) => ({ ...current, [field]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    navigate(ROUTES.HOME, { replace: true });
+
+    if (audience !== 'couple') {
+      navigate(ROUTES.SIGNUP, { replace: true });
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      toast.error('Passwords do not match!');
+      return;
+    }
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      location: form.location.trim(),
+      weldingStyleId: form.style,
+      password: form.password,
+      weldingDate: new Date(form.weddingDate).toISOString(),
+      budget: Number(String(form.budget).replace(/[^0-9.]/g, '')),
+    };
+
+    try {
+      const response = await createCoupleProfile(payload).unwrap();
+      const createdUser = response?.data?.user || response?.user || {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        role: 'COUPLE',
+      };
+      const tokens = response?.data?.tokens || response?.tokens || {};
+      const accessToken = tokens?.accessToken || response?.data?.accessToken || response?.accessToken || null;
+
+      if (accessToken) {
+        dispatch(
+          loginSuccess({
+            user: createdUser,
+            token: accessToken,
+            accessToken,
+            refreshToken: tokens?.refreshToken || response?.data?.refreshToken || response?.refreshToken || null,
+            tokenType: tokens?.tokenType || response?.data?.tokenType || response?.tokenType || 'Bearer',
+            expiresIn: tokens?.expiresIn || response?.data?.expiresIn || response?.expiresIn || null,
+          }),
+        );
+      }
+
+      toast.success('Account created successfully');
+      navigate(ROUTES.USER_DASHBOARD, { replace: true });
+    } catch (error) {
+      toast.error(
+        error?.data?.message || error?.message || 'Failed to create account',
+      );
+    }
   };
 
   const RightContent = (
@@ -89,11 +170,15 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
               <select
                 value={form.style}
                 onChange={updateField('style')}
-                className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79]'
+                disabled={isWeddingStylesLoading || styleOptions.length === 0}
+                className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79] disabled:cursor-not-allowed disabled:bg-[#f6f6f6]'
               >
-                {STYLE_OPTIONS.map((style) => (
-                  <option key={style} value={style}>
-                    {style}
+                <option value='' disabled>
+                  {isWeddingStylesLoading ? 'Loading wedding styles...' : 'Select wedding style'}
+                </option>
+                {styleOptions.map((style) => (
+                  <option key={style.id} value={style.id}>
+                    {style.name}
                   </option>
                 ))}
               </select>
@@ -106,16 +191,29 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
             <Field label='Budget' icon={Wallet} value={form.budget} onChange={updateField('budget')} placeholder='$10,000' />
           </div>
 
-          <Field label='Password' icon={ShieldCheck} value={form.password} onChange={updateField('password')} placeholder='••••••••' type='password' />
-          <Field label='Confirm Password' icon={ShieldCheck} value={form.confirmPassword} onChange={updateField('confirmPassword')} placeholder='••••••••' type='password' />
+        <PasswordField 
+            label='Password' 
+            value={form.password} 
+            onChange={updateField('password')} 
+            showPassword={showPassword} 
+            setShowPassword={setShowPassword} 
+          />
+          <PasswordField 
+            label='Confirm Password' 
+            value={form.confirmPassword} 
+            onChange={updateField('confirmPassword')} 
+            showPassword={showConfirmPassword} 
+            setShowPassword={setShowConfirmPassword} 
+          />
         </div>
 
         <button
           type='submit'
-          className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+            disabled={isLoading || !form.style}
+            className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70'
         >
           <ArrowRight size={18} />
-          Create Account
+          {isLoading ? 'Creating...' : 'Create Account'}
         </button>
 
         <p className='pt-2 text-center font-raleway text-[14px] text-[#857f7a]'>
@@ -240,11 +338,15 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
                   <select
                     value={form.style}
                     onChange={updateField('style')}
-                    className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79]'
+                    disabled={isWeddingStylesLoading || styleOptions.length === 0}
+                    className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79] disabled:cursor-not-allowed disabled:bg-[#f6f6f6]'
                   >
-                    {STYLE_OPTIONS.map((style) => (
-                      <option key={style} value={style}>
-                        {style}
+                    <option value='' disabled>
+                      {isWeddingStylesLoading ? 'Loading wedding styles...' : 'Select wedding style'}
+                    </option>
+                    {styleOptions.map((style) => (
+                      <option key={style.id} value={style.id}>
+                        {style.name}
                       </option>
                     ))}
                   </select>
@@ -258,16 +360,29 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
                 <Field label='Budget' icon={Wallet} value={form.budget} onChange={updateField('budget')} placeholder='$10,000' />
               </div>
 
-              <Field label='Password' icon={ShieldCheck} value={form.password} onChange={updateField('password')} placeholder='••••••••' type='password' />
-              <Field label='Confirm Password' icon={ShieldCheck} value={form.confirmPassword} onChange={updateField('confirmPassword')} placeholder='••••••••' type='password' />
+            <PasswordField 
+                label='Password' 
+                value={form.password} 
+                onChange={updateField('password')} 
+                showPassword={showPassword} 
+                setShowPassword={setShowPassword} 
+              />
+              <PasswordField 
+                label='Confirm Password' 
+                value={form.confirmPassword} 
+                onChange={updateField('confirmPassword')} 
+                showPassword={showConfirmPassword} 
+                setShowPassword={setShowConfirmPassword} 
+              />
             </div>
 
-            <button
+              <button
               type='submit'
-              className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+                disabled={isLoading || !form.style}
+                className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70'
             >
               <ArrowRight size={18} />
-              Create Account
+              {isLoading ? 'Creating...' : 'Create Account'}
             </button>
 
             <p className='pt-2 text-center font-raleway text-[14px] text-[#857f7a]'>
@@ -302,5 +417,32 @@ const Field = ({ label, icon: Icon, type = 'text', value, onChange, placeholder 
     </div>
   </div>
 );
+
+const PasswordField = ({ label, value, onChange, showPassword, setShowPassword, placeholder = '••••••••' }) => (
+  <div>
+    <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>{label}</label>
+    <div className='relative'>
+      <ShieldCheck size={18} className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
+      
+      <input
+        type={showPassword ? 'text' : 'password'}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className='h-12 w-full rounded-xl border border-[#b5b5b5] bg-white px-4 pl-11 pr-11 font-raleway text-[16px] text-[#2d2d2d] outline-none transition-colors placeholder:text-[#b5b5b5] focus:border-[#9f8b79]'
+      />
+
+      <button
+        type='button'
+        onClick={() => setShowPassword(!showPassword)}
+        className='absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c] hover:text-[#2d2d2d] transition-colors focus:outline-none'
+      >
+        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
+  </div>
+);
+
+
 
 export default CoupleSignup;

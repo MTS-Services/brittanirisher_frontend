@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { ROUTES } from '../../config';
@@ -160,17 +160,26 @@ const Sidebar = ({
     <div className='h-full w-full bg-white flex flex-col border-r border-gray-200'>
       <div className='flex items-start justify-between px-4 pt-4 pb-3 border-b border-gray-200 shrink-0'>
         <div>
-          <img
-            src='/logo.png'
-            alt='Vow & Vendor'
-            width={140}
-            height={36}
-            fetchPriority='high'
-            className='h-15 w-auto object-contain'
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
+          <Link
+            to={ROUTES.HOME}
+            aria-label='Go to home page'
+            onClick={() => {
+              onClose();
             }}
-          />
+            className='inline-flex'
+          >
+            <img
+              src='/logo.png'
+              alt='Vow & Vendor'
+              width={140}
+              height={36}
+              fetchPriority='high'
+              className='h-15 w-auto object-contain'
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </Link>
           {/* <p className='text-xs text-gray-500 mt-2'>{dashboardLabel}</p> */}
         </div>
         <button
