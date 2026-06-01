@@ -41,9 +41,38 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const PERIOD_OPTIONS = [
   { label: 'This year', value: 'this_year', points: 12 },
-  { label: 'Last 6 months', value: 'last_6_months', points: 6 },
-  { label: 'Last 3 months', value: 'last_3_months', points: 3 },
+  { label: 'Previous year', value: 'previous_year', points: 12 },
 ];
+
+const parseAmount = (value) => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (typeof value === 'string') {
+    const sanitized = value.replace(/[^\d.-]/g, '');
+    const parsed = Number(sanitized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+};
+
+const extractChartData = (payload) => {
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  if (Array.isArray(payload?.data?.chartData)) return payload.data.chartData;
+  if (Array.isArray(payload?.chartData)) return payload.chartData;
+
+  if (payload?.data && typeof payload.data === 'object') {
+    const objectEntries = Object.entries(payload.data);
+    const monthLikeEntries = objectEntries.filter(([key]) =>
+      /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)$/i.test(key),
+    );
+
+    if (monthLikeEntries.length > 0) {
+      return monthLikeEntries.map(([month, revenue]) => ({ month, revenue }));
+    }
+  }
+
+  return [];
+};
 
 const toChartLabel = (item, index) => {
   if (item?.month) return item.month;
@@ -65,11 +94,13 @@ export default function RevenueChart() {
     refetchOnWindowFocus: true,
   });
 
-  const rawData = Array.isArray(data?.data) ? data.data : [];
+  const rawData = extractChartData(data);
 
   const normalizedData = rawData.map((item, index) => ({
     month: toChartLabel(item, index),
-    value: Number(item?.revenue ?? item?.value ?? 0),
+    value: parseAmount(
+      item?.revenue ?? item?.value ?? item?.totalRevenue ?? item?.amount ?? 0,
+    ),
   }));
 
   const selectedPeriod = PERIOD_OPTIONS.find(
@@ -80,6 +111,12 @@ export default function RevenueChart() {
   );
 
   const hasData = revenueData.length > 0;
+
+  const formatYAxisValue = (value) => {
+    const safeValue = parseAmount(value);
+    if (safeValue >= 1000) return `$${(safeValue / 1000).toFixed(1)}k`;
+    return `$${Math.round(safeValue)}`;
+  };
 
   return (
     <div className='bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6'>
@@ -129,7 +166,7 @@ export default function RevenueChart() {
           <ResponsiveContainer width='100%' height='100%'>
             <AreaChart
               data={revenueData}
-              margin={{ top: 10, right: 4, left: -30, bottom: 0 }}
+              margin={{ top: 10, right: 8, left: 0, bottom: 0 }}
             >
               <defs>
                 <linearGradient id='revenueGrad' x1='0' y1='0' x2='0' y2='1'>
@@ -156,7 +193,7 @@ export default function RevenueChart() {
                 tick={{ fontSize: 14, fill: '#9ca3af' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                tickFormatter={formatYAxisValue}
               />
               <Tooltip
                 content={<CustomTooltip />}
