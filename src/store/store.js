@@ -10,6 +10,7 @@ import themeReducer, {
   setPrimaryColor,
 } from './slices/themeSlice';
 import cartReducer from './slices/cartSlice';
+import { apiSlice } from './apiSlice';
 
 const applyPrimaryColor = (color) => {
   document.documentElement.style.setProperty('--color-primary', color);
@@ -21,7 +22,24 @@ const listener = createListenerMiddleware();
 listener.startListening({
   actionCreator: loginSuccess,
   effect: (action) => {
-    localStorage.setItem('token', action.payload.token);
+    const accessToken = action.payload.accessToken || action.payload.token;
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('accessToken', accessToken);
+    if (action.payload.refreshToken) {
+      localStorage.setItem('refreshToken', action.payload.refreshToken);
+    } else {
+      localStorage.removeItem('refreshToken');
+    }
+    if (action.payload.tokenType) {
+      localStorage.setItem('tokenType', action.payload.tokenType);
+    } else {
+      localStorage.removeItem('tokenType');
+    }
+    if (action.payload.expiresIn) {
+      localStorage.setItem('expiresIn', action.payload.expiresIn);
+    } else {
+      localStorage.removeItem('expiresIn');
+    }
     localStorage.setItem('user', JSON.stringify(action.payload.user));
   },
 });
@@ -30,6 +48,10 @@ listener.startListening({
   actionCreator: logout,
   effect: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('tokenType');
+    localStorage.removeItem('expiresIn');
     localStorage.removeItem('user');
   },
 });
@@ -73,9 +95,12 @@ const store = configureStore({
     auth: authReducer,
     theme: themeReducer,
     cart: cartReducer,
+    [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(listener.middleware),
+    getDefaultMiddleware()
+      .prepend(listener.middleware)
+      .concat(apiSlice.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 
