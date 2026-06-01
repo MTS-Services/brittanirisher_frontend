@@ -59,7 +59,8 @@ export const API_CONFIG = {
 export const SEO_CONFIG = {
   DEFAULT_TITLE: process.env.REACT_APP_SEO_TITLE || 'Vow & Vendor',
   DEFAULT_DESCRIPTION:
-    process.env.REACT_APP_SEO_DESCRIPTION || 'A curated wedding vendor marketplace',
+    process.env.REACT_APP_SEO_DESCRIPTION ||
+    'A curated wedding vendor marketplace',
   DEFAULT_KEYWORDS: (
     process.env.REACT_APP_SEO_KEYWORDS || 'react,webpack,tailwind'
   ).split(','),

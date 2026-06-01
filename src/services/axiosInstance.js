@@ -1,12 +1,29 @@
 import axios from 'axios';
-import { API_CONFIG, ROUTES } from '../config';
 import { API_ENDPOINTS } from './httpEndpoint';
 import store from '../store/store';
 import { logout, loginSuccess } from '../store/slices/authSlice';
+import { API_CONFIG } from '../config/index';
 
+// export const API_CONFIG = {
+//   BASE_URL: process.env.REACT_APP_API_BASE_URL || '',
+//   VITALS_ENDPOINT: process.env.REACT_APP_VITALS_ENDPOINT || '',
+//   TIMEOUT: parseInt(process.env.REACT_APP_API_TIMEOUT || '10000', 10),
+//   RETRY_ATTEMPTS: parseInt(process.env.REACT_APP_API_RETRY_ATTEMPTS || '3', 10),
+//   RETRY_DELAY: parseInt(process.env.REACT_APP_API_RETRY_DELAY || '1000', 10),
+// };
+
+
+export const 
+
+const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  ADMIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
+};
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: {

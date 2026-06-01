@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../store/slices/authSlice';
 import { ROUTES } from '../config';
+import { useLoginMutation } from '../store/features/auth/authApi';
 
 import {
   LogIn,
@@ -18,6 +19,7 @@ import {
   ChevronDown,
   Home,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const AUDIENCE_OPTIONS = [
   { id: 'couple', label: 'Couple' },
@@ -26,7 +28,12 @@ const AUDIENCE_OPTIONS = [
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const STYLE_OPTIONS = ['Minimalist Modern', 'Romantic Classic', 'Garden Luxe', 'Editorial Chic'];
+const STYLE_OPTIONS = [
+  'Minimalist Modern',
+  'Romantic Classic',
+  'Garden Luxe',
+  'Editorial Chic',
+];
 
 const AVATAR_STYLES = [
   'bg-[#b7c3b3]',
@@ -35,17 +42,23 @@ const AVATAR_STYLES = [
   'bg-[#9f8b79]',
 ];
 
+const roleDashboardMap = {
+  ADMIN: ROUTES.ADMIN_DASHBOARD,
+  VENDOR: ROUTES.VENDOR_DASHBOARD,
+  COUPLE: ROUTES.USER_DASHBOARD,
+};
+
 const Login = ({ initialMode = 'login' }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [authMode, setAuthMode] = useState(initialMode);
   const [audience, setAudience] = useState('couple');
-  const [loginEmail, setLoginEmail] = useState('admin@test.com');
-  const [loginPassword, setLoginPassword] = useState('admin123');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
 
   useEffect(() => {
     setAuthMode(initialMode);
@@ -78,43 +91,70 @@ const Login = ({ initialMode = 'login' }) => {
       return;
     }
     setErrors({});
-    setIsLoading(true);
+
     try {
-      await new Promise((res) => setTimeout(res, 500));
+      const response = await login({
+        email: loginEmail.trim(),
+        password: loginPassword,
+      }).unwrap();
+
+      const user = response?.data?.user || null;
+      const tokens = response?.data?.tokens || {};
+      const accessToken = tokens?.accessToken || null;
+
+      if (!user || !accessToken) {
+        setErrors({ form: 'Invalid login response. Please try again.' });
+        return;
+      }
+
       dispatch(
         loginSuccess({
-          user: { id: 1, name: 'Admin User', email: loginEmail, role: 'admin' },
-          token: `demo-token-${Date.now()}`,
+          user,
+          token: accessToken,
+          accessToken,
+          refreshToken: tokens?.refreshToken || null,
+          tokenType: tokens?.tokenType || 'Bearer',
+          expiresIn: tokens?.expiresIn || null,
         }),
       );
-      navigate(ROUTES.ADMIN_DASHBOARD, { replace: true });
-    } finally {
-      setIsLoading(false);
+
+      const redirectRoute = roleDashboardMap[user.role] || ROUTES.HOME;
+      toast.success('Login successful! Redirecting...');
+      navigate(redirectRoute, { replace: true });
+    } catch (error) {
+      setErrors({
+        form:
+          error?.data?.message ||
+          error?.message ||
+          'Login failed. Please check your credentials.',
+      });
+
+      toast.error(
+        error?.data?.message ||
+          error?.message ||
+          'Login failed. Please check your credentials.',
+      );
     }
   };
 
   const isLogin = authMode === 'login';
 
-    const handleDummyLogin = (role) => {
-      const roleDashboardMap = {
-        admin: ROUTES.ADMIN_DASHBOARD,
-        vendor: ROUTES.VENDOR_DASHBOARD,
-        user: ROUTES.USER_DASHBOARD,
-      };
+  // const handleDummyLogin = (role) => {
+  //   const normalizedRole = role.toUpperCase();
 
-      dispatch(
-        loginSuccess({
-          user: { 
-            id: Math.random().toString(36).substr(2, 9), 
-            name: role.charAt(0).toUpperCase() + role.slice(1) + ' User', 
-            email: `${role}@test.com`, 
-            role 
-          },
-          token: `demo-token-${Date.now()}`,
-        }),
-      );
-      navigate(roleDashboardMap[role], { replace: true });
-    };
+  //   dispatch(
+  //     loginSuccess({
+  //       user: {
+  //         id: Math.random().toString(36).substr(2, 9),
+  //         name: role.charAt(0).toUpperCase() + role.slice(1) + ' User',
+  //         email: `${role}@test.com`,
+  //         role: normalizedRole,
+  //       },
+  //       token: `demo-token-${Date.now()}`,
+  //     }),
+  //   );
+  //   navigate(roleDashboardMap[normalizedRole], { replace: true });
+  // };
   return (
     <div className='min-h-dvh overflow-hidden bg-[#f4f0ea] lg:flex'>
       <section className='relative flex min-h-112 items-center justify-center overflow-hidden lg:min-h-dvh lg:flex-[0_0_52%]'>
@@ -153,15 +193,19 @@ const Login = ({ initialMode = 'login' }) => {
               ))}
             </div>
             <div>
-              <p className='font-raleway text-[18px] leading-6'>Joined by 10,000+</p>
-              <p className='font-raleway text-[14px] leading-6 text-white/75'>Brides &amp; Vendors</p>
+              <p className='font-raleway text-[18px] leading-6'>
+                Joined by 10,000+
+              </p>
+              <p className='font-raleway text-[14px] leading-6 text-white/75'>
+                Brides &amp; Vendors
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       <section className='flex flex-1 items-center  bg-white px-5 py-10 sm:px-8 lg:px-10'>
-        <div  className='w-full mx-auto max-w-162.5'>
+        <div className='w-full mx-auto max-w-162.5'>
           <div className='mb-5 flex items-center justify-between gap-3'>
             <h1 className='font-playfair text-3xl leading-none text-[#070707] md:text-4xl lg:text-5xl'>
               Sign In
@@ -181,7 +225,9 @@ const Login = ({ initialMode = 'login' }) => {
                     type='button'
                     onClick={() => setAudience(option.id)}
                     className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-                      active ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+                      active
+                        ? 'bg-[#e8ded2] text-[#2d3036]'
+                        : 'bg-transparent text-[#090909]'
                     }`}
                   >
                     {option.label}
@@ -196,7 +242,9 @@ const Login = ({ initialMode = 'login' }) => {
               type='button'
               onClick={() => setAuthMode('login')}
               className={`pb-3 font-raleway text-[16px] font-medium transition-colors ${
-                isLogin ? 'border-b-2 border-[#2d2d2d] text-[#2d2d2d]' : 'text-[#857f7a]'
+                isLogin
+                  ? 'border-b-2 border-[#2d2d2d] text-[#2d2d2d]'
+                  : 'text-[#857f7a]'
               }`}
             >
               Login
@@ -205,7 +253,9 @@ const Login = ({ initialMode = 'login' }) => {
               type='button'
               onClick={() => setAuthMode('signup')}
               className={`pb-3 font-raleway text-[16px] font-medium transition-colors ${
-                !isLogin ? 'border-b-2 border-[#2d2d2d] text-[#2d2d2d]' : 'text-[#857f7a]'
+                !isLogin
+                  ? 'border-b-2 border-[#2d2d2d] text-[#2d2d2d]'
+                  : 'text-[#857f7a]'
               }`}
             >
               Sign Up
@@ -214,11 +264,17 @@ const Login = ({ initialMode = 'login' }) => {
 
           <form onSubmit={handleLogin} noValidate className='mt-7 space-y-5'>
             <div>
-              <label htmlFor='login-email' className='mb-2 block font-raleway text-[16px] text-[#615d58]'>
+              <label
+                htmlFor='login-email'
+                className='mb-2 block font-raleway text-[16px] text-[#615d58]'
+              >
                 Email
               </label>
               <div className='relative'>
-                <Mail size={18} className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
+                <Mail
+                  size={18}
+                  className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]'
+                />
                 <input
                   type='email'
                   id='login-email'
@@ -227,15 +283,27 @@ const Login = ({ initialMode = 'login' }) => {
                   onChange={(event) => setLoginEmail(event.target.value)}
                   placeholder='Write your email'
                   aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? 'login-email-error' : undefined}
+                  aria-describedby={
+                    errors.email ? 'login-email-error' : undefined
+                  }
                   className='h-12 w-full rounded-xl border border-[#b5b5b5] bg-white px-11 font-raleway text-[16px] text-[#2d2d2d] outline-none transition-colors placeholder:text-[#b5b5b5] focus:border-[#9f8b79]'
                 />
               </div>
-              {errors.email && <p id='login-email-error' className='mt-2 font-raleway text-[14px] text-red-600'>{errors.email}</p>}
+              {errors.email && (
+                <p
+                  id='login-email-error'
+                  className='mt-2 font-raleway text-[14px] text-red-600'
+                >
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             <div>
-              <label htmlFor='login-password' className='mb-2 block font-raleway text-[16px] text-[#615d58]'>
+              <label
+                htmlFor='login-password'
+                className='mb-2 block font-raleway text-[16px] text-[#615d58]'
+              >
                 Password
               </label>
               <div className='relative'>
@@ -255,19 +323,34 @@ const Login = ({ initialMode = 'login' }) => {
                   onChange={(event) => setLoginPassword(event.target.value)}
                   placeholder='••••••••'
                   aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? 'login-password-error' : undefined}
+                  aria-describedby={
+                    errors.password ? 'login-password-error' : undefined
+                  }
                   className='h-12 w-full rounded-xl border border-[#b5b5b5] bg-white px-4 pr-11 font-raleway text-[16px] text-[#2d2d2d] outline-none transition-colors placeholder:text-[#b5b5b5] focus:border-[#9f8b79]'
                 />
               </div>
-              {errors.password && <p id='login-password-error' className='mt-2 font-raleway text-[14px] text-red-600'>{errors.password}</p>}
+              {errors.password && (
+                <p
+                  id='login-password-error'
+                  className='mt-2 font-raleway text-[14px] text-red-600'
+                >
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             <div className='flex items-center justify-between gap-4 text-[14px] font-raleway text-[#857f7a]'>
               <label className='flex items-center gap-2'>
-                <input type='checkbox' className='h-4 w-4 rounded border-[#b5b5b5]' />
+                <input
+                  type='checkbox'
+                  className='h-4 w-4 rounded border-[#b5b5b5]'
+                />
                 Remember me
               </label>
-              <button type='button' className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'>
+              <button
+                type='button'
+                className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
+              >
                 Forgot password?
               </button>
             </div>
@@ -277,11 +360,21 @@ const Login = ({ initialMode = 'login' }) => {
               disabled={isLoading}
               className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60'
             >
-              {isLoading ? <span className='h-4 w-4 animate-spin rounded-full border-2 border-[#464e46] border-t-transparent' /> : <LogIn size={18} />}
+              {isLoading ? (
+                <span className='h-4 w-4 animate-spin rounded-full border-2 border-[#464e46] border-t-transparent' />
+              ) : (
+                <LogIn size={18} />
+              )}
               {isLoading ? 'Signing in…' : 'Login'}
             </button>
 
-            <div className='mt-6 space-y-3 border-t border-[#e9eaeb] pt-6'>
+            {errors.form && (
+              <p className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 font-raleway text-[14px] text-red-700'>
+                {errors.form}
+              </p>
+            )}
+
+            {/* <div className='mt-6 space-y-3 border-t border-[#e9eaeb] pt-6'>
               <p className='text-center font-raleway text-[14px] text-[#615d58]'>Or try demo login:</p>
               <div className='grid grid-cols-3 gap-3'>
                 <button
@@ -306,10 +399,14 @@ const Login = ({ initialMode = 'login' }) => {
                   User
                 </button>
               </div>
-            </div>
+            </div> */}
             <p className='pt-2 text-center font-raleway text-[14px] text-[#857f7a]'>
               Don&apos;t have an account?{' '}
-              <button type='button' onClick={() => setAuthMode('signup')} className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'>
+              <button
+                type='button'
+                onClick={() => setAuthMode('signup')}
+                className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
+              >
                 Sign Up
               </button>
             </p>
