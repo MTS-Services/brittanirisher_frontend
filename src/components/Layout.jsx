@@ -55,9 +55,9 @@ const Layout = memo(() => {
     <div className='min-h-screen flex flex-col bg-(--page-bg) text-[#26221d]'>
       <ScrollToTop />
       <nav className='sticky top-0 z-9999 bg-[#f5f1eb] backdrop-blur-md'>
-        <div className='mx-auto container flex h-20  items-center justify-between px-4 sm:px-6 lg:px-8'>
+        <div className='mx-auto container flex h-12 md:h-18  items-center justify-between px-4 sm:px-6 lg:px-8'>
           <Link to={ROUTES.HOME} className='flex items-center gap-3'>
-            <img  src="/logo.png" alt="logo" />
+            <img src="/logo.png" alt="logo" className='h-10 md:h-14 w-auto object-contain' />
           </Link>
 
           <div className='hidden items-center gap-2 lg:flex'>

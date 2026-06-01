@@ -31,10 +31,10 @@ const Footer = memo(() => {
         className="hidden sm:block absolute right-0 -top-72 w-80 z-0 pointer-events-none"
       />
       <div className="mx-auto container px-4 pb-4 pt-6 sm:px-6 relative z-10 lg:px-8 ">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] z-9999">
+        <div className="grid gap-6 md:gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] z-9999">
           <div>
             <div className="flex items-center gap-3">
-              <img src="/Footer_logo.png" alt="logo" className=" w-30 h-25" />
+              <img src="/Footer_logo.png" alt="logo" className="w-20 h-18  md:w-30 md:h-25" />
             </div>
             <p className="text-justify mt-1 max-w-xs text-sm leading-7 text-white">
               Helping brides plan their dream wedding while connecting with
@@ -47,7 +47,7 @@ const Footer = memo(() => {
             <h3 className="text-base font-semibold  text-white">
               Quick Links
             </h3>
-            <ul className="mt-5 space-y-3 text-sm text-white">
+            <ul className="mt-3 md:mt-5 space-y-1.5 md:space-y-2.5 text-sm text-white">
               {QUICK_LINKS.map((link) => (
                 <li key={link.label}>
                   {link.href.startsWith("#") ? (
@@ -74,7 +74,7 @@ const Footer = memo(() => {
             <h3 className="text-base font-semibold  text-white">
               Contact Info
             </h3>
-            <ul className="mt-5 space-y-3 text-sm text-white">
+            <ul className="mt-3 md:mt-5 space-y-1.5 md:space-y-2.5 text-sm text-white">
               <li>123 Wedding Lane, Suite 200</li>
               <li>hello@vowandvendor.com</li>
               <li>(555) 012-3456</li>
@@ -86,7 +86,7 @@ const Footer = memo(() => {
             <h3 className="text-base font-semibold  text-white">
               Support
             </h3>
-            <ul className="mt-5 space-y-3 text-sm text-white">
+            <ul className="mt-3 md:mt-5 space-y-1.5 md:space-y-2.5 text-sm text-white">
               {SUPPORT_LINKS.map((label) => (
                 <li key={label}>{label}</li>
               ))}
