@@ -62,6 +62,10 @@ button {
   font-family: 'Playfair Display', serif;
 }
 
+.font-Inter {
+  font-family: 'Inter', sans-serif;
+}
+
 @keyframes border-spin {
   100% {
     transform: rotate(360deg);

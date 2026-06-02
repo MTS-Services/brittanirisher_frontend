@@ -30,9 +30,9 @@ const Signup = () => {
 
   return (
     <div className='min-h-dvh overflow-hidden bg-[#f4f0ea] lg:flex'>
-      <section className='relative flex min-h-80 md:min-h-130 items-center justify-center overflow-hidden lg:min-h-dvh lg:flex-[0_0_52%]'>
+      <section className='relative flex min-h-80 md:min-h-screen items-center justify-center overflow-hidden lg:min-h-dvh lg:flex-[0_0_52%]'>
         <img
-          src='/Elegant_Photography.jpg'
+          src='/Elegant_Photography2.jpg'
           alt='Wedding couple holding hands'
           className='absolute inset-0 h-full w-full object-cover object-center'
         />

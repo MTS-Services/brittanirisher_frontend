@@ -1,16 +1,25 @@
 import React from 'react';
 import { ChevronDown, X } from 'lucide-react';
 
-const initialExpenseForm = {
-  category: 'Photography',
+const defaultExpenseForm = {
+  categoryId: '',
   vendorName: '',
   vendorPhone: '',
   vendorEmail: '',
-  expense: '$00.00',
+  amount: '',
   note: '',
 };
 
-const AddExpenseModal = ({ isOpen, expenseForm, onFormChange, onClose, onSave }) => {
+const AddExpenseModal = ({
+  isOpen,
+  expenseForm = defaultExpenseForm,
+  onFormChange,
+  onClose,
+  onSave,
+  categories = [],
+  categoriesLoading = false,
+  isSaving = false,
+}) => {
   if (!isOpen) {
     return null;
   }
@@ -21,7 +30,7 @@ const AddExpenseModal = ({ isOpen, expenseForm, onFormChange, onClose, onSave })
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSave();
+    onSave(event);
   };
 
   return (
@@ -60,16 +69,19 @@ const AddExpenseModal = ({ isOpen, expenseForm, onFormChange, onClose, onSave })
               <div className='relative'>
                 <select
                   id='expense-category'
-                  value={expenseForm.category}
-                  onChange={handleFormFieldChange('category')}
-                  className='h-10 w-full appearance-none rounded-sm border border-[#d8d8d8] bg-[#f5f5f5] px-3 pr-10 text-[0.95rem] text-[#535353] outline-none focus:border-[#a9b9a6]'
+                  value={expenseForm.categoryId}
+                  onChange={handleFormFieldChange('categoryId')}
+                  disabled={categoriesLoading || categories.length === 0}
+                  className='h-10 w-full appearance-none rounded-sm border border-[#d8d8d8] bg-[#f5f5f5] px-3 pr-10 text-[0.95rem] text-[#535353] outline-none focus:border-[#a9b9a6] disabled:cursor-not-allowed disabled:bg-[#f1f1f1]'
                 >
-                  <option>Photography</option>
-                  <option>Videography</option>
-                  <option>Floral Design</option>
-                  <option>Catering</option>
-                  <option>Dj & Music</option>
-                  <option>Bakery</option>
+                  <option value=''>
+                    {categoriesLoading ? 'Loading categories...' : 'Select category'}
+                  </option>
+                  {categories.map((category) => (
+                    <option key={category.id || category._id} value={category.id || category._id}>
+                      {category.name || category.title || 'Category'}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown
                   size={18}
@@ -127,10 +139,12 @@ const AddExpenseModal = ({ isOpen, expenseForm, onFormChange, onClose, onSave })
               </label>
               <input
                 id='expense-value'
-                type='text'
-                value={expenseForm.expense}
-                onChange={handleFormFieldChange('expense')}
-                placeholder='$00.00'
+                type='number'
+                min='0'
+                step='0.01'
+                value={expenseForm.amount}
+                onChange={handleFormFieldChange('amount')}
+                placeholder='1000.50'
                 className='h-10 w-full rounded-sm border border-[#d8d8d8] bg-[#f5f5f5] px-3 text-[0.95rem] text-[#535353] outline-none placeholder:text-[#909090] focus:border-[#a9b9a6]'
               />
             </div>
@@ -153,9 +167,10 @@ const AddExpenseModal = ({ isOpen, expenseForm, onFormChange, onClose, onSave })
           <div className='sticky bottom-0 z-10 border-t border-[#e6e6e6] bg-[#f8f8f8] px-4 py-3 sm:px-5'>
             <button
               type='submit'
+              disabled={isSaving}
               className='rounded-md bg-[#a4b5a2] px-5 py-2 text-base text-[#2f3a2f] transition hover:bg-[#94a592]'
             >
-              Save
+              {isSaving ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

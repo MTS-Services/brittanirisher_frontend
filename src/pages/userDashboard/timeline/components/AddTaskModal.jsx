@@ -63,7 +63,7 @@ const AddTaskModal = ({
                   onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
                   className="h-9 w-full rounded-lg border border-[#d7d7d7] bg-white px-3 pr-9 font-raleway text-xs text-[#5a5a5a] focus:border-[#9bae99] focus:outline-none"
                 />
-                <Calendar className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9a9a9a]" />
+                {/* <Calendar className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9a9a9a]" /> */}
               </div>
             </div>
           </div>

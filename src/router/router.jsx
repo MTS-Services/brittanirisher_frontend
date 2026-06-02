@@ -74,11 +74,11 @@ const adminSeg = segFor(ROUTES.ADMIN);
 const vendorSeg = segFor(ROUTES.VENDOR);
 const userSeg = segFor(ROUTES.USER);
 
-const PageLoader = () => (
-  <div className='flex items-center justify-center min-h-screen'>
-    <div className='w-8 h-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent' />
-  </div>
-);
+// const PageLoader = () => (
+//   <div className='flex items-center justify-center min-h-screen'>
+//     <div className='w-8 h-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent' />
+//   </div>
+// );
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -106,7 +106,7 @@ const router = createBrowserRouter(
     <>
       <Route
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <Layout />
           </Suspense>
         }
@@ -123,7 +123,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.LOGIN}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <Login />
           </Suspense>
         }
@@ -132,7 +132,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.SIGNUP}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <Signup />
           </Suspense>
         }
@@ -141,7 +141,7 @@ const router = createBrowserRouter(
       <Route
         path='/vendor-signup-flow'
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <VendorSignupFlow />
           </Suspense>
         }
@@ -150,7 +150,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.ADMIN}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -183,7 +183,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -212,7 +212,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.USER}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense >
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>

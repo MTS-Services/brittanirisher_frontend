@@ -1,14 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { 
+  useGetCoupleProfileQuery, 
+  useUpdateCoupleProfileMutation,
+  useGetStatesQuery
+} from '../../../store/features/couple/coupleDashboard';
+
+const ProfileSkeleton = () => (
+  <div className="w-full animate-pulse">
+    <div className="mb-6 h-8 w-48 rounded bg-gray-200"></div>
+    <div className="mb-8 rounded-lg border border-[#e0dcd7] bg-white p-6">
+      <div className="mb-6 h-6 w-32 rounded bg-gray-200"></div>
+      <div className="mb-6 flex gap-4">
+        <div className="h-16 w-16 rounded-full bg-gray-200"></div>
+        <div className="space-y-2">
+          <div className="h-5 w-40 rounded bg-gray-200"></div>
+          <div className="h-4 w-52 rounded bg-gray-200"></div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {[1, 2, 3, 4, 5, 6].map((n) => (
+          <div key={n} className="space-y-2">
+            <div className="h-4 w-24 rounded bg-gray-200"></div>
+            <div className="h-10 w-full rounded bg-gray-100"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const Profile = () => {
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetCoupleProfileQuery();
+  const { data: statesResponse } = useGetStatesQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateCoupleProfileMutation();
+
   const [profileForm, setProfileForm] = useState({
-    fullName: 'MD Ismail Molla',
-    phoneNumber: '(316) 555-0116',
-    email: 'jackson.graham@example.com',
-    location: '2464 Royal Ln. Mesa, New Jersey 45463',
-    weddingStyle: 'Minimalistic Modern',
-    weddingDate: '6/17/2026',
-    weddingBudget: '$50,000',
+    fullName: '',
+    phoneNumber: '',
+    selectedState: '',
+    selectedCity: '',
+    streetAddress: '',
+    weddingDate: '',
+    weddingBudget: '',
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -17,9 +50,54 @@ const Profile = () => {
     confirmPassword: '',
   });
 
+  const [availableCities, setAvailableCities] = useState([]);
+
+  useEffect(() => {
+    if (profileResponse?.data) {
+      const serverData = profileResponse.data;
+      
+      let formattedDate = '';
+      if (serverData.weddingDate) {
+        const dateObj = new Date(serverData.weddingDate);
+        formattedDate = !isNaN(dateObj.getTime()) 
+          ? dateObj.toLocaleDateString('en-US') 
+          : '';
+      }
+
+      setProfileForm((prev) => ({
+        ...prev,
+        fullName: serverData.name || '',
+        phoneNumber: serverData.phone || '',
+        weddingDate: formattedDate,
+        weddingBudget: serverData.budget !== undefined ? String(serverData.budget) : '',
+        streetAddress: serverData.location || '',
+      }));
+    }
+  }, [profileResponse]);
+
+  useEffect(() => {
+    if (profileForm.selectedState && statesResponse?.data) {
+      const stateObj = statesResponse.data.find(
+        (s) => s.name.toLowerCase() === profileForm.selectedState.toLowerCase() || s.id === profileForm.selectedState
+      );
+      setAvailableCities(stateObj ? stateObj.cities : []);
+    } else {
+      setAvailableCities([]);
+    }
+  }, [profileForm.selectedState, statesResponse]);
+
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-    setProfileForm({ ...profileForm, [name]: value });
+    
+    if (name === 'selectedState') {
+      setProfileForm({ 
+        ...profileForm, 
+        selectedState: value, 
+        selectedCity: '' 
+      });
+    } else {
+      setProfileForm({ ...profileForm, [name]: value });
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -27,8 +105,34 @@ const Profile = () => {
     setPasswordForm({ ...passwordForm, [name]: value });
   };
 
-  const handleSaveProfile = () => {
-    console.log('Profile saved:', profileForm);
+  const handleSaveProfile = async () => {
+    try {
+      const numericBudget = Number(profileForm.weddingBudget.replace(/[^0-9.-]+/g, ""));
+      
+      const fullLocationString = [
+        profileForm.streetAddress,
+        profileForm.selectedCity,
+        profileForm.selectedState
+      ].filter(Boolean).join(', ');
+
+      const payload = {
+        name: profileForm.fullName,
+        phone: profileForm.phoneNumber,
+        location: fullLocationString,
+        budget: isNaN(numericBudget) ? 0 : numericBudget,
+      };
+
+      if (profileForm.weddingDate) {
+        const parsedDate = new Date(profileForm.weddingDate);
+        if (!isNaN(parsedDate.getTime())) {
+          payload.weddingDate = parsedDate.toISOString();
+        }
+      }
+
+      await updateProfile(payload).unwrap();
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+    }
   };
 
   const handleSavePassword = () => {
@@ -40,23 +144,41 @@ const Profile = () => {
     }
   };
 
+  if (isProfileLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  const statesList = statesResponse?.data || [];
+
   return (
-    <section className='w-full  text-[#171717] font-raleway'>
+    <section className='w-full text-[#171717] font-raleway'>
       <header className='mb-6'>
         <h1 className='m-0 font-playfair text-2xl leading-tight text-[#1b1b1b] md:text-4xl'>Profile</h1>
-        <p className='mt-2 font-raleway text-base font-raleway text-[#7a7a7a]'>Manage your wedding details and personal information</p>
+        <p className='mt-2 text-base text-[#7a7a7a]'>Manage your wedding details and personal information</p>
       </header>
 
       <article className='mb-8 rounded-lg border border-[#e0dcd7] bg-white px-4 py-6'>
         <h2 className='mb-6 text-lg font-semibold text-[#1b1b1b]'>Account Details</h2>
 
         <div className='mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center'>
-          <div className='inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#d2a674] text-center text-lg font-bold text-white'>
-            E&M
+          <div className='inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#d2a674] text-center text-lg font-bold text-white overflow-hidden'>
+            {profileResponse?.data?.profileImage ? (
+              <img 
+                src={`https://api-brittanirisher.maktechgroup.tech${profileResponse.data.profileImage}`} 
+                alt="Profile" 
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              'E&M'
+            )}
           </div>
           <div>
-            <h3 className='m-0 text-base font-semibold text-[#2a2a2a]'>Emma & Michael</h3>
-            <p className='mt-1 text-sm text-[#7a7a7a]'>Getting married on August 15, 2026</p>
+            <h3 className='m-0 text-base font-semibold text-[#2a2a2a]'>
+              {profileForm.fullName || 'Emma & Michael'}
+            </h3>
+            {profileForm.weddingDate && (
+              <p className='mt-1 text-sm text-[#7a7a7a]'>Getting married on {profileForm.weddingDate}</p>
+            )}
           </div>
         </div>
 
@@ -84,34 +206,48 @@ const Profile = () => {
           </div>
 
           <div>
-            <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>Email</label>
-            <input
-              type='email'
-              name='email'
-              value={profileForm.email}
+            <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>State</label>
+            <select
+              name='selectedState'
+              value={profileForm.selectedState}
               onChange={handleProfileChange}
               className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
-            />
+            >
+              <option value="">Select State</option>
+              {statesList.map((state) => (
+                <option key={state.id} value={state.name}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
-            <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>Location</label>
-            <input
-              type='text'
-              name='location'
-              value={profileForm.location}
+            <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>City</label>
+            <select
+              name='selectedCity'
+              value={profileForm.selectedCity}
               onChange={handleProfileChange}
-              className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
-            />
+              disabled={!profileForm.selectedState}
+              className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1] disabled:bg-gray-50 disabled:text-gray-400'
+            >
+              <option value="">Select City</option>
+              {availableCities.map((city) => (
+                <option key={city.id} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div>
-            <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>Wedding Style</label>
+          <div className="sm:col-span-2">
+            <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>Street Address</label>
             <input
               type='text'
-              name='weddingStyle'
-              value={profileForm.weddingStyle}
+              name='streetAddress'
+              value={profileForm.streetAddress}
               onChange={handleProfileChange}
+              placeholder="House no, Street name, Apt..."
               className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
             />
           </div>
@@ -142,9 +278,10 @@ const Profile = () => {
 
         <button
           onClick={handleSaveProfile}
-          className='mt-6 rounded-md bg-[#b4c4b1] px-6 py-2 text-sm font-medium text-[#2f3a2f] transition hover:bg-[#a4b5a2]'
+          disabled={isUpdating}
+          className='mt-6 rounded-md bg-[#b4c4b1] px-6 py-2 text-sm font-medium text-[#2f3a2f] transition hover:bg-[#a4b5a2] disabled:opacity-50'
         >
-          Save
+          {isUpdating ? 'Saving...' : 'Save'}
         </button>
       </article>
 

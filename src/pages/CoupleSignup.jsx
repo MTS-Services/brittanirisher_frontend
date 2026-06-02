@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Mail, Phone, MapPin, CalendarDays, Wallet, ChevronDown,Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Mail, Phone, MapPin, CalendarDays, Wallet, ChevronDown, Eye, EyeOff } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import {
   useCreateCoupleProfileMutation,
   useGetWeddingStylesQuery,
 } from '../store/features/auth/authApi';
+
+import { useGetStatesQuery } from '../store/features/couple/coupleDashboard';
 import { ROUTES } from '../config';
 import { loginSuccess } from '../store/slices/authSlice';
 
@@ -15,27 +17,73 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [createCoupleProfile, { isLoading }] = useCreateCoupleProfileMutation();
+  
   const { data: weddingStylesResponse, isLoading: isWeddingStylesLoading } =
     useGetWeddingStylesQuery(undefined, { skip: audience !== 'couple' });
+  
+  const { data: statesResponse, isLoading: isStatesLoading } = 
+    useGetStatesQuery(undefined, { skip: audience !== 'couple' });
 
   const styleOptions = useMemo(
     () => weddingStylesResponse?.data || [],
     [weddingStylesResponse],
   );
 
+  const stateOptions = useMemo(
+    () => statesResponse?.data || statesResponse || [],
+    [statesResponse],
+  );
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
-    location: '',
+    state: '',
+    city: '',
+    stateName: '',
+    cityName: '',
+    address: '',
     style: '',
     weddingDate: '2026-12-24',
     budget: '$10,000',
     password: '',
     confirmPassword: '',
   });
-const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const selectedState = useMemo(() => {
+    if (!form.state) {
+      return null;
+    }
+
+    return (
+      stateOptions.find((state) => {
+        const stateId = state?.id || state?._id || '';
+        const stateName = state?.name || '';
+        return stateId === form.state || stateName.toLowerCase() === form.state.toLowerCase();
+      }) || null
+    );
+  }, [form.state, stateOptions]);
+
+  const cityOptions = useMemo(
+    () => selectedState?.cities || [],
+    [selectedState],
+  );
+
+  const selectedCity = useMemo(() => {
+    if (!form.city) {
+      return null;
+    }
+
+    return (
+      cityOptions.find((city) => {
+        const cityId = city?.id || city?._id || '';
+        const cityName = city?.name || '';
+        return cityId === form.city || cityName.toLowerCase() === form.city.toLowerCase();
+      }) || null
+    );
+  }, [cityOptions, form.city]);
 
   useEffect(() => {
     if (audience !== 'couple') {
@@ -52,7 +100,29 @@ const [showPassword, setShowPassword] = useState(false);
 
   const updateField = (field) => (event) => {
     const { value } = event.target;
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => {
+      const updated = { ...current, [field]: value };
+      if (field === 'state') {
+        updated.city = '';
+        updated.cityName = '';
+        const matchingState = stateOptions.find((state) => {
+          const stateId = state?.id || state?._id || '';
+          const stateName = state?.name || '';
+          return stateId === value || stateName.toLowerCase() === value.toLowerCase();
+        });
+        updated.stateName = matchingState?.name || '';
+      }
+
+      if (field === 'city') {
+        const matchingCity = cityOptions.find((city) => {
+          const cityId = city?.id || city?._id || '';
+          const cityName = city?.name || '';
+          return cityId === value || cityName.toLowerCase() === value.toLowerCase();
+        });
+        updated.cityName = matchingCity?.name || '';
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (event) => {
@@ -67,11 +137,18 @@ const [showPassword, setShowPassword] = useState(false);
       toast.error('Passwords do not match!');
       return;
     }
+
+    const resolvedStateName = selectedState?.name || form.stateName || '';
+    const resolvedCityName = selectedCity?.name || form.cityName || '';
+    const location = [form.address.trim(), resolvedCityName, resolvedStateName].filter(Boolean).join(', ');
+
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      location: form.location.trim(),
+      stateId: form.state,
+      cityId: form.city,
+      location,
       weldingStyleId: form.style,
       password: form.password,
       weldingDate: new Date(form.weddingDate).toISOString(),
@@ -111,8 +188,8 @@ const [showPassword, setShowPassword] = useState(false);
   };
 
   const RightContent = (
-    <div  className='w-full max-w-162.5'>
-        <header className='space-y-4'>
+    <div className='w-full max-w-162.5'>
+      <header className='space-y-4'>
         <h1 className='font-playfair text-[40px] leading-none text-[#070707] sm:text-[48px]'>
           Create an Account
         </h1>
@@ -162,7 +239,57 @@ const [showPassword, setShowPassword] = useState(false);
           <Field label='Name' icon={Mail} value={form.name} onChange={updateField('name')} placeholder='Enter your name' />
           <Field label='Phone' icon={Phone} value={form.phone} onChange={updateField('phone')} placeholder='Write your phone number' />
           <Field label='Email' icon={Mail} value={form.email} onChange={updateField('email')} placeholder='Write your email' />
-          <Field label='Location' icon={MapPin} value={form.location} onChange={updateField('location')} placeholder='Enter Location' />
+          
+          <div>
+            <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>State</label>
+            <div className='relative'>
+              <select
+                value={form.state}
+                onChange={updateField('state')}
+                disabled={isStatesLoading || stateOptions.length === 0}
+                className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79] disabled:cursor-not-allowed disabled:bg-[#f6f6f6]'
+              >
+                <option value=''>
+                  {isStatesLoading ? 'Loading states...' : 'Select State'}
+                </option>
+                {stateOptions.map((state) => (
+                  <option key={state.id || state._id || state.name} value={state.id || state._id || state.name}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={18} className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
+            </div>
+          </div>
+
+          {/* City and Address aligned side by side */}
+          <div>
+            <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>City</label>
+            <div className='relative'>
+              <select
+                value={form.city}
+                onChange={updateField('city')}
+                disabled={!form.state || cityOptions.length === 0}
+                className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79] disabled:cursor-not-allowed disabled:bg-[#f6f6f6]'
+              >
+                <option value=''>
+                  {!form.state
+                    ? 'Select state first'
+                    : cityOptions.length === 0
+                      ? 'No cities available'
+                      : 'Select City'}
+                </option>
+                {cityOptions.map((city) => (
+                  <option key={city.id || city._id || city.name} value={city.id || city._id || city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={18} className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
+            </div>
+          </div>
+          
+          <Field label='Address' icon={MapPin} value={form.address} onChange={updateField('address')} placeholder='Enter Full Address' />
 
           <div>
             <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>Wedding Style</label>
@@ -182,6 +309,7 @@ const [showPassword, setShowPassword] = useState(false);
                   </option>
                 ))}
               </select>
+              <ChevronDown size={18} className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
             </div>
           </div>
 
@@ -191,7 +319,7 @@ const [showPassword, setShowPassword] = useState(false);
             <Field label='Budget' icon={Wallet} value={form.budget} onChange={updateField('budget')} placeholder='$10,000' />
           </div>
 
-        <PasswordField 
+          <PasswordField 
             label='Password' 
             value={form.password} 
             onChange={updateField('password')} 
@@ -209,8 +337,8 @@ const [showPassword, setShowPassword] = useState(false);
 
         <button
           type='submit'
-            disabled={isLoading || !form.style}
-            className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70'
+          disabled={isLoading || !form.style}
+          className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70'
         >
           <ArrowRight size={18} />
           {isLoading ? 'Creating...' : 'Create Account'}
@@ -279,8 +407,8 @@ const [showPassword, setShowPassword] = useState(false);
       </section>
 
       <section className='flex flex-1  items-center bg-white px-5 py-10 '>
-        <div  className='mx-auto max-w-162.5 w-full'>
-            <header className='space-y-4'>
+        <div className='mx-auto max-w-162.5 w-full'>
+          <header className='space-y-4'>
             <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
               Create an Account
             </h1>
@@ -330,7 +458,57 @@ const [showPassword, setShowPassword] = useState(false);
               <Field label='Name' icon={Mail} value={form.name} onChange={updateField('name')} placeholder='Enter your name' />
               <Field label='Phone' icon={Phone} value={form.phone} onChange={updateField('phone')} placeholder='Write your phone number' />
               <Field label='Email' icon={Mail} value={form.email} onChange={updateField('email')} placeholder='Write your email' />
-              <Field label='Location' icon={MapPin} value={form.location} onChange={updateField('location')} placeholder='Enter Location' />
+              
+              <div>
+                <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>State</label>
+                <div className='relative'>
+                  <select
+                    value={form.state}
+                    onChange={updateField('state')}
+                    disabled={isStatesLoading || stateOptions.length === 0}
+                    className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79] disabled:cursor-not-allowed disabled:bg-[#f6f6f6]'
+                  >
+                    <option value=''>
+                      {isStatesLoading ? 'Loading states...' : 'Select State'}
+                    </option>
+                    {stateOptions.map((state) => (
+                      <option key={state.id || state._id || state.name} value={state.name}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={18} className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
+                </div>
+              </div>
+
+              {/* City and Address aligned side by side */}
+              <div>
+                <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>City</label>
+                <div className='relative'>
+                  <select
+                    value={form.city}
+                    onChange={updateField('city')}
+                    disabled={!form.state || cityOptions.length === 0}
+                    className='h-12 w-full appearance-none rounded-xl border border-[#b5b5b5] bg-white px-4 pr-10 font-raleway text-[16px] text-[#2d2d2d] outline-none focus:border-[#9f8b79] disabled:cursor-not-allowed disabled:bg-[#f6f6f6]'
+                  >
+                    <option value=''>
+                      {!form.state
+                        ? 'Select state first'
+                        : cityOptions.length === 0
+                          ? 'No cities available'
+                          : 'Select City'}
+                    </option>
+                    {cityOptions.map((city) => (
+                      <option key={city.id || city._id || city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={18} className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c]' />
+                </div>
+              </div>
+              
+              <Field label='Address' icon={MapPin} value={form.address} onChange={updateField('address')} placeholder='Enter Full Address' />
 
               <div>
                 <label className='mb-2 block font-raleway text-[16px] text-[#615d58]'>Wedding Style</label>
@@ -360,7 +538,7 @@ const [showPassword, setShowPassword] = useState(false);
                 <Field label='Budget' icon={Wallet} value={form.budget} onChange={updateField('budget')} placeholder='$10,000' />
               </div>
 
-            <PasswordField 
+              <PasswordField 
                 label='Password' 
                 value={form.password} 
                 onChange={updateField('password')} 
@@ -376,10 +554,10 @@ const [showPassword, setShowPassword] = useState(false);
               />
             </div>
 
-              <button
+            <button
               type='submit'
-                disabled={isLoading || !form.style}
-                className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70'
+              disabled={isLoading || !form.style}
+              className='inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#a7b9a6] font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70'
             >
               <ArrowRight size={18} />
               {isLoading ? 'Creating...' : 'Create Account'}
@@ -442,7 +620,5 @@ const PasswordField = ({ label, value, onChange, showPassword, setShowPassword, 
     </div>
   </div>
 );
-
-
 
 export default CoupleSignup;
