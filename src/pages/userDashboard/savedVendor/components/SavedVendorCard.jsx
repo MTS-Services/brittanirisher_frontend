@@ -2,15 +2,20 @@ import React from 'react';
 import { DollarSign, Heart, MapPin, Trash2 } from 'lucide-react';
 
 const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => {
+  const baseUrl = ""; 
+  const imageUrl = vendor.portfolioImage?.startsWith('http') 
+    ? vendor.portfolioImage 
+    : `${baseUrl}${vendor.portfolioImage}`;
+
   return (
     <article className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md'>
       <div className='relative h-52 bg-[#ece9e2]'>
         <img
-          src={vendor.image}
+          src={imageUrl}
           alt={vendor.name}
           className='h-full w-full object-cover'
           onError={(event) => {
-            event.target.src = `https://via.placeholder.com/300x200?text=${vendor.name}`;
+            event.target.src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(vendor.name)}`;
           }}
         />
 
@@ -28,14 +33,14 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
             <Trash2 size={18} />
           </button>
 
-        <button
-          onClick={() => onToggleFavorite(vendor.id)}
-          type='button'
-          className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#d6b18d] transition hover:bg-[#f4f4f4] hover:text-[#c89d74]'
-          aria-label='Toggle favorite'
-        >
-          <Heart size={18} className={isFavorite ? 'fill-[#d6b18d] text-[#d6b18d]' : ''} />
-        </button>
+          <button
+            onClick={() => onToggleFavorite(vendor.id)}
+            type='button'
+            className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#d6b18d] transition hover:bg-[#f4f4f4] hover:text-[#c89d74]'
+            aria-label='Toggle favorite'
+          >
+            <Heart size={18} className={isFavorite ? 'fill-[#d6b18d] text-[#d6b18d]' : ''} />
+          </button>
         </div>
       </div>
 
@@ -50,7 +55,7 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
 
         <div className='mb-4 flex items-center gap-2 text-sm text-[#303030]'>
           <MapPin size={16} className='text-[#6a6a6a]' />
-          <span className='font-raleway'>{vendor.location}</span>
+          <span className='font-raleway capitalize'>{vendor.location}</span>
         </div>
 
         <button

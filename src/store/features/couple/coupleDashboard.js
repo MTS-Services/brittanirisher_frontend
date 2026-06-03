@@ -327,6 +327,17 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    getSaveVendors: builder.query({
+  query: (params = {}) => {
+    const { page = 1, limit = 10 } = params;
+    return {
+      url: `/save-vendor?page=${page}&limit=${limit}`,
+      method: "GET",
+    };
+  },
+  providesTags: ["SaveVendor"], 
+}),
   }),
 });
 
@@ -352,6 +363,7 @@ const {
   useCreateCoupleScheduleMutation,
   useUpdateCoupleScheduleMutation,
   useDeleteCoupleScheduleMutation,
+  useGetSaveVendorsQuery
 } = CoupledashboardApi;
 
 export {
@@ -376,4 +388,5 @@ export {
   useCreateCoupleScheduleMutation,
   useUpdateCoupleScheduleMutation,
   useDeleteCoupleScheduleMutation,
+  useGetSaveVendorsQuery
 };
