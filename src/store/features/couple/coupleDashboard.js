@@ -338,6 +338,37 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
   },
   providesTags: ["SaveVendor"], 
 }),
+
+    saveVendor: builder.mutation({
+      query: (body) => ({
+        url: `/save-vendor`,
+        method: "POST",
+        body, 
+      }),
+      invalidatesTags: ["SaveVendor"],
+      
+      async onQueryStarted({ vendorId }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            CoupledashboardApi.util.updateQueryData(
+              "getVendorSuggested",
+              undefined, 
+              (draft) => {
+                const vendorList = draft?.data?.vendors || draft?.vendors || draft;
+                if (Array.isArray(vendorList)) {
+                  const vendor = vendorList.find((v) => v.id === vendorId);
+                  if (vendor) {
+                    vendor.isSaved = !vendor.isSaved;
+                  }
+                }
+              }
+            )
+          );
+        } catch {
+        }
+      },
+    }),
   }),
 });
 
@@ -363,7 +394,8 @@ const {
   useCreateCoupleScheduleMutation,
   useUpdateCoupleScheduleMutation,
   useDeleteCoupleScheduleMutation,
-  useGetSaveVendorsQuery
+  useGetSaveVendorsQuery,
+  useSaveVendorMutation,
 } = CoupledashboardApi;
 
 export {
@@ -388,5 +420,6 @@ export {
   useCreateCoupleScheduleMutation,
   useUpdateCoupleScheduleMutation,
   useDeleteCoupleScheduleMutation,
-  useGetSaveVendorsQuery
+  useGetSaveVendorsQuery,
+  useSaveVendorMutation,
 };

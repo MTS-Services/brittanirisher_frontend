@@ -378,7 +378,7 @@ const VendorDetails = () => {
                 href="#enquiry"
                 className="px-4 py-2 font-raleway bg-[#D4A574] text-[#FFFFFF] rounded text-base"
               >
-                Send Enquiry
+                Send Inquiry
               </a>
             </div>
           </div>
@@ -526,7 +526,7 @@ const VendorDetails = () => {
           ref={enquiryRef}
         >
           <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
-            Send Enquiry
+            Send Inquiry
           </h2>
           <form onSubmit={handleSendEnquiry} className="flex flex-col gap-3">
             <div>

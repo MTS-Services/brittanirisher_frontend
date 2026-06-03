@@ -1,10 +1,20 @@
 import React from 'react';
 import { DollarSign, Heart, MapPin, Sparkles, Loader2 } from 'lucide-react';
+import { useSaveVendorMutation } from '../../../../store/features/couple/coupleDashboard'; 
 
-// API taban adresi burada merkezi olarak tanımlandı
 const BASE_URL = "https://api-brittanirisher.maktechgroup.tech";
 
 const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
+  const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
+
+  const handleSaveToggle = async (vendorId) => {
+    try {
+      await saveVendor({ vendorId }).unwrap();
+    } catch (error) {
+      console.error("Failed to save vendor:", error);
+    }
+  };
+
   if (isLoading) {
     return (
       <section className='mb-6 flex items-center justify-center py-16'>
@@ -38,7 +48,6 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
         {vendors.map((vendor) => {
-          // BASE_URL kullanımı ve URL temizleme mantığı düzeltildi
           const imageUrl = vendor.thumbnailImage
             ? vendor.thumbnailImage.startsWith('http')
               ? vendor.thumbnailImage
@@ -74,12 +83,14 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
 
                 <button
                   type='button'
-                  className={`absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#d9d7d2] bg-white/95 transition hover:bg-white ${
-                    vendor.isSaved ? 'text-[#d4544d]' : 'text-[#a8a8a8] hover:text-[#d4544d]'
+                  onClick={() => handleSaveToggle(vendor.id)}
+                  disabled={isSaving} 
+                  className={`absolute right-2 top-2 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d9d7d2] bg-white/95 transition hover:bg-white disabled:opacity-70 ${
+                    vendor.isSaved ? 'text-[#d6b28d]' : 'text-[#a8a8a8] hover:text-[#d6b28d]'
                   }`}
-                  aria-label='Add to favorites'
+                  aria-label={vendor.isSaved ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Heart size={12} fill={vendor.isSaved ? 'currentColor' : 'none'} />
+                  <Heart size={22} fill={vendor.isSaved ? 'currentColor' : 'none'} />
                 </button>
               </div>
 
