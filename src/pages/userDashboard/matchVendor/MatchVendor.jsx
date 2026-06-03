@@ -3,128 +3,96 @@ import MatchVendorHeader from './components/MatchVendorHeader';
 import MatchVendorPreferences from './components/MatchVendorPreferences';
 import VendorResultsSection from './components/VendorResultsSection';
 import MatchVendorPagination from './components/MatchVendorPagination';
+import { useGetVendorSuggestedQuery } from '../../../store/features/couple/coupleDashboard';
 
-const vendorData = [
-  {
-    id: 1,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '128 Reviews',
-    location: 'San Francisco, CA',
-    priceRange: '$3,500 - $4,000',
-  },
-  {
-    id: 2,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '102 Reviews',
-    location: 'San Francisco, CA',
-    priceRange: '$2,800 - $3,500',
-  },
-  {
-    id: 3,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=600&auto=format&fit=crop&q=80',
-    rating: 4.5,
-    reviews: 'Est. - 14 days',
-    location: 'San Francisco, CA',
-    priceRange: '$3,200 - $4,500',
-  },
-  {
-    id: 4,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: 'Est. - 18 days',
-    location: 'San Francisco, CA',
-    priceRange: '$3,800 - $5,000',
-  },
-  {
-    id: 5,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '95 Reviews',
-    location: 'San Francisco, CA',
-    priceRange: '$3,000 - $3,800',
-  },
-  {
-    id: 6,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '78 Reviews',
-    location: 'San Francisco, CA',
-    priceRange: '$2,500 - $3,200',
-  },
-  {
-    id: 7,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '110 Reviews',
-    location: 'San Francisco, CA',
-    priceRange: '$3,500 - $4,200',
-  },
-  {
-    id: 8,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80',
-    rating: 4.5,
-    reviews: '88 Reviews',
-    location: 'San Francisco, CA',
-    priceRange: '$3,000 - $4,000',
-  },
-];
 
+const INITIAL_PREFERENCES = {
+  search: '',
+  date: '',
+  _dateDisplay: '',
+  state: '',
+  city: '',
+  minPrice: '',
+  maxPrice: '',
+  category: '',
+};
+ 
 const MatchVendor = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [preferences, setPreferences] = useState({
-    budget: '$10,000',
-    weddingStyle: 'Romantic elegant',
-    date: '03/18/YY',
-    location: 'California',
-    category: 'Photography',
-  });
-
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(vendorData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedVendors = vendorData.slice(startIndex, startIndex + itemsPerPage);
-
+ 
+  // Draft preferences — what user is typing/selecting
+  const [preferences, setPreferences] = useState(INITIAL_PREFERENCES);
+ 
+  // Applied preferences — what is actually sent to API (only after Search click)
+  const [appliedPreferences, setAppliedPreferences] = useState(INITIAL_PREFERENCES);
+ 
+  // Build query params from APPLIED preferences only
+  const queryParams = {
+    page: currentPage,
+    limit: 10,
+    ...(appliedPreferences.search && { search: appliedPreferences.search }),
+    ...(appliedPreferences.state && { state: appliedPreferences.state }),
+    ...(appliedPreferences.city && { city: appliedPreferences.city }),
+    ...(appliedPreferences.date && { availableDate: appliedPreferences.date }),
+    ...(appliedPreferences.minPrice && { minPrice: appliedPreferences.minPrice }),
+    ...(appliedPreferences.maxPrice && { maxPrice: appliedPreferences.maxPrice }),
+    ...(appliedPreferences.category && { category: appliedPreferences.category }),
+  };
+ 
+  const { data, isLoading, isFetching, isError } = useGetVendorSuggestedQuery(queryParams);
+  console.log("==================",data);
+  
+  const vendors = data?.data || [];
+  const meta = data?.meta || {};
+  const totalPages = meta?.totalPages || 1;
+  const totalItems = meta?.totalItems || 0;
+ 
+  // Apply filters and reset to page 1
+  const handleSearch = () => {
+    setAppliedPreferences({ ...preferences });
+    setCurrentPage(1);
+  };
+ 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
-
+ 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
-
+ 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+ 
   return (
-    <section className='w-full  text-[#171717] font-raleway '>
+    <section className='w-full text-[#171717] font-raleway'>
       <MatchVendorHeader />
-
+ 
       <MatchVendorPreferences
         preferences={preferences}
         setPreferences={setPreferences}
+        onSearch={handleSearch}
       />
-
+ 
       <VendorResultsSection
-        vendors={paginatedVendors}
-        totalCount={vendorData.length}
+        vendors={vendors}
+        totalCount={totalItems}
+        isLoading={isLoading || isFetching}
+        isError={isError}
       />
-
-      <MatchVendorPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPrevPage={handlePrevPage}
-        onNextPage={handleNextPage}
-        onPageChange={setCurrentPage}
-      />
+ 
+      {!isLoading && !isError && totalPages > 1 && (
+        <MatchVendorPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrevPage={handlePrevPage}
+          onNextPage={handleNextPage}
+          onPageChange={handlePageChange}
+        />
+      )}
     </section>
   );
 };
-
+ 
 export default MatchVendor;

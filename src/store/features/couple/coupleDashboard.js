@@ -1,8 +1,6 @@
 import { apiSlice } from "../../apiSlice";
 
 const CoupledashboardApi = apiSlice.injectEndpoints({
-  // tagTypes: ['CoupleExpense'],
-
   endpoints: (builder) => ({
     getCoupleDashboard: builder.query({
       query: () => ({
@@ -12,11 +10,51 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
       providesTags: ["Dashboard"],
     }),
 
+    // ✅ Single, correct definition of getVendorSuggested
     getVendorSuggested: builder.query({
-      query: (page = 1) => ({
-        url: `vendor-profiles/couple?page=${page}&limit=10`,
-        method: "GET",
-      }),
+      query: (params = {}) => {
+        const resolvedParams = typeof params === "number" ? { page: params } : params;
+
+        const {
+          page = 1,
+          limit = 10,
+          sortBy,
+          sortOrder,
+          search,
+          availableDate,
+          minPrice,
+          maxPrice,
+          category,
+          state,
+          city,
+        } = resolvedParams;
+
+        const queryObj = {
+          page: String(page),
+          limit: String(limit),
+        };
+
+        if (sortBy)                                       queryObj.sortBy = sortBy;
+        if (sortOrder)                                    queryObj.sortOrder = sortOrder;
+        if (search?.trim())                               queryObj.search = search.trim();
+        if (availableDate)                                queryObj.availableDate = availableDate;
+        if (minPrice !== undefined && minPrice !== "")    queryObj.minPrice = String(minPrice);
+        if (maxPrice !== undefined && maxPrice !== "")    queryObj.maxPrice = String(maxPrice);
+        if (category)                                     queryObj.category = category;
+        if (state)                                        queryObj.state = state;
+        if (city)                                         queryObj.city = city;
+
+        const queryString = new URLSearchParams(queryObj).toString();
+
+        return {
+          url: `vendor-profiles/couple?${queryString}`,
+          method: "GET",
+        };
+      },
+      serializeQueryArgs: ({ queryArgs }) => {
+        const resolved = typeof queryArgs === "number" ? { page: queryArgs } : queryArgs;
+        return JSON.stringify(resolved);
+      },
     }),
 
     getCoupleProfile: builder.query({
@@ -25,12 +63,14 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
     getStates: builder.query({
       query: () => ({
         url: `/state`,
         method: "GET",
       }),
     }),
+
     getCategories: builder.query({
       query: () => ({
         url: `/categories`,
@@ -47,6 +87,7 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         return Array.isArray(categoryList) ? categoryList : [];
       },
     }),
+
     getCoupleExpense: builder.query({
       query: () => ({
         url: `/couple-expense`,
@@ -115,24 +156,17 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body: { isCompleted },
       }),
-      async onQueryStarted(
-        { taskId, isCompleted },
-        { dispatch, queryFulfilled },
-      ) {
+      async onQueryStarted({ taskId, isCompleted }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
-          CoupledashboardApi.util.updateQueryData(
-            "getCoupleChecklist",
-            undefined,
-            (draft) => {
-              for (const section of draft) {
-                const task = section.tasks?.find((t) => t.id === taskId);
-                if (task) {
-                  task.isCompleted = isCompleted;
-                  break;
-                }
+          CoupledashboardApi.util.updateQueryData("getCoupleChecklist", undefined, (draft) => {
+            for (const section of draft) {
+              const task = section.tasks?.find((t) => t.id === taskId);
+              if (task) {
+                task.isCompleted = isCompleted;
+                break;
               }
-            },
-          ),
+            }
+          })
         );
         try {
           await queryFulfilled;
@@ -150,6 +184,7 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Checklist"],
     }),
+
     updateCoupleChecklist: builder.mutation({
       query: ({ taskSectionId, body }) => ({
         url: `/couple-checklist/${taskSectionId}`,
@@ -169,7 +204,8 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         return response?.data?.sections || response?.data || response || [];
       },
     }),
-updateTimelineTaskStatus: builder.mutation({
+
+    updateTimelineTaskStatus: builder.mutation({
       query: ({ taskId, isCompleted }) => ({
         url: `/couple-timeline/task-status/${taskId}`,
         method: "PATCH",
@@ -197,7 +233,6 @@ updateTimelineTaskStatus: builder.mutation({
       },
     }),
 
-
     updateTimelineSectionNote: builder.mutation({
       query: ({ timelineSectionId, note }) => ({
         url: `/couple-timeline/${timelineSectionId}`,
@@ -224,75 +259,74 @@ updateTimelineTaskStatus: builder.mutation({
     }),
 
     createTimelineTask: builder.mutation({
-  query: (body) => ({
-    url: "/couple-timeline",
-    method: "POST",
-    body,
-  }),
-  invalidatesTags: ["Timeline"],
-}),
-getCoupleSchedule: builder.query({
-  query: () => ({
-    url: `/couple-day-schedule`,
-    method: "GET",
-  }),
-  providesTags: ["Schedule"],
-  transformResponse: (response) => {
-  return response?.data || [];  
-},
-}),
-createCoupleSchedule: builder.mutation({
-  query: (body) => ({
-    url: `/couple-day-schedule`,
-    method: "POST",
-    body,
-  }),
-  invalidatesTags: ["Schedule"],
-}),
+      query: (body) => ({
+        url: "/couple-timeline",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Timeline"],
+    }),
 
+    getCoupleSchedule: builder.query({
+      query: () => ({
+        url: `/couple-day-schedule`,
+        method: "GET",
+      }),
+      providesTags: ["Schedule"],
+      transformResponse: (response) => {
+        return response?.data || [];
+      },
+    }),
 
-updateCoupleSchedule: builder.mutation({
-  query: ({ id, body }) => ({
-    url: `/couple-day-schedule/${id}`,
-    method: "PATCH",
-    body,
-  }),
-  async onQueryStarted({ id, body }, { dispatch, queryFulfilled }) {
-    const patchResult = dispatch(
-      CoupledashboardApi.util.updateQueryData("getCoupleSchedule", undefined, (draft) => {
-        const item = draft.find((s) => s.id === id);
-        if (item) Object.assign(item, body);
-      })
-    );
-    try {
-      await queryFulfilled;
-    } catch {
-      patchResult.undo();
-    }
-  },
-}),
- 
+    createCoupleSchedule: builder.mutation({
+      query: (body) => ({
+        url: `/couple-day-schedule`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Schedule"],
+    }),
 
+    updateCoupleSchedule: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/couple-day-schedule/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      async onQueryStarted({ id, body }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          CoupledashboardApi.util.updateQueryData("getCoupleSchedule", undefined, (draft) => {
+            const item = draft.find((s) => s.id === id);
+            if (item) Object.assign(item, body);
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
 
-deleteCoupleSchedule: builder.mutation({
-  query: (id) => ({
-    url: `/couple-day-schedule/${id}`,
-    method: "DELETE",
-  }),
-  async onQueryStarted(id, { dispatch, queryFulfilled }) {
-    const patchResult = dispatch(
-      CoupledashboardApi.util.updateQueryData("getCoupleSchedule", undefined, (draft) => {
-        const index = draft.findIndex((s) => s.id === id);
-        if (index !== -1) draft.splice(index, 1);
-      })
-    );
-    try {
-      await queryFulfilled;
-    } catch {
-      patchResult.undo();
-    }
-  },
-}),
+    deleteCoupleSchedule: builder.mutation({
+      query: (id) => ({
+        url: `/couple-day-schedule/${id}`,
+        method: "DELETE",
+      }),
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          CoupledashboardApi.util.updateQueryData("getCoupleSchedule", undefined, (draft) => {
+            const index = draft.findIndex((s) => s.id === id);
+            if (index !== -1) draft.splice(index, 1);
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
@@ -314,7 +348,7 @@ const {
   useUpdateTimelineTaskStatusMutation,
   useUpdateTimelineSectionNoteMutation,
   useCreateTimelineTaskMutation,
-    useGetCoupleScheduleQuery,
+  useGetCoupleScheduleQuery,
   useCreateCoupleScheduleMutation,
   useUpdateCoupleScheduleMutation,
   useDeleteCoupleScheduleMutation,
