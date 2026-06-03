@@ -109,23 +109,30 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
       transformResponse: (response) => response?.data || [],
     }),
 
-  updateTaskStatus: builder.mutation({
+    updateTaskStatus: builder.mutation({
       query: ({ taskId, isCompleted }) => ({
         url: `/couple-checklist/task-status/${taskId}`,
         method: "PATCH",
         body: { isCompleted },
       }),
-      async onQueryStarted({ taskId, isCompleted }, { dispatch, queryFulfilled }) {
+      async onQueryStarted(
+        { taskId, isCompleted },
+        { dispatch, queryFulfilled },
+      ) {
         const patchResult = dispatch(
-          CoupledashboardApi.util.updateQueryData("getCoupleChecklist", undefined, (draft) => {
-            for (const section of draft) {
-              const task = section.tasks?.find((t) => t.id === taskId);
-              if (task) {
-                task.isCompleted = isCompleted;
-                break;
+          CoupledashboardApi.util.updateQueryData(
+            "getCoupleChecklist",
+            undefined,
+            (draft) => {
+              for (const section of draft) {
+                const task = section.tasks?.find((t) => t.id === taskId);
+                if (task) {
+                  task.isCompleted = isCompleted;
+                  break;
+                }
               }
-            }
-          })
+            },
+          ),
         );
         try {
           await queryFulfilled;
@@ -151,6 +158,141 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Checklist"],
     }),
+
+    getCoupleTimeline: builder.query({
+      query: () => ({
+        url: `/couple-timeline`,
+        method: "GET",
+      }),
+      providesTags: ["Timeline"],
+      transformResponse: (response) => {
+        return response?.data?.sections || response?.data || response || [];
+      },
+    }),
+updateTimelineTaskStatus: builder.mutation({
+      query: ({ taskId, isCompleted }) => ({
+        url: `/couple-timeline/task-status/${taskId}`,
+        method: "PATCH",
+        body: { isCompleted },
+      }),
+      async onQueryStarted({ taskId, isCompleted }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          CoupledashboardApi.util.updateQueryData("getCoupleTimeline", undefined, (draft) => {
+            if (Array.isArray(draft)) {
+              for (const section of draft) {
+                const task = section.tasks?.find((t) => t.id === taskId);
+                if (task) {
+                  task.isCompleted = isCompleted;
+                  break;
+                }
+              }
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
+
+
+    updateTimelineSectionNote: builder.mutation({
+      query: ({ timelineSectionId, note }) => ({
+        url: `/couple-timeline/${timelineSectionId}`,
+        method: "PATCH",
+        body: { note },
+      }),
+      async onQueryStarted({ timelineSectionId, note }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          CoupledashboardApi.util.updateQueryData("getCoupleTimeline", undefined, (draft) => {
+            if (Array.isArray(draft)) {
+              const section = draft.find((s) => s.id === timelineSectionId);
+              if (section) {
+                section.note = note;
+              }
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
+
+    createTimelineTask: builder.mutation({
+  query: (body) => ({
+    url: "/couple-timeline",
+    method: "POST",
+    body,
+  }),
+  invalidatesTags: ["Timeline"],
+}),
+getCoupleSchedule: builder.query({
+  query: () => ({
+    url: `/couple-day-schedule`,
+    method: "GET",
+  }),
+  providesTags: ["Schedule"],
+  transformResponse: (response) => {
+  return response?.data || [];  
+},
+}),
+createCoupleSchedule: builder.mutation({
+  query: (body) => ({
+    url: `/couple-day-schedule`,
+    method: "POST",
+    body,
+  }),
+  invalidatesTags: ["Schedule"],
+}),
+
+
+updateCoupleSchedule: builder.mutation({
+  query: ({ id, body }) => ({
+    url: `/couple-day-schedule/${id}`,
+    method: "PATCH",
+    body,
+  }),
+  async onQueryStarted({ id, body }, { dispatch, queryFulfilled }) {
+    const patchResult = dispatch(
+      CoupledashboardApi.util.updateQueryData("getCoupleSchedule", undefined, (draft) => {
+        const item = draft.find((s) => s.id === id);
+        if (item) Object.assign(item, body);
+      })
+    );
+    try {
+      await queryFulfilled;
+    } catch {
+      patchResult.undo();
+    }
+  },
+}),
+ 
+
+
+deleteCoupleSchedule: builder.mutation({
+  query: (id) => ({
+    url: `/couple-day-schedule/${id}`,
+    method: "DELETE",
+  }),
+  async onQueryStarted(id, { dispatch, queryFulfilled }) {
+    const patchResult = dispatch(
+      CoupledashboardApi.util.updateQueryData("getCoupleSchedule", undefined, (draft) => {
+        const index = draft.findIndex((s) => s.id === id);
+        if (index !== -1) draft.splice(index, 1);
+      })
+    );
+    try {
+      await queryFulfilled;
+    } catch {
+      patchResult.undo();
+    }
+  },
+}),
   }),
 });
 
@@ -168,6 +310,14 @@ const {
   useUpdateTaskStatusMutation,
   useCreateCoupleChecklistMutation,
   useUpdateCoupleChecklistMutation,
+  useGetCoupleTimelineQuery,
+  useUpdateTimelineTaskStatusMutation,
+  useUpdateTimelineSectionNoteMutation,
+  useCreateTimelineTaskMutation,
+    useGetCoupleScheduleQuery,
+  useCreateCoupleScheduleMutation,
+  useUpdateCoupleScheduleMutation,
+  useDeleteCoupleScheduleMutation,
 } = CoupledashboardApi;
 
 export {
@@ -184,4 +334,12 @@ export {
   useUpdateTaskStatusMutation,
   useCreateCoupleChecklistMutation,
   useUpdateCoupleChecklistMutation,
+  useGetCoupleTimelineQuery,
+  useUpdateTimelineTaskStatusMutation,
+  useUpdateTimelineSectionNoteMutation,
+  useCreateTimelineTaskMutation,
+  useGetCoupleScheduleQuery,
+  useCreateCoupleScheduleMutation,
+  useUpdateCoupleScheduleMutation,
+  useDeleteCoupleScheduleMutation,
 };
