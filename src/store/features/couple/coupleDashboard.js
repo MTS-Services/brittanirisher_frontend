@@ -1,7 +1,7 @@
 import { apiSlice } from "../../apiSlice";
 
 const CoupledashboardApi = apiSlice.injectEndpoints({
-  // tagTypes: ['CoupleExpense'], 
+  // tagTypes: ['CoupleExpense'],
 
   endpoints: (builder) => ({
     getCoupleDashboard: builder.query({
@@ -9,7 +9,7 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         url: `/couple-profiles/dashboard`,
         method: "GET",
       }),
-      providesTags : ['Dashboard'],
+      providesTags: ["Dashboard"],
     }),
 
     getVendorSuggested: builder.query({
@@ -34,7 +34,7 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
     getCategories: builder.query({
       query: () => ({
         url: `/categories`,
-        method: 'GET',
+        method: "GET",
       }),
       transformResponse: (response) => {
         const categoryList =
@@ -52,7 +52,7 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         url: `/couple-expense`,
         method: "GET",
       }),
-      providesTags: ['CoupleExpense'],
+      providesTags: ["CoupleExpense"],
       transformResponse: (response) => {
         const expenseList =
           response?.data?.expenses ||
@@ -68,9 +68,9 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
     getCoupleExpenseById: builder.query({
       query: (id) => ({
         url: `/couple-expense/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'CoupleExpense', id }],
+      providesTags: (result, error, id) => [{ type: "CoupleExpense", id }],
       transformResponse: (response) => {
         return (
           response?.data?.expense ||
@@ -81,16 +81,15 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
           response
         );
       },
-      
     }),
 
     createCoupleExpense: builder.mutation({
       query: (body) => ({
         url: `/couple-expense`,
-        method: 'POST',
+        method: "POST",
         body,
       }),
-     invalidatesTags: ['CoupleExpense', 'Dashboard'],
+      invalidatesTags: ["CoupleExpense", "Dashboard"],
     }),
 
     updateCoupleProfile: builder.mutation({
@@ -99,6 +98,58 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
+    }),
+
+    getCoupleChecklist: builder.query({
+      query: () => ({
+        url: "/couple-checklist",
+        method: "GET",
+      }),
+      providesTags: ["Checklist"],
+      transformResponse: (response) => response?.data || [],
+    }),
+
+  updateTaskStatus: builder.mutation({
+      query: ({ taskId, isCompleted }) => ({
+        url: `/couple-checklist/task-status/${taskId}`,
+        method: "PATCH",
+        body: { isCompleted },
+      }),
+      async onQueryStarted({ taskId, isCompleted }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          CoupledashboardApi.util.updateQueryData("getCoupleChecklist", undefined, (draft) => {
+            for (const section of draft) {
+              const task = section.tasks?.find((t) => t.id === taskId);
+              if (task) {
+                task.isCompleted = isCompleted;
+                break;
+              }
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
+
+    createCoupleChecklist: builder.mutation({
+      query: (body) => ({
+        url: "/couple-checklist",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Checklist"],
+    }),
+    updateCoupleChecklist: builder.mutation({
+      query: ({ taskSectionId, body }) => ({
+        url: `/couple-checklist/${taskSectionId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Checklist"],
     }),
   }),
 });
@@ -113,6 +164,10 @@ const {
   useGetCoupleExpenseByIdQuery,
   useCreateCoupleExpenseMutation,
   useUpdateCoupleProfileMutation,
+  useGetCoupleChecklistQuery,
+  useUpdateTaskStatusMutation,
+  useCreateCoupleChecklistMutation,
+  useUpdateCoupleChecklistMutation,
 } = CoupledashboardApi;
 
 export {
@@ -125,4 +180,8 @@ export {
   useGetCoupleExpenseByIdQuery,
   useCreateCoupleExpenseMutation,
   useUpdateCoupleProfileMutation,
+  useGetCoupleChecklistQuery,
+  useUpdateTaskStatusMutation,
+  useCreateCoupleChecklistMutation,
+  useUpdateCoupleChecklistMutation,
 };
