@@ -6,6 +6,15 @@ import {
   useDeleteCoupleScheduleMutation,
 } from "../../../../store/features/couple/coupleDashboard";
 
+
+const ScheduleSkeleton = () => (
+  <div className="w-full animate-pulse space-y-6">
+    <div className="h-12 bg-gray-200 rounded-xl w-1/3" />
+    <div className="h-24 bg-gray-200 rounded-2xl w-full" />
+    <div className="h-48 bg-gray-200 rounded-2xl w-full" />
+  </div>
+);
+
 // ─── Inline Edit Row ──────────────────────────────────────────
 const EditRow = ({ schedule, onSave, onCancel }) => {
   const [form, setForm] = useState({
@@ -85,7 +94,6 @@ const ScheduleItem = ({ schedule, onEdit, onDelete }) => {
 
   return (
     <div className="relative flex items-center gap-4 p-3 border border-[#F5F5F5] bg-[#FDFCFC] rounded-xl group">
-      {/* Time Badge */}
       <div className="flex flex-col items-center justify-center bg-[#FFFBF7] border border-[#F7EAD9] rounded-lg p-2 min-w-[75px]">
         <Clock3 className="h-3.5 w-3.5 text-[#FFB03A]" />
         <span className="text-[11px] font-bold text-[#707070] mt-0.5 whitespace-nowrap">
@@ -93,7 +101,6 @@ const ScheduleItem = ({ schedule, onEdit, onDelete }) => {
         </span>
       </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-semibold text-[#2f2f2f] truncate">
           {schedule.eventName}
@@ -104,7 +111,6 @@ const ScheduleItem = ({ schedule, onEdit, onDelete }) => {
         </p>
       </div>
 
-      {/* Action Buttons — visible on hover */}
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
         <button
           onClick={() => onEdit(schedule)}
@@ -122,7 +128,6 @@ const ScheduleItem = ({ schedule, onEdit, onDelete }) => {
         </button>
       </div>
 
-      {/* Delete Confirm */}
       {showDeleteConfirm && (
         <DeleteConfirm
           onConfirm={() => {
@@ -136,22 +141,19 @@ const ScheduleItem = ({ schedule, onEdit, onDelete }) => {
   );
 };
 
-// ─── Skeleton ─────────────────────────────────────────────────
-const ScheduleSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-pulse">
-    {Array.from({ length: 4 }).map((_, i) => (
-      <div key={i} className="h-16 bg-gray-100 rounded-xl" />
-    ))}
-  </div>
-);
-
 // ─── Main Component ───────────────────────────────────────────
 const WeddingScheduleCard = ({ onOpenModal }) => {
   const { data: schedules = [], isLoading, isError } = useGetCoupleScheduleQuery();
   const [updateCoupleSchedule] = useUpdateCoupleScheduleMutation();
   const [deleteCoupleSchedule] = useDeleteCoupleScheduleMutation();
-
   const [editingId, setEditingId] = useState(null);
+
+  if (isLoading) return <ScheduleSkeleton />;
+  if (isError) return (
+    <div className="text-center py-10 text-red-500">
+      Failed to load schedule data.
+    </div>
+  );
 
   const handleEdit = (schedule) => setEditingId(schedule.id);
 
@@ -174,7 +176,6 @@ const WeddingScheduleCard = ({ onOpenModal }) => {
 
   return (
     <div className="bg-white font-raleway border border-[#EBEBEB] rounded-xl p-6 space-y-4">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <CalendarDays className="h-5 w-5 text-[#8aa088]" />
@@ -188,21 +189,13 @@ const WeddingScheduleCard = ({ onOpenModal }) => {
         </button>
       </div>
 
-      {/* Event count */}
-      {!isLoading && !isError && schedules.length > 0 && (
+      {schedules.length > 0 && (
         <p className="text-xs text-[#9a9a9a]">
           {schedules.length} event{schedules.length !== 1 ? "s" : ""} planned
         </p>
       )}
 
-      {/* Content */}
-      {isLoading ? (
-        <ScheduleSkeleton />
-      ) : isError ? (
-        <div className="text-center py-8 text-red-400 text-sm">
-          Failed to load schedule. Please try again.
-        </div>
-      ) : schedules.length === 0 ? (
+      {schedules.length === 0 ? (
         <div className="text-center py-10 text-[#c0c0c0] text-sm">
           No events added yet. Click{" "}
           <span className="text-[#9bae99] font-medium">+ Add Schedule</span> to get started.
