@@ -1,9 +1,6 @@
 import React, { memo, useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  Star,
-  ArrowLeft,
-  Heart,
   Check,
   X,
   ChevronLeft,
@@ -11,9 +8,11 @@ import {
   Mail,
   Phone,
   ChevronRight,
-  BadgeCheck,
+  Heart,
 } from "lucide-react";
-import ALL_VENDORS from "../data/vendors";
+import { useGetVendorDetailQuery,useSendEnquiryMutation } from "../../src/store/features/public/publicApi"; 
+import { useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard";
+// import {  } from "../../src/store/features/couple/coupleDashboard"; 
 import { useSEO } from "../hooks/useSEO";
 
 const formatDate = (iso) => {
@@ -28,57 +27,38 @@ const formatDate = (iso) => {
 };
 
 const PricingCard = memo(({ plan }) => {
-  const navigate = useNavigate();
   return (
     <article
       className={`relative rounded-lg border p-4 md:p-6 flex flex-col h-full shadow-sm ${
-        plan.featured
+        plan.badge
           ? "border-[#4f5b4d] bg-[#474f47] text-white scale-[1.02]"
           : "border-[#e4dbcf] bg-white text-[#2a241e]"
       }`}
     >
-      {plan.featured && (
-        <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#99a897] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
-          Most Popular
+      {plan.badge && (
+        <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#99a897] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white whitespace-nowrap">
+          {plan.badge}
         </span>
       )}
 
-      <h3 className="mt-5 font-playfair text-3xl">{plan.name}</h3>
+      <h3 className="mt-5 font-playfair text-3xl">{plan.packageName}</h3>
       <div className="mt-3 flex items-end gap-1">
-        <span className="font-playfair font-bold text-5xl leading-none">
-          {plan.price}
+        <span className="font-playfair font-bold text-4xl leading-none">
+          ${Number(plan.price).toLocaleString()}
         </span>
-        <span
-          className={`pb-1 text-sm ${plan.featured ? "text-white" : "text-[#857F7A]"}`}
-        >
-          {plan.period}
+        <span className={`pb-1 text-sm ${plan.badge ? "text-white" : "text-[#857F7A]"}`}>
+          /package
         </span>
       </div>
-      <p
-        className={`mt-4 mb-3 font-raleway text-base md:text-lg leading-7 ${plan.featured ? "text-white" : "text-[#857F7A]"}`}
-      >
-        {plan.description}
+      <p className={`mt-4 mb-3 font-raleway text-base md:text-lg leading-7 ${plan.badge ? "text-white" : "text-[#857F7A]"}`}>
+        {plan.shortDescription || "No description provided for this package."}
       </p>
-      <div
-        className={`border-t ${plan.featured ? "text-white" : "text-[#857F7A]"}`}
-      />
-      <ul className="mt-6 mb-6 space-y-3 text-sm">
-        {plan.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2 font-raleway">
-            <Check size={16} className="text-[#16B21B]" />
+      <div className={`border-t ${plan.badge ? "border-white/20" : "border-[#e4dbcf]"}`} />
+      <ul className="mt-6 mb-6 space-y-3 text-sm flex-1">
+        {plan.features?.map((feature, idx) => (
+          <li key={idx} className="flex items-center gap-2 font-raleway">
+            <Check size={16} className="text-[#16B21B] shrink-0" />
             <span className="text-sm">{feature}</span>
-          </li>
-        ))}
-        {plan.excluded.map((feature) => (
-          <li
-            key={feature}
-            className="flex font-raleway items-center gap-2 opacity-80"
-          >
-            <X
-              size={16}
-              className={plan.featured ? "text-white/70" : "text-[#6b6b6b]"}
-            />
-            <span>{feature}</span>
           </li>
         ))}
       </ul>
@@ -86,62 +66,14 @@ const PricingCard = memo(({ plan }) => {
   );
 });
 
-const PricingGrid = () => {
-  const PLANS = [
-    {
-      id: "starter",
-      name: "Starter",
-      price: "$00",
-      period: "/month",
-      description: "Perfect for new wedding professionals just starting out.",
-      features: [
-        "Profile listing",
-        "Portfolio (10 items)",
-        "Direct Leads",
-        "Basic Support",
-      ],
-      excluded: [
-        "Featured Placement",
-        "Analytics Dashboard",
-        "Review Management",
-      ],
-    },
-    {
-      id: "professional",
-      name: "Professional",
-      price: "$25",
-      period: "/month",
-      description: "The most popular choice for established small businesses.",
-      featured: true,
-      features: [
-        "Priority Listing",
-        "Unlimited Portfolio",
-        "Lead Notifications",
-        "Review management",
-        "Basic support",
-      ],
-      excluded: ["Top-tier placement", "Top-Tier Placement"],
-    },
-    {
-      id: "premium",
-      name: "Premium",
-      price: "$75",
-      period: "/month",
-      description: "Maximum exposure for the wedding industry leaders.",
-      features: [
-        "Top-tier placement",
-        "Unlimited everything",
-        "Advanced analytics",
-        "Account manager",
-        "Lead Verification",
-      ],
-      excluded: [],
-    },
-  ];
+const PricingGrid = ({ packages }) => {
+  if (!packages || packages.length === 0) {
+    return <p className="text-[#857F7A] font-raleway mt-4">No packages available for this vendor.</p>;
+  }
 
   return (
-    <div className=" max-w-7xl mx-auto grid gap-8 md:gap-5 lg:grid-cols-3 auto-rows-fr">
-      {PLANS.map((plan) => (
+    <div className="max-w-7xl mx-auto grid gap-8 md:gap-5 lg:grid-cols-3 auto-rows-fr mt-8">
+      {packages.map((plan) => (
         <PricingCard key={plan.id} plan={plan} />
       ))}
     </div>
@@ -164,16 +96,18 @@ const buildMonthMatrix = (year, month) => {
 const VendorDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const vendorId = Number(id);
-  const vendor = useMemo(
-    () => ALL_VENDORS.find((v) => v.id === vendorId),
-    [vendorId],
-  );
   const enquiryRef = useRef(null);
 
+  const { data: response, isLoading, isError } = useGetVendorDetailQuery(id);
+  const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
+  
+  const [sendEnquiry, { isLoading: isInquiring }] = useSendEnquiryMutation();
+  
+  const vendor = response?.data;
+
   useSEO({
-    title: vendor ? `${vendor.name} — Vendor` : "Vendor details",
-    description: vendor ? vendor.description : "Vendor details",
+    title: vendor ? `${vendor.businessName} — Vendor` : "Vendor details",
+    description: vendor ? vendor.aboutMe : "Vendor details",
   });
 
   const [selectedDate, setSelectedDate] = useState("");
@@ -185,64 +119,46 @@ const VendorDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
 
+  useEffect(() => {
+    if (vendor && typeof vendor.isFavorite !== "undefined") {
+      setIsFavorite(vendor.isFavorite);
+    }
+  }, [vendor]);
+
   const heroImages = useMemo(() => {
     const arr = [];
-    const seen = new Set();
-
-    // prefer vendor.image first
-    if (vendor?.image) {
-      arr.push(vendor.image);
-      seen.add(vendor.image);
+    if (vendor?.coverImage) {
+      arr.push(vendor.coverImage);
     }
-
-    // then vendor portfolio unique images
-    const p = vendor?.portfolio || [];
-    for (let i = 0; i < p.length && arr.length < 3; i++) {
-      const src = p[i];
-      if (!seen.has(src)) {
-        arr.push(src);
-        seen.add(src);
-      }
+    if (vendor?.portfolioImages && vendor.portfolioImages.length > 0) {
+      vendor.portfolioImages.forEach((img) => {
+        if (img.mediaUrl) arr.push(img.mediaUrl);
+      });
     }
-
-    // if still short, pull images from other vendors' portfolios (avoid duplicates)
-    if (arr.length < 3) {
-      for (const other of ALL_VENDORS) {
-        if (!other || other.id === vendor?.id) continue;
-        const op = other.portfolio || [];
-        for (let j = 0; j < op.length && arr.length < 3; j++) {
-          const src = op[j];
-          if (!seen.has(src)) {
-            arr.push(src);
-            seen.add(src);
-          }
-        }
-        if (arr.length >= 3) break;
-      }
+    while (arr.length < 3) {
+      arr.push("/dummy-image-square.jpg");
     }
-
-    // final fallback to a dummy image
-    while (arr.length < 3) arr.push('/dummy-image-square.jpg');
-
-    return arr.slice(0, 3);
-  }, [vendorId]);
+    return arr;
+  }, [vendor]);
 
   useEffect(() => {
     setHeroIndex(0);
-  }, [vendorId]);
-
-  const prevHero = () => setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length);
-  const nextHero = () => setHeroIndex((i) => (i + 1) % heroImages.length);
-
-  useEffect(() => {
     setSelectedDate("");
     setBookingStatus("idle");
-  }, [vendorId]);
+  }, [id]);
 
-  if (!vendor) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto py-20 text-center">
-        <p className="text-lg">Vendor not found.</p>
+      <div className="container mx-auto py-20 text-center font-raleway">
+        <p className="text-lg">Loading vendor profile...</p>
+      </div>
+    );
+  }
+
+  if (isError || !vendor) {
+    return (
+      <div className="container mx-auto py-20 text-center font-raleway">
+        <p className="text-lg text-red-500">Vendor not found or failed to load profile.</p>
         <button
           onClick={() => navigate(-1)}
           className="mt-4 px-4 py-2 bg-[#3a3028] text-white rounded"
@@ -253,53 +169,67 @@ const VendorDetails = () => {
     );
   }
 
+  const prevHero = () => setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length);
+  const nextHero = () => setHeroIndex((i) => (i + 1) % heroImages.length);
+
   const availableSet = new Set(vendor.availableDates || []);
   const bookedSet = new Set(vendor.bookedDates || []);
-  const serviceHighlights = vendor.serviceHighlights || [];
-  const portfolioImages = (vendor.portfolio || []).map((src, index) => ({
-    src,
-    alt: `${vendor.name} portfolio ${index + 1}`,
-  }));
+  
+  const serviceHighlights = vendor.highlightedServices || [];
   const days = buildMonthMatrix(month.getFullYear(), month.getMonth());
 
-  const prevMonth = () =>
-    setMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
-  const nextMonth = () =>
-    setMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1));
+  const prevMonth = () => setMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
+  const nextMonth = () => setMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1));
 
   const handleBook = () => {
     if (!selectedDate) {
-      window.alert("Please select a date from the calendar.");
       return;
     }
     setBookingStatus("loading");
     setTimeout(() => {
-      if (!vendor.bookedDates) vendor.bookedDates = [];
-      vendor.bookedDates.push(selectedDate);
-      vendor.availableDates = (vendor.availableDates || []).filter(
-        (d) => d !== selectedDate,
-      );
       setBookingStatus("done");
-      window.alert(
-        `Booking request sent for ${formatDate(selectedDate)} — ${vendor.name}`,
-      );
+      window.alert(`Booking request sent for ${formatDate(selectedDate)} — ${vendor.businessName}`);
     }, 700);
   };
 
-  const handleSendEnquiry = (e) => {
+  const handleSendEnquiry = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
     const email = form.email.value.trim();
     const message = form.message.value.trim();
+
     if (!name || !phone || !email) {
-      window.alert("Please fill name, phone and email");
       return;
     }
-    window.alert("Enquiry sent (demo) — we will get back to you");
-    form.reset();
-    enquiryRef.current?.scrollIntoView({ behavior: "smooth" });
+
+    const enquiryPayload = {
+      vendorId: id, 
+      senderName: name,
+      senderPhone: phone,
+      senderEmail: email,
+      message: message || "",
+      status: "NEW"
+    };
+
+    try {
+      await sendEnquiry(enquiryPayload).unwrap();
+      form.reset();
+    } catch (error) {
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    const previousState = isFavorite;
+    setIsFavorite(!previousState);
+
+    try {
+      await saveVendor({ vendorId: id }).unwrap();
+    } catch (error) {
+      setIsFavorite(previousState);
+      window.alert("Failed to update favorite status. Please try again.");
+    }
   };
 
   return (
@@ -311,163 +241,135 @@ const VendorDetails = () => {
         className="pointer-events-none absolute right-10 top-470 z-50 hidden w-56 translate-x-1/4 -translate-y-1/4 md:block lg:w-40"
       />
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-base text-[#4A4A4A] inline-flex items-center gap-1.5"
-          >
-            <ChevronLeft size={22} /> Back
-          </button>
-        </div>
+        <button
+          onClick={() => navigate(-1)}
+          className="text-base text-[#4A4A4A] inline-flex items-center gap-1.5 font-raleway bg-transparent border-none cursor-pointer"
+        >
+          <ChevronLeft size={22} /> Back
+        </button>
       </div>
 
-      {/* Hero */}
-      <div className="overflow-hidden rounded-md  shadow-sm ">
+      {/* Hero Layout */}
+      <div className="overflow-hidden rounded-md shadow-sm border border-[#eadfcd] bg-white">
         <div className="relative">
           <img
             src={heroImages[heroIndex]}
-            alt={`${vendor.name} image ${heroIndex + 1}`}
-            className="w-full h-70 md:h-96 object-cover rounded-t-md"
+            alt={`${vendor.businessName} image ${heroIndex + 1}`}
+            className="w-full h-70 md:h-96 object-cover"
           />
           <button
             onClick={prevHero}
             aria-label="Previous image"
-            className="absolute left-1 md:left-3 top-1/2 -translate-y-1/2 bg-white p-1.5 md:p-2 rounded-full"
+            className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 md:p-2 rounded-full hover:bg-white shadow-sm"
           >
-            <ChevronLeft />
+            <ChevronLeft size={20} />
           </button>
           <button
             onClick={nextHero}
             aria-label="Next image"
-            className="absolute right-1 md:right-3 top-1/2 -translate-y-1/2 bg-white p-1.5 md:p-2 rounded-full"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 md:p-2 rounded-full hover:bg-white shadow-sm"
           >
-            <ChevronRight />
+            <ChevronRight size={20} />
           </button>
         </div>
         <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>
-            
-            <h1 className="text-2xl md:text-3xl font-serif text-[#201c18]">
-              {vendor.name}
+            <h1 className="text-2xl md:text-3xl font-serif text-[#201c18] capitalize">
+              {vendor.businessName}
             </h1>
-            <div className="py-1.5 mt-2 px-2.5 bg-[#e8dfd3] inline-flex rounded-full">
-              <span className="text-base">{vendor.category}</span>
-            </div>
-            <div className="flex flex-wrap font-raleway items-center gap-2 mt-4 text-sm md:text-base text-[#6B6B6B]">
-              <span><MapPin size={20} /></span>
-              <span>{vendor.location}</span>
-              <span><Mail size={20} /></span>
-              <span>{vendor.contact?.email}</span>
-              <span><Phone size={20} /></span>
-              <span>{vendor.contact?.phone}</span>
+            {vendor.category?.name && (
+              <div className="py-1 mt-2 px-3 bg-[#e8dfd3] inline-flex rounded-full text-xs font-raleway text-[#4a3f35]">
+                <span>{vendor.category.name}</span>
+              </div>
+            )}
+            <div className="flex flex-wrap font-raleway items-center gap-x-4 gap-y-2 mt-4 text-sm text-[#6B6B6B]">
+              <span className="flex items-center gap-1"><MapPin size={18} /> {vendor.location}</span>
+              <span className="flex items-center gap-1"><Mail size={18} /> {vendor.user?.email}</span>
+              {vendor.phone && (
+                <span className="flex items-center gap-1"><Phone size={18} /> {vendor.phone}</span>
+              )}
             </div>
           </div>
-          <div>
-            <div className="flex items-center gap-3">
-              <button
-                className="flex items-center gap-2 px-1 py-1 bg-white  rounded text-sm"
-                onClick={() => setIsFavorite((s) => !s)}
-              >
-                <Heart
-                  size={29}
-                  className={`text-[#D4A574] bg-isFavorite ? '#D4A574' : 'transparent' rounded-full p-0.5 transition-colors'}`}
-                />
-               
-              </button>
-              <a
-                href="#enquiry"
-                className="px-4 py-2 font-raleway bg-[#D4A574] text-[#FFFFFF] rounded text-base"
-              >
-                Send Inquiry
-              </a>
-            </div>
+          <div className="flex items-center gap-3 self-start md:self-auto">
+            <button
+              className="flex items-center justify-center p-2 bg-white border border-[#eadfcd] rounded-full transition-colors disabled:opacity-70"
+              onClick={handleToggleFavorite}
+              disabled={isSaving}
+              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart
+                size={24}
+                className={isFavorite ? "fill-[#D4A574] text-[#D4A574]" : "text-[#D4A574]"}
+              />
+            </button>
+            <a
+              href="#enquiry"
+              className="px-5 py-2.5 font-raleway bg-[#D4A574] hover:bg-[#c39463] text-white rounded text-sm font-medium transition-colors"
+            >
+              Send Inquiry
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Packages */}
-      <div className="relative  overflow-visible ">
-        <img
-          src="/Packages_Pricing_Left.png"
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -left-22 bottom-70 hidden w-44 -translate-x-1/2 translate-y-1/2 md:block lg:w-68"
-        />
-        <img
-          src="/Packages_Pricing.png"
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-16 top-1/2 hidden w-40 -translate-y-1/2 translate-x-1/2 md:block lg:w-68"
-        />
-
+      {/* Packages Section */}
+      <div className="relative overflow-visible">
         <section className="relative py-14">
           <div className="relative text-center">
-            <h2 className=" font-playfair mb-4 text-2xl text-[#2a241e] md:text-[30px]">
+            <h2 className="font-playfair mb-2 text-2xl text-[#2a241e] md:text-[30px]">
               Packages &amp; Pricing
             </h2>
-            <PricingGrid />
+            <PricingGrid packages={vendor.packages} />
           </div>
         </section>
       </div>
 
-
-  {/* About / Calendar / Enquiry */}
-      <section className="grid grid-cols-1 md:grid-cols-3 pb-14 gap-6 ">
-
+      {/* Grid: About / Calendar / Enquiry */}
+      <section className="grid grid-cols-1 md:grid-cols-3 pb-14 gap-6">
         {/* About Me */}
-        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6">
-          <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2 ">About Me</h2>
-          <p className="text-base font-raleway text-[#4a3f35] leading-relaxed">
-            {vendor.about}
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 border border-[#eadfcd]">
+          <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-3 border-b border-[#ddd6cd] mb-4">
+            About Me
+          </h2>
+          <p className="text-base font-raleway text-[#4a3f35] leading-relaxed whitespace-pre-line">
+            {vendor.aboutMe || "No introduction written yet."}
           </p>
         </div>
 
-        {/* Available Date */}
-        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between">
+        {/* Availability Calendar */}
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between border border-[#eadfcd]">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
-                Available Date
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#ddd6cd]">
+              <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl">
+                Available Dates
               </h2>
-              <div className="flex items-center gap-3 text-[11px] text-[#6b5e52]">
-                <span className="flex items-center gap-1 text-sm">
-                  <span className="w-2 h-2 rounded-full bg-[#b0a89c] inline-block" />
-                  Booked
-                </span>
-                <span className="flex items-center gap-1 text-sm ">
-                  <span className="w-2 h-2 rounded-full bg-[#5c6e58] inline-block" />
-                  Available
-                </span>
+              <div className="flex items-center gap-2 text-[11px] text-[#6b5e52]">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#b0a89c]" /> Booked</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#5c6e58]" /> Available</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={prevMonth}
-                className="text-[#4a3f35] px-2 hover:opacity-70 bg-transparent border-none"
-              >
-                <ChevronLeft size={22} />
+              <button onClick={prevMonth} className="text-[#4a3f35] p-1 hover:opacity-75 bg-transparent border-none cursor-pointer">
+                <ChevronLeft size={20} />
               </button>
-              <span className="text-lg md:text-2xl font-playfair font-semibold text-[#828282]">
+              <span className="text-lg font-playfair font-semibold text-[#2a241e]">
                 {monthLabel(month)}
               </span>
-              <button
-                onClick={nextMonth}
-                className="text-[#4a3f35] px-2 hover:opacity-70 bg-transparent border-none"
-              >
-                <ChevronRight size={22} />
+              <button onClick={nextMonth} className="text-[#4a3f35] p-1 hover:opacity-75 bg-transparent border-none cursor-pointer">
+                <ChevronRight size={20} />
               </button>
             </div>
 
-            <div className="grid grid-cols-7 text-center text-sm font-raleway text-[#8a7a6a] font-semibold mb-2 tracking-wide">
+            <div className="grid grid-cols-7 text-center text-xs font-semibold text-[#8a7a6a] mb-2 tracking-wider">
               {["SUN", "MO", "TU", "WED", "TH", "FR", "SA"].map((d) => (
                 <div key={d} className="py-1">{d}</div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-0.5 text-sm">
+            <div className="grid grid-cols-7 gap-1 text-sm">
               {days.map((dt, i) => {
-                if (!dt) return <div key={`blank-${i}`} className="py-3" />;
+                if (!dt) return <div key={`blank-${i}`} className="py-2" />;
                 const iso = dt.toISOString().slice(0, 10);
                 const isAvailable = availableSet.has(iso);
                 const isBooked = bookedSet.has(iso);
@@ -475,13 +377,10 @@ const VendorDetails = () => {
 
                 if (isSelected) {
                   return (
-                    <div
-                      key={iso}
-                      className="flex items-center justify-center py-1"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-[#6b7c65] text-white text-sm font-semibold flex items-center justify-center cursor-pointer">
+                    <div key={iso} className="flex items-center justify-center py-1">
+                      <button className="w-8 h-8 rounded-full bg-[#6b7c65] text-white text-xs font-semibold flex items-center justify-center cursor-pointer border-none">
                         {dt.getDate()}
-                      </div>
+                      </button>
                     </div>
                   );
                 }
@@ -491,11 +390,11 @@ const VendorDetails = () => {
                     key={iso}
                     onClick={() => { if (isAvailable) setSelectedDate(iso); }}
                     disabled={!isAvailable}
-                    className={`text-center py-2 text-base font-raleway rounded ${
+                    className={`text-center py-1.5 text-sm rounded transition-colors ${
                       isBooked
-                        ? "text-[#c8bfb5]  cursor-default font-raleway"
-                        : isAvailable
-                        ? "text-[#4a3f35] font-semibold hover:bg-[#f0ede6]"
+                        ? "text-[#c8bfb5] line-through cursor-not-allowed bg-[#f0ede6]/40"
+                        : "isAvailable"
+                        ? "text-[#4a3f35] font-semibold hover:bg-[#6b7c65] hover:text-white cursor-pointer"
                         : "text-[#c8bfb5] cursor-default"
                     }`}
                   >
@@ -506,156 +405,103 @@ const VendorDetails = () => {
             </div>
           </div>
 
-          <div className="mt-4 space-y-2">
+          <div className="mt-6">
             <button
               onClick={handleBook}
-              className="inline-flex w-full items-center justify-center px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm md:text-base font-raleway font-medium rounded tracking-wide transition-colors"
+              disabled={bookingStatus === "loading"}
+              className="w-full px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm font-medium rounded tracking-wide transition-colors cursor-pointer disabled:opacity-50"
             >
               {bookingStatus === "loading" ? "Requesting..." : "Request Booking"}
             </button>
-            {/* <p className="text-xs text-[#8a7a6a] font-raleway italic text-center">
-              Select an available date from the calendar before requesting booking.
-            </p> */}
           </div>
         </div>
 
-        {/* Send Enquiry */}
-        <div
-          className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6"
-          id="enquiry"
-          ref={enquiryRef}
-        >
-          <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-2">
+        {/* Inquiry Form */}
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 border border-[#eadfcd]" id="enquiry" ref={enquiryRef}>
+          <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-3 border-b border-[#ddd6cd] mb-4">
             Send Inquiry
           </h2>
           <form onSubmit={handleSendEnquiry} className="flex flex-col gap-3">
             <div>
-              <label className="block text-sm font-raleway font-semibold text-[#1a1a1a] mb-1">
-                Name
-              </label>
-              <input
-                name="name"
-                placeholder="Enter your full name"
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
-              />
+              <label className="block text-xs font-semibold text-[#1a1a1a] mb-1 font-raleway">Name</label>
+              <input name="name" required placeholder="Enter your full name" className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-white placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]" />
             </div>
             <div>
-              <label className="block text-[12px] font-semibold text-[#1a1a1a] mb-1">
-                Phone Number
-              </label>
-              <input
-                name="phone"
-                placeholder="Enter your phone number"
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
-              />
+              <label className="block text-xs font-semibold text-[#1a1a1a] mb-1 font-raleway">Phone Number</label>
+              <input name="phone" required placeholder="Enter your phone number" className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-white placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]" />
             </div>
             <div>
-              <label className="block text-[12px] font-semibold text-[#1a1a1a] mb-1">
-                Email
-              </label>
-              <input
-                name="email"
-                placeholder="Enter your email address"
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]"
-              />
+              <label className="block text-xs font-semibold text-[#1a1a1a] mb-1 font-raleway">Email</label>
+              <input name="email" type="email" required placeholder="Enter your email address" className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-white placeholder-[#b0a89c] outline-none focus:border-[#b0a89c]" />
             </div>
             <div>
-              <label className="block text-sm font-raleway font-semibold text-[#1a1a1a] mb-1">
-                Message
-              </label>
-              <textarea
-                name="message"
-                placeholder="Write how can I help you"
-                rows={4}
-                className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-[13px] text-[#4a3f35] bg-[#faf9f6] placeholder-[#b0a89c] outline-none focus:border-[#b0a89c] resize-none"
-              />
+              <label className="block text-xs font-semibold text-[#1a1a1a] mb-1 font-raleway">Message</label>
+              <textarea name="message" placeholder="Write how we can help you" rows={4} className="w-full px-3 py-2 border border-[#ddd6cd] rounded text-sm font-raleway text-[#4a3f35] bg-white placeholder-[#b0a89c] outline-none focus:border-[#b0a89c] resize-none" />
             </div>
-
-            <div className="mt-2 flex flex-row items-center gap-4">
-              <button
-                type="submit"
-                className="inline-flex flex-1 items-center justify-center px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm md:text-base font-raleway font-medium rounded tracking-wide transition-colors"
-              >
-                Submit
-              </button>
-            </div>
+            <button 
+              type="submit" 
+              disabled={isInquiring}
+              className="w-full mt-2 px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm font-medium rounded transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {isInquiring ? "Submitting..." : "Submit"}
+            </button>
           </form>
         </div>
-
       </section>
 
+      {/* Service Highlights */}
       <section className="relative mb-14 overflow-hidden rounded-md border border-[#eadfcd] bg-[#fbf7f0] px-4 py-6 shadow-sm md:px-6 md:py-7">
-   
-
         <div className="relative">
           <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl">
             Service Highlights
           </h4>
-
-          <div className="mt-5 grid gap-6 lg:grid-cols-[1.15fr_1fr_1fr]">
-            <div className="space-y-2.5">
-              {serviceHighlights.slice(0, 3).map((h) => (
-                <div key={h} className="flex items-start gap-2 text-[#6b5e52]">
-                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[10px] text-[#e0a15f]">
-                   <Check />
+          {serviceHighlights.length > 0 ? (
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {serviceHighlights.map((h, index) => (
+                <div key={index} className="flex items-start gap-2 text-[#6b5e52]">
+                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[#e0a15f]">
+                    <Check size={10} />
                   </span>
-                  <span className="font-raleway text-sm leading-6 md:text-[15px]">{h}</span>
+                  <span className="font-raleway text-sm leading-6">{h}</span>
                 </div>
               ))}
             </div>
-
-            <div className="space-y-3">
-              {serviceHighlights.slice(3, 6).map((h) => (
-                <div key={h} className="flex items-start gap-2 text-[#6b5e52]">
-                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[10px] text-[#e0a15f]">
-<Check />                  </span>
-                  <span className="font-raleway text-sm leading-6 md:text-[15px]">{h}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              {serviceHighlights.slice(6, 9).map((h) => (
-                <div key={h} className="flex items-start gap-2 text-[#6b5e52]">
-                  <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#e0a15f] text-[10px] text-[#e0a15f]">
-                    <Check />
-                  </span>
-                  <span className="font-raleway text-sm leading-6 md:text-[15px]">{h}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          ) : (
+            <p className="text-sm font-raleway text-[#857F7A] mt-2">No highlights specified.</p>
+          )}
 
           <div className="mt-6 grid gap-3 md:grid-cols-2">
-            <div className="rounded-md bg-white/85 px-4 py-4 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset] ring-1 ring-[#eadfcd]">
-              <p className="text-xs uppercase tracking-widest text-[#a08a76] font-raleway">Experience</p>
-              <p className="mt-1 font-playfair text-xl text-[#2a241e] ">8 years</p>
+            <div className="rounded-md bg-white/85 px-4 py-3 ring-1 ring-[#eadfcd]">
+              <p className="text-[10px] uppercase tracking-widest text-[#a08a76] font-raleway font-semibold">Experience</p>
+              <p className="mt-0.5 font-playfair text-lg text-[#2a241e]">{vendor.experienceYears || "N/A"}</p>
             </div>
-            <div className="rounded-md bg-white/85 px-4 py-4 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset] ring-1 ring-[#eadfcd]">
-              <p className="text-xs uppercase tracking-widest text-[#a08a76] font-raleway">Specialty</p>
-              <p className="mt-1 font-playfair text-lg text-[#2a241e] md:text-xl">Romantic &amp; Editorial</p>
+            <div className="rounded-md bg-white/85 px-4 py-3 ring-1 ring-[#eadfcd]">
+              <p className="text-[10px] uppercase tracking-widest text-[#a08a76] font-raleway font-semibold">Specialty</p>
+              <p className="mt-0.5 font-playfair text-lg text-[#2a241e] capitalize">{vendor.speciality || "N/A"}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Portfolio */}
-      <section className="mb-14">
-        <h4 className="font-playfair  text-xl font-semibold text-[#2a241e] md:text-2xl pb-4">
-          Portfolio
-        </h4>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
-          {portfolioImages.map((item, i) => (
-            <div key={item.alt} className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-[#eadfcd]">
-              <img
-                src={item.src}
-                alt={item.alt}
-                className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-36"
-              />
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Portfolio Section */}
+      {vendor.portfolioImages && vendor.portfolioImages.length > 0 && (
+        <section className="mb-14">
+          <h4 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-4">
+            Portfolio
+          </h4>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {vendor.portfolioImages.map((item) => (
+              <div key={item.id} className="group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-[#eadfcd]">
+                <img
+                  src={item.mediaUrl}
+                  alt="Portfolio media"
+                  className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-36"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
