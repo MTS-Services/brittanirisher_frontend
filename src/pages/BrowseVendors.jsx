@@ -19,6 +19,27 @@ const BUDGETS = [
 
 const VENDORS_PER_PAGE = 12;
 
+const BrowseVendorsSkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+    {[...Array(VENDORS_PER_PAGE)].map((_, index) => (
+      <div key={index} className="overflow-hidden rounded-xl border border-[#dfddd8] bg-white shadow-sm">
+        <div className="h-48 bg-[#ece9e2]" />
+        
+        <div className="p-4 space-y-3">
+          <div className="flex justify-between items-center">
+            <div className="h-4 w-1/3 rounded bg-[#ece9e2]" />
+            <div className="h-4 w-10 rounded bg-[#ece9e2]" />
+          </div>
+          <div className="h-5 w-3/4 rounded bg-[#ece9e2]" />
+          <div className="h-4 w-1/2 rounded bg-[#ece9e2]" />
+          <hr className="border-gray-100 pt-1" />
+          <div className="h-4 w-2/3 rounded bg-[#ece9e2]" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const BrowseVendors = memo(() => {
   const { data: categoriesData } = useGetCategoriesQuery();
   const { data: statesData } = useGetStatesQuery();
@@ -151,7 +172,6 @@ const BrowseVendors = memo(() => {
       <div className="mb-5">
         <p className="mb-2 text-base text-[#9a8a7a] font-raleway">Category</p>
         <div className="max-h-52 overflow-y-auto pr-1 scrollbar-thin">
-          {/* Default 'All Categories' Radio Button */}
           <label className="flex items-center gap-2.5 mb-1.5 cursor-pointer">
             <input
               type="radio"
@@ -168,7 +188,6 @@ const BrowseVendors = memo(() => {
             </span>
           </label>
 
-          {/* Dynamic Categories from API */}
           {categories.map((cat) => (
             <label key={cat.id || cat.slug} className="flex items-center gap-2.5 mb-1.5 cursor-pointer">
               <input
@@ -341,9 +360,8 @@ const BrowseVendors = memo(() => {
           </div>
         )}
 
-        {/* Shimmer loading state or Grid rendering */}
         {isLoading ? (
-          <div className="text-center py-20 font-raleway text-[#888]">Loading profiles...</div>
+          <BrowseVendorsSkeleton />
         ) : paginatedVendors.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedVendors.map((vendor) => (
@@ -360,7 +378,6 @@ const BrowseVendors = memo(() => {
           </div>
         )}
 
-        {/* Server Driven Pagination */}
         {!isLoading && totalPages > 1 && (
           <div className="flex items-center justify-center gap-1.5 mt-10 flex-wrap">
             <button 

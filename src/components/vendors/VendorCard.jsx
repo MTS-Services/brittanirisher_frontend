@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Star } from "lucide-react";
 import { API_CONFIG } from "../../config";
@@ -50,13 +50,19 @@ const VendorCard = memo(({ vendor, variant = "grid", onClick }) => {
   }, [vendor]);
 
   const displayPrice = useMemo(() => {
-    if (
-      vendor?.packagePriceRange?.low !== undefined &&
-      vendor?.packagePriceRange?.high !== undefined
-    ) {
-      return `$${vendor.packagePriceRange.low.toLocaleString()} - $${vendor.packagePriceRange.high.toLocaleString()}`;
+    if (vendor?.packagePriceRange?.low !== undefined) {
+      return `$${vendor.packagePriceRange.low.toLocaleString()}`;
     }
-    if (vendor?.price) return `$${vendor.price.toLocaleString()}`;
+    
+    if (typeof vendor?.price === 'string' && vendor.price.includes('-')) {
+      return vendor.price.split('-')[0].trim();
+    }
+
+    if (vendor?.price) {
+      return typeof vendor.price === 'number' 
+        ? `$${vendor.price.toLocaleString()}` 
+        : vendor.price;
+    }
     return "Contact Pricing";
   }, [vendor]);
 

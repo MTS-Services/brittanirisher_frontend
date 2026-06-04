@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CircleCheck, Circle } from 'lucide-react';
+import toast from 'react-hot-toast'; // টোস্ট ইমপোর্ট করা হয়েছে
 
 const ChecklistTimelineSection = ({ section, onToggleTask, onAddAnotherTask }) => {
   const tasks = section.tasks || [];
   const completedCount = tasks.filter(task => task.isCompleted).length;
   const totalCount = tasks.length;
+
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+   
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+   
+    if (totalCount > 0 && completedCount === totalCount) {
+      toast.success(`"${section.title}" section completed! `, {
+        id: `completed-${section.id || section.title}`, 
+      });
+    }
+  }, [completedCount, totalCount, section.title, section.id]);
 
   return (
     <section className='rounded-2xl border border-[#D4A57426] bg-white px-4 py-4 font-raleway'>
@@ -48,15 +66,13 @@ const ChecklistTimelineSection = ({ section, onToggleTask, onAddAnotherTask }) =
         ))}
       </div>
 
-    
-        <button
-          type='button'
-          onClick={() => onAddAnotherTask(section)}
-          className='mt-3 border-none bg-transparent p-0 text-sm text-[#778376] transition hover:text-[#707070] underline'
-        >
-          Add another task
-        </button>
-      
+      <button
+        type='button'
+        onClick={() => onAddAnotherTask(section)}
+        className='mt-3 border-none bg-transparent p-0 text-sm text-[#778376] transition hover:text-[#707070] underline'
+      >
+        Add another task
+      </button>
     </section>
   );
 };

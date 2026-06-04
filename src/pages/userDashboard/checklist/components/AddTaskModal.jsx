@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, Plus } from 'lucide-react';
+import { toast } from 'react-hot-toast'; 
 
 const AddTaskModal = ({ isOpen, onClose, onSave, isSubmitting, editSection }) => {
   const [taskTitle, setTaskTitle] = useState('');
@@ -34,14 +35,24 @@ const AddTaskModal = ({ isOpen, onClose, onSave, isSubmitting, editSection }) =>
     setTaskList((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!taskTitle.trim() || taskList.length === 0) return;
 
-    onSave({
-      title: taskTitle.trim(),
-      tasks: taskList,
-    });
+    const trimmedTitle = taskTitle.trim();
+
+    try {
+      await onSave({
+        title: trimmedTitle,
+        tasks: taskList,
+      });
+
+      toast.success(`"${trimmedTitle}" created successfully!`);
+      
+      onClose(); 
+    } catch (error) {
+      toast.error('Failed to save');
+    }
   };
 
   return (

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 const ChecklistSectionCard = ({ section, onToggleTask, onSaveNote, getPriorityStyle }) => {
   const tasks = section.tasks || [];
-  const sectionCompleted = tasks.filter((t) => t.isCompleted).length;
+  const totalCount = tasks.length;
+  const completedCount = tasks.filter((t) => t.isCompleted).length;
   
   const [noteText, setNoteText] = useState(section.note || "");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setNoteText(section.note || "");
@@ -14,6 +17,32 @@ const ChecklistSectionCard = ({ section, onToggleTask, onSaveNote, getPrioritySt
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  const handleTaskChange = async (taskId, currentStatus) => {
+    await onToggleTask(section.id, taskId, currentStatus);
+
+    
+    const nextCompletedCount = currentStatus ? completedCount - 1 : completedCount + 1;
+
+    if (totalCount > 0 && nextCompletedCount === totalCount) {
+      const sectionName = section.category || "Timeline Phase";
+      toast.success(`"${sectionName}" section completed! `, {
+        id: `card-completed-${section.id || sectionName}`,
+      });
+    }
+  };
+
+  const handleSaveNote = async () => {
+    setIsSaving(true);
+    try {
+      await onSaveNote(section.id, noteText);
+      toast.success("Note saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save note.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -31,12 +60,13 @@ const ChecklistSectionCard = ({ section, onToggleTask, onSaveNote, getPrioritySt
           <div>
             <span className="block text-[10px] font-bold text-[#b2b2b2] tracking-wider uppercase">COMPLETION</span>
             <span className="text-sm font-semibold text-[#5a5a5a]">
-              {sectionCompleted}/{tasks.length} Tasks
+              {completedCount}/{totalCount} Tasks
             </span>
           </div>
         </div>
       </div>
 
+      {/* Task List */}
       <div className="space-y-3">
         {tasks.map((task) => (
           <div key={task.id} className="flex flex-col rounded-xl border border-[#EBEBEB] bg-[#FDFCFC] p-4 space-y-2 transition hover:bg-gray-50">
@@ -45,7 +75,7 @@ const ChecklistSectionCard = ({ section, onToggleTask, onSaveNote, getPrioritySt
                 <input
                   type="checkbox"
                   checked={task.isCompleted}
-                  onChange={() => onToggleTask(section.id, task.id, task.isCompleted)}
+                  onChange={() => handleTaskChange(task.id, task.isCompleted)} 
                   className="h-5 w-5 rounded border border-[#aaaaaa] bg-white accent-[#9bae99] cursor-pointer transition-all"
                 />
                 <span
@@ -79,6 +109,7 @@ const ChecklistSectionCard = ({ section, onToggleTask, onSaveNote, getPrioritySt
         ))}
       </div>
 
+      {/* Phase Notes Section */}
       <div className="space-y-2 pt-2 border-t border-gray-100">
         <label className="text-xs font-bold text-[#707070] uppercase tracking-wider">PHASE NOTES</label>
         <textarea
@@ -90,10 +121,11 @@ const ChecklistSectionCard = ({ section, onToggleTask, onSaveNote, getPrioritySt
         <div className="flex justify-end">
           <button 
             type="button"
-            onClick={() => onSaveNote(section.id, noteText)}
-            className="bg-[#9bae99] bg-opacity-70 text-white text-xs px-4 py-1.5 rounded-lg hover:bg-opacity-100 transition"
+            onClick={handleSaveNote}
+            disabled={isSaving}
+            className="bg-[#9bae99] bg-opacity-70 text-white text-xs px-4 py-1.5 rounded-lg hover:bg-opacity-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Note
+            {isSaving ? "Saving..." : "Save Note"}
           </button>
         </div>
       </div>

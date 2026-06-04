@@ -10,7 +10,7 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react";
-import { useGetVendorDetailQuery, useSendEnquiryMutation,useGetVendorCalendarQuery } from "../../src/store/features/public/publicApi"; 
+import { useGetVendorDetailQuery, useSendEnquiryMutation, useGetVendorCalendarQuery } from "../../src/store/features/public/publicApi"; 
 import { useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard"; 
 import { useSEO } from "../hooks/useSEO";
 import { API_CONFIG } from "../config";
@@ -25,6 +25,82 @@ const formatDate = (iso) => {
     return iso;
   }
 };
+
+// ── Vendor Profile Full Skeleton Loader ──
+const VendorDetailsSkeleton = () => (
+  <div className="container mx-auto pt-8 px-4 space-y-10 animate-pulse">
+    {/* Back Button Skeleton */}
+    <div className="h-5 w-16 bg-[#ece9e2] rounded" />
+
+    {/* Hero Area Skeleton */}
+    <div className="overflow-hidden rounded-md border border-[#eadfcd] bg-white shadow-sm">
+      <div className="h-70 md:h-96 bg-[#ece9e2]" />
+      <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="space-y-3 flex-1">
+          <div className="h-8 w-1/3 bg-[#ece9e2] rounded" />
+          <div className="h-6 w-20 bg-[#ece9e2] rounded-full" />
+          <div className="flex gap-4 pt-2">
+            <div className="h-4 w-24 bg-[#ece9e2] rounded" />
+            <div className="h-4 w-32 bg-[#ece9e2] rounded" />
+            <div className="h-4 w-28 bg-[#ece9e2] rounded" />
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <div className="h-10 w-10 bg-[#ece9e2] rounded-full" />
+          <div className="h-10 w-28 bg-[#ece9e2] rounded" />
+        </div>
+      </div>
+    </div>
+
+    {/* Pricing Section Skeleton */}
+    <div className="text-center space-y-6">
+      <div className="h-7 w-48 bg-[#ece9e2] rounded mx-auto" />
+      <div className="grid gap-8 md:gap-5 lg:grid-cols-3">
+        {[...Array(3)].map((_, idx) => (
+          <div key={idx} className="rounded-lg border border-[#e4dbcf] bg-white p-6 space-y-4">
+            <div className="h-7 w-1/2 bg-[#ece9e2] rounded" />
+            <div className="h-10 w-1/3 bg-[#ece9e2] rounded" />
+            <div className="h-4 w-full bg-[#ece9e2] rounded" />
+            <hr className="border-[#e4dbcf]" />
+            <div className="space-y-2 pt-2">
+              <div className="h-4 w-3/4 bg-[#ece9e2] rounded" />
+              <div className="h-4 w-5/6 bg-[#ece9e2] rounded" />
+              <div className="h-4 w-2/3 bg-[#ece9e2] rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* 3-Column Grid Skeleton (About, Calendar, Inquiry) */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* About Skeleton */}
+      <div className="bg-[#faf9f6] rounded-md p-6 border border-[#eadfcd] space-y-4">
+        <div className="h-6 w-1/3 bg-[#ece9e2] rounded" />
+        <div className="space-y-2 pt-2">
+          <div className="h-4 w-full bg-[#ece9e2] rounded" />
+          <div className="h-4 w-full bg-[#ece9e2] rounded" />
+          <div className="h-4 w-4/5 bg-[#ece9e2] rounded" />
+        </div>
+      </div>
+      {/* Calendar Skeleton */}
+      <div className="bg-[#faf9f6] rounded-md p-6 border border-[#eadfcd] space-y-4">
+        <div className="h-6 w-1/2 bg-[#ece9e2] rounded" />
+        <div className="h-40 bg-[#ece9e2] rounded" />
+        <div className="h-10 w-full bg-[#ece9e2] rounded" />
+      </div>
+      {/* Inquiry Form Skeleton */}
+      <div className="bg-[#faf9f6] rounded-md p-6 border border-[#eadfcd] space-y-4">
+        <div className="h-6 w-1/2 bg-[#ece9e2] rounded" />
+        <div className="space-y-3">
+          <div className="h-8 w-full bg-[#ece9e2] rounded" />
+          <div className="h-8 w-full bg-[#ece9e2] rounded" />
+          <div className="h-8 w-full bg-[#ece9e2] rounded" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const PricingCard = memo(({ plan }) => {
   return (
@@ -118,18 +194,19 @@ const VendorDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
 
-  const calendarParams = useMemo(() => {
-    return {
-      vendorId: id,
-      month: String(month.getMonth() + 1).padStart(2, '0'),
-      year: month.getFullYear()
-    };
-  }, [id, month]);
+const calendarParams = useMemo(() => {
+  if (!id) return null;
+  return {
+    vendorId: id,
+    month: String(month.getMonth() + 1), 
+    year: month.getFullYear()
+  };
+}, [id, month]);
 
-  const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCalendarQuery(calendarParams, {
-    skip: !id,
-  });
-
+const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCalendarQuery(
+    calendarParams, 
+    { skip: !id } 
+  );
   useEffect(() => {
     if (vendor && typeof vendor.isFavorite !== "undefined") {
       setIsFavorite(vendor.isFavorite);
@@ -162,19 +239,15 @@ const VendorDetails = () => {
     const bookedDates = calendarResponse?.data?.days || [];
     const set = new Set();
     bookedDates.forEach(day => {
-      if (day.status === "BOOKED" && day.blockedDate) {
-        set.add(day.blockedDate.slice(0, 10));
+      if (day?.status === "BOOKED" && day?.blockedDate) {
+        set.add(day.blockedDate.slice(0, 10)); 
       }
     });
     return set;
   }, [calendarResponse]);
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto py-20 text-center font-raleway">
-        <p className="text-lg">Loading vendor profile...</p>
-      </div>
-    );
+    return <VendorDetailsSkeleton />;
   }
 
   if (isError || !vendor) {
@@ -247,7 +320,7 @@ const VendorDetails = () => {
       await saveVendor({ vendorId: id }).unwrap();
     } catch (error) {
       setIsFavorite(previousState);
-      window.alert("Failed to update favorite status. Please try again.");
+      
     }
   };
 
@@ -358,10 +431,10 @@ const VendorDetails = () => {
         {/* Availability Calendar */}
         <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between border border-[#eadfcd] relative">
           
-          {/* Calendar Loading Spinner */}
+          {/* Calendar Internal Loading overlay (When user switches months) */}
           {isCalendarLoading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-md">
-              <span className="text-xs text-[#6b7c65] font-semibold">Updating calendar...</span>
+              <span className="text-xs text-[#6b7c65] font-semibold animate-pulse">Updating calendar...</span>
             </div>
           )}
 
