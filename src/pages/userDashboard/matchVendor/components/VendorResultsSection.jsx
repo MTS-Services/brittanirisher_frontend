@@ -1,8 +1,33 @@
 import React from 'react';
-import { DollarSign, Heart, MapPin, Sparkles, Loader2 } from 'lucide-react';
+import { DollarSign, Heart, MapPin, Sparkles } from 'lucide-react';
 import { useSaveVendorMutation } from '../../../../store/features/couple/coupleDashboard'; 
+import { API_CONFIG } from "../../../../config";
 
-const BASE_URL = "https://api-brittanirisher.maktechgroup.tech";
+// স্কেলিটন লোডার কম্পোনেন্ট (১টি কার্ডের জন্য)
+const VendorCardSkeleton = () => (
+  <div className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm animate-pulse'>
+    {/* ইমেজের জন্য স্কেলিটন প্লেসহোল্ডার */}
+    <div className='h-48 bg-[#ece9e2]' />
+    
+    {/* টেক্সটের জন্য স্কেলিটন প্লেসহোল্ডার */}
+    <div className='px-3 py-2.5 space-y-3'>
+      {/* টাইটেল */}
+      <div className='h-5 w-3/4 rounded bg-[#ece9e2]' />
+      {/* ক্যাটাগরি */}
+      <div className='h-4 w-1/2 rounded bg-[#ece9e2]' />
+      
+      <div className='space-y-2 pt-1'>
+        {/* প্রাইস রেঞ্জ */}
+        <div className='h-3.5 w-2/3 rounded bg-[#ece9e2]' />
+        {/* লোকেশন */}
+        <div className='h-3.5 w-1/2 rounded bg-[#ece9e2]' />
+      </div>
+      
+      {/* বাটন */}
+      <div className='h-8 w-full rounded bg-[#ece9e2] mt-2' />
+    </div>
+  </div>
+);
 
 const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
   const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
@@ -17,9 +42,14 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
 
   if (isLoading) {
     return (
-      <section className='mb-6 flex items-center justify-center py-16'>
-        <Loader2 className='h-8 w-8 animate-spin text-[#9cae9b]' />
-        <span className='ml-3 font-raleway text-sm text-[#7a7a7a]'>Loading vendors...</span>
+      <section className='mb-6'>
+        <div className='mb-4 h-6 w-56 animate-pulse rounded bg-[#ece9e2]' />
+        
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
+          {[...Array(4)].map((_, index) => (
+            <VendorCardSkeleton key={index} />
+          ))}
+        </div>
       </section>
     );
   }
@@ -48,11 +78,12 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
         {vendors.map((vendor) => {
-          const imageUrl = vendor.thumbnailImage
-            ? vendor.thumbnailImage.startsWith('http')
-              ? vendor.thumbnailImage
-              : `${BASE_URL.replace(/\/$/, '')}/${vendor.thumbnailImage.replace(/^\//, '')}`
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.businessName || vendor.name || 'Vendor')}&background=ece9e2&color=8a8a8a&size=300`;
+          const rawImage = vendor.thumbnailImage;
+          const isFullUrl = rawImage?.startsWith('http://') || rawImage?.startsWith('https://');
+          
+          const finalImageUrl = isFullUrl 
+            ? rawImage 
+            : `${API_CONFIG.BASE_URL}${rawImage || '/dummy-image-square.jpg'}`;
 
           const priceRange =
             vendor.packagePriceRange?.low && vendor.packagePriceRange?.high
@@ -66,11 +97,11 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
             >
               <div className='relative h-48 bg-[#ece9e2]'>
                 <img
-                  src={imageUrl}
+                  src={finalImageUrl}
                   alt={vendor.businessName || vendor.name}
                   className='h-full w-full object-cover'
                   onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.name || 'Vendor')}&background=ece9e2&color=8a8a8a&size=300`;
+                    e.currentTarget.src = "/dummy-image-square.jpg";
                   }}
                 />
 

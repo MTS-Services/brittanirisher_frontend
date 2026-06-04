@@ -1,5 +1,6 @@
 import React from 'react';
 import { DollarSign, Heart, MapPin, Trash2 } from 'lucide-react';
+import { API_CONFIG } from '../../../../config';
 
 const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => {
   const baseUrl = ""; 
@@ -11,7 +12,7 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
     <article className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md'>
       <div className='relative h-52 bg-[#ece9e2]'>
         <img
-          src={imageUrl}
+          src={`${API_CONFIG.BASE_URL}${imageUrl}`}
           alt={vendor.name}
           className='h-full w-full object-cover'
           onError={(event) => {

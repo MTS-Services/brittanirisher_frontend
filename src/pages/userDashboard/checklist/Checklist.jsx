@@ -10,38 +10,38 @@ const SkeletonLoader = () => {
     <div className='w-full animate-pulse space-y-4'>
       {/* Header Skeleton */}
       <div className='flex items-center justify-between py-2'>
-        <div className='h-8 w-48 rounded bg-gray-200' />
-        <div className='h-10 w-32 rounded-md bg-gray-200' />
+        <div className='h-8 w-48 rounded bg-[#ece9e2]' />
+        <div className='h-10 w-32 rounded-md bg-[#ece9e2]' />
       </div>
 
       {/* Progress Card Skeleton */}
       <div className='rounded-xl border border-gray-100 bg-white p-4 shadow-sm'>
         <div className='mb-3 flex items-center justify-between'>
           <div className='space-y-2'>
-            <div className='h-7 w-36 rounded bg-gray-200' />
-            <div className='h-4 w-48 rounded bg-gray-200' />
+            <div className='h-7 w-36 rounded bg-[#ece9e2]' />
+            <div className='h-4 w-48 rounded bg-[#ece9e2]' />
           </div>
-          <div className='h-9 w-14 rounded bg-gray-200' />
+          <div className='h-9 w-14 rounded bg-[#ece9e2]' />
         </div>
-        <div className='h-2.5 w-full rounded-full bg-gray-200' />
+        <div className='h-2.5 w-full rounded-full bg-[#ece9e2]' />
       </div>
 
       {/* Section List Skeletons */}
       {[1, 2, 3].map((index) => (
         <div key={index} className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3'>
           <div className='flex items-center justify-between'>
-            <div className='h-6 w-40 rounded bg-gray-200' />
-            <div className='h-4 w-16 rounded bg-gray-200' />
+            <div className='h-6 w-40 rounded bg-[#ece9e2]' />
+            <div className='h-4 w-16 rounded bg-[#ece9e2]' />
           </div>
           <div className='space-y-2'>
             {[1, 2, 3].map((taskIndex) => (
-              <div key={taskIndex} className='flex h-10 items-center rounded-lg bg-gray-50 px-3'>
-                <div className='mr-3 h-5 w-5 rounded-full bg-gray-200' />
-                <div className='h-4 w-1/2 rounded bg-gray-200' />
+              <div key={taskIndex} className='flex h-10 items-center rounded-lg bg-[#ece9e2] px-3'>
+                <div className='mr-3 h-5 w-5 rounded-full bg-[#ece9e2]' />
+                <div className='h-4 w-1/2 rounded bg-[#ece9e2]' />
               </div>
             ))}
           </div>
-          <div className='h-4 w-28 rounded bg-gray-200 mt-2' />
+          <div className='h-4 w-28 rounded bg-[#ece9e2] mt-2' />
         </div>
       ))}
     </div>

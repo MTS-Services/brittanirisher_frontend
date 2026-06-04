@@ -5,12 +5,12 @@ import SuggestedCard from './SuggestedCard';
 const CardSkeleton = () => (
   <div className="flex h-full flex-col rounded-lg border border-[#f0eee9] p-4 animate-pulse bg-white">
     <div className="mb-4 flex items-center justify-between">
-      <div className="h-5 w-20 rounded-full bg-gray-200"></div>
-      <div className="h-4 w-16 rounded bg-gray-200"></div>
+      <div className="h-5 w-20 rounded-full bg-[#ece9e2]"></div>
+      <div className="h-4 w-16 rounded bg-[#ece9e2]"></div>
     </div>
-    <div className="mb-2 h-6 w-3/4 rounded bg-gray-300"></div>
-    <div className="mb-5 h-5 w-1/2 rounded bg-gray-200"></div>
-    <div className="mt-auto h-10 w-full rounded-lg bg-gray-200"></div>
+    <div className="mb-2 h-6 w-3/4 rounded bg-[#ece9e2]"></div>
+    <div className="mb-5 h-5 w-1/2 rounded bg-[#ece9e2]"></div>
+    <div className="mt-auto h-10 w-full rounded-lg bg-[#ece9e2]"></div>
   </div>
 );
 

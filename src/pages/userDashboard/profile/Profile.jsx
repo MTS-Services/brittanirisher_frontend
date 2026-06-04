@@ -7,21 +7,21 @@ import {
 
 const ProfileSkeleton = () => (
   <div className="w-full animate-pulse">
-    <div className="mb-6 h-8 w-48 rounded bg-gray-200"></div>
+  <div className="mb-6 h-8 w-48 rounded bg-[#ece9e2]"></div>
     <div className="mb-8 rounded-lg border border-[#e0dcd7] bg-white p-6">
-      <div className="mb-6 h-6 w-32 rounded bg-gray-200"></div>
+      <div className="mb-6 h-6 w-32 rounded bg-[#ece9e2]"></div>
       <div className="mb-6 flex gap-4">
-        <div className="h-16 w-16 rounded-full bg-gray-200"></div>
+        <div className="h-16 w-16 rounded-full bg-[#ece9e2]"></div>
         <div className="space-y-2">
-          <div className="h-5 w-40 rounded bg-gray-200"></div>
-          <div className="h-4 w-52 rounded bg-gray-200"></div>
+          <div className="h-5 w-40 rounded bg-[#ece9e2]"></div>
+          <div className="h-4 w-52 rounded bg-[#ece9e2]"></div>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[1, 2, 3, 4, 5, 6].map((n) => (
           <div key={n} className="space-y-2">
-            <div className="h-4 w-24 rounded bg-gray-200"></div>
-            <div className="h-10 w-full rounded bg-gray-100"></div>
+            <div className="h-4 w-24 rounded bg-[#ece9e2]"></div>
+            <div className="h-10 w-full rounded bg-[#ece9e2]"></div>
           </div>
         ))}
       </div>

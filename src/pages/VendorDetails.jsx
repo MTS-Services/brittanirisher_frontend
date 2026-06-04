@@ -10,10 +10,10 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react";
-import { useGetVendorDetailQuery,useSendEnquiryMutation } from "../../src/store/features/public/publicApi"; 
-import { useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard";
-// import {  } from "../../src/store/features/couple/coupleDashboard"; 
+import { useGetVendorDetailQuery, useSendEnquiryMutation,useGetVendorCalendarQuery } from "../../src/store/features/public/publicApi"; 
+import { useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard"; 
 import { useSEO } from "../hooks/useSEO";
+import { API_CONFIG } from "../config";
 
 const formatDate = (iso) => {
   try {
@@ -100,7 +100,6 @@ const VendorDetails = () => {
 
   const { data: response, isLoading, isError } = useGetVendorDetailQuery(id);
   const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
-  
   const [sendEnquiry, { isLoading: isInquiring }] = useSendEnquiryMutation();
   
   const vendor = response?.data;
@@ -118,6 +117,18 @@ const VendorDetails = () => {
   });
   const [isFavorite, setIsFavorite] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
+
+  const calendarParams = useMemo(() => {
+    return {
+      vendorId: id,
+      month: String(month.getMonth() + 1).padStart(2, '0'),
+      year: month.getFullYear()
+    };
+  }, [id, month]);
+
+  const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCalendarQuery(calendarParams, {
+    skip: !id,
+  });
 
   useEffect(() => {
     if (vendor && typeof vendor.isFavorite !== "undefined") {
@@ -147,6 +158,17 @@ const VendorDetails = () => {
     setBookingStatus("idle");
   }, [id]);
 
+  const bookedSet = useMemo(() => {
+    const bookedDates = calendarResponse?.data?.days || [];
+    const set = new Set();
+    bookedDates.forEach(day => {
+      if (day.status === "BOOKED" && day.blockedDate) {
+        set.add(day.blockedDate.slice(0, 10));
+      }
+    });
+    return set;
+  }, [calendarResponse]);
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-20 text-center font-raleway">
@@ -172,9 +194,6 @@ const VendorDetails = () => {
   const prevHero = () => setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length);
   const nextHero = () => setHeroIndex((i) => (i + 1) % heroImages.length);
 
-  const availableSet = new Set(vendor.availableDates || []);
-  const bookedSet = new Set(vendor.bookedDates || []);
-  
   const serviceHighlights = vendor.highlightedServices || [];
   const days = buildMonthMatrix(month.getFullYear(), month.getMonth());
 
@@ -253,7 +272,7 @@ const VendorDetails = () => {
       <div className="overflow-hidden rounded-md shadow-sm border border-[#eadfcd] bg-white">
         <div className="relative">
           <img
-            src={heroImages[heroIndex]}
+            src={`${API_CONFIG.BASE_URL}${heroImages[heroIndex]}`}
             alt={`${vendor.businessName} image ${heroIndex + 1}`}
             className="w-full h-70 md:h-96 object-cover"
           />
@@ -337,7 +356,15 @@ const VendorDetails = () => {
         </div>
 
         {/* Availability Calendar */}
-        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between border border-[#eadfcd]">
+        <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between border border-[#eadfcd] relative">
+          
+          {/* Calendar Loading Spinner */}
+          {isCalendarLoading && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-md">
+              <span className="text-xs text-[#6b7c65] font-semibold">Updating calendar...</span>
+            </div>
+          )}
+
           <div>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#ddd6cd]">
               <h2 className="font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl">
@@ -370,8 +397,12 @@ const VendorDetails = () => {
             <div className="grid grid-cols-7 gap-1 text-sm">
               {days.map((dt, i) => {
                 if (!dt) return <div key={`blank-${i}`} className="py-2" />;
-                const iso = dt.toISOString().slice(0, 10);
-                const isAvailable = availableSet.has(iso);
+                
+                const yearStr = dt.getFullYear();
+                const monthStr = String(dt.getMonth() + 1).padStart(2, '0');
+                const dayStr = String(dt.getDate()).padStart(2, '0');
+                const iso = `${yearStr}-${monthStr}-${dayStr}`;
+
                 const isBooked = bookedSet.has(iso);
                 const isSelected = selectedDate === iso;
 
@@ -388,14 +419,12 @@ const VendorDetails = () => {
                 return (
                   <button
                     key={iso}
-                    onClick={() => { if (isAvailable) setSelectedDate(iso); }}
-                    disabled={!isAvailable}
+                    onClick={() => { if (!isBooked) setSelectedDate(iso); }}
+                    disabled={isBooked}
                     className={`text-center py-1.5 text-sm rounded transition-colors ${
                       isBooked
                         ? "text-[#c8bfb5] line-through cursor-not-allowed bg-[#f0ede6]/40"
-                        : "isAvailable"
-                        ? "text-[#4a3f35] font-semibold hover:bg-[#6b7c65] hover:text-white cursor-pointer"
-                        : "text-[#c8bfb5] cursor-default"
+                        : "text-[#4a3f35] font-semibold hover:bg-[#6b7c65] hover:text-white cursor-pointer"
                     }`}
                   >
                     {dt.getDate()}
@@ -408,7 +437,7 @@ const VendorDetails = () => {
           <div className="mt-6">
             <button
               onClick={handleBook}
-              disabled={bookingStatus === "loading"}
+              disabled={bookingStatus === "loading" || !selectedDate}
               className="w-full px-4 py-2.5 bg-[#6b7c65] hover:bg-[#5c6e58] text-white text-sm font-medium rounded tracking-wide transition-colors cursor-pointer disabled:opacity-50"
             >
               {bookingStatus === "loading" ? "Requesting..." : "Request Booking"}
@@ -493,7 +522,7 @@ const VendorDetails = () => {
             {vendor.portfolioImages.map((item) => (
               <div key={item.id} className="group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-[#eadfcd]">
                 <img
-                  src={item.mediaUrl}
+                  src={`${API_CONFIG.BASE_URL}${item.mediaUrl}`}
                   alt="Portfolio media"
                   className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-36"
                 />

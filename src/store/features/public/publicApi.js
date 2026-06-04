@@ -21,9 +21,16 @@ export const coupleDashboardApi = apiSlice.injectEndpoints({
         body: enquiryData,
       }),
     }),
+    getVendorCalendar: builder.query({
+      query: ({ vendorId, month, year }) => ({
+        url: "/vendor-availabilities/calendar",
+        method: "GET",
+        params: { vendorId, month, year },
+      }),
+    }),
   }),
 });
 
-const { useGetVendorProfilesQuery,useGetVendorDetailQuery,useSendEnquiryMutation } = coupleDashboardApi;
+const { useGetVendorProfilesQuery,useGetVendorDetailQuery,useSendEnquiryMutation,useGetVendorCalendarQuery } = coupleDashboardApi;
 
-export { useGetVendorProfilesQuery,useGetVendorDetailQuery,useSendEnquiryMutation };
+export { useGetVendorProfilesQuery,useGetVendorDetailQuery,useSendEnquiryMutation,useGetVendorCalendarQuery };

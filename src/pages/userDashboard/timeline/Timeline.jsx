@@ -16,9 +16,9 @@ import {
 // ─── Skeleton ─────────────────────────────────────────────────
 const TimelineSkeleton = () => (
   <div className="w-full animate-pulse space-y-6">
-    <div className="h-12 bg-gray-200 rounded-xl w-1/3" />
-    <div className="h-24 bg-gray-200 rounded-2xl w-full" />
-    <div className="h-48 bg-gray-200 rounded-2xl w-full" />
+    <div className="h-12 bg-[#ece9e2] rounded-xl w-1/3" />
+    <div className="h-24 bg-[#ece9e2] rounded-2xl w-full" />
+    <div className="h-48 bg-[#ece9e2] rounded-2xl w-full" />
   </div>
 );
 

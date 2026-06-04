@@ -14,45 +14,45 @@ import { useGetCoupleExpenseQuery } from '../../../../store/features/couple/coup
 const ChartSkeleton = () => (
   <div className="mt-6 rounded-2xl border border-[#D4A57426] bg-white p-5 animate-pulse">
     {/* Title Skeleton */}
-    <div className="h-7 w-48 rounded bg-gray-200 mb-6"></div>
+    <div className="h-7 w-48 rounded bg-[#ece9e2]0 mb-6"></div>
     
     <div className="w-full overflow-x-auto lg:overflow-visible">
       <div className="h-72 min-w-160 lg:min-w-0 flex items-end gap-6 px-4 pb-8 border-b border-l border-gray-200">
        
-        <div className="h-[40%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[75%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[25%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[25%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[25%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[60%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[90%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[45%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[25%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[60%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[90%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[45%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[60%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[90%] w-full bg-gray-200/70 rounded-t-md"></div>
-        <div className="h-[45%] w-full bg-gray-200/70 rounded-t-md"></div>
+        <div className="h-[40%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[75%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[25%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[25%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[25%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[60%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[90%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[45%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[25%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[60%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[90%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[45%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[60%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[90%] w-full bg-[#ece9e2] rounded-t-md"></div>
+        <div className="h-[45%] w-full bg-[#ece9e2] rounded-t-md"></div>
       </div>
     </div>
     
     {/* Bottom Labels Skeleton */}
     <div className="flex justify-between mt-3 px-2">
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
-      <div className="h-3 w-12 rounded bg-gray-200"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
+      <div className="h-3 w-12 rounded bg-[#ece9e2]"></div>
     </div>
   </div>
 );

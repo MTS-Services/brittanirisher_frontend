@@ -6,7 +6,6 @@ import VendorCard from '../components/vendors/VendorCard';
 import { 
   useGetCategoriesQuery, 
   useGetStatesQuery, 
-   
 } from '../../src/store/features/couple/coupleDashboard';
 import { useGetVendorProfilesQuery } from '../../src/store/features/public/publicApi';
 
@@ -35,11 +34,9 @@ const BrowseVendors = memo(() => {
   const navigate = useNavigate();
 
   const categories = useMemo(() => {
-    const rawData = Array.isArray(categoriesData) ? categoriesData : categoriesData?.data;
-    return rawData?.map((c) => c.name) || [];
+    return Array.isArray(categoriesData) ? categoriesData : categoriesData?.data || [];
   }, [categoriesData]);
 
-  const categoryList = useMemo(() => ['All Categories', ...categories], [categories]);
   const statesList = useMemo(() => statesData?.data || [], [statesData]);
 
   const selectedStateObj = useMemo(() => statesList.find(s => s.id === selectedStateId), [selectedStateId, statesList]);
@@ -47,6 +44,12 @@ const BrowseVendors = memo(() => {
   const availableCities = selectedStateObj ? selectedStateObj.cities : [];
 
   const currentBudgetObj = useMemo(() => BUDGETS.find((b) => b.label === selectedBudget) || BUDGETS[0], [selectedBudget]);
+
+  const selectedCategoryName = useMemo(() => {
+    if (selectedCategory === 'All Categories') return 'All Categories';
+    const found = categories.find(c => c.slug === selectedCategory);
+    return found ? found.name : 'All Categories';
+  }, [selectedCategory, categories]);
 
   const queryParams = useMemo(() => {
     const params = {
@@ -57,7 +60,7 @@ const BrowseVendors = memo(() => {
     };
 
     if (selectedCategory !== 'All Categories') {
-      params.category = selectedCategory.toLowerCase(); 
+      params.category = selectedCategory; 
     }
     if (currentBudgetObj.min !== '') {
       params.minPrice = currentBudgetObj.min;
@@ -71,9 +74,12 @@ const BrowseVendors = memo(() => {
     if (selectedCityName !== '') {
       params.city = selectedCityName.toLowerCase(); 
     }
+    
     if (availability !== '') {
-      const [year, month, day] = availability.split('-');
-      params.availableDate = `${month}-${day}-${year}`;
+      const dateObj = new Date(availability);
+      if (!isNaN(dateObj.getTime())) {
+        params.availableDate = dateObj.toISOString();
+      }
     }
 
     return params;
@@ -92,7 +98,7 @@ const BrowseVendors = memo(() => {
     keywords: ['browse vendors', 'wedding vendors', 'marketplace'],
   });
 
-  const handleCategoryChange = (cat) => { setSelectedCategory(cat); setCurrentPage(1); };
+  const handleCategoryChange = (slug) => { setSelectedCategory(slug); setCurrentPage(1); };
   const handleBudgetChange = (label) => { setSelectedBudget(label); setCurrentPage(1); };
   
   const handleStateChange = (e) => {
@@ -145,20 +151,38 @@ const BrowseVendors = memo(() => {
       <div className="mb-5">
         <p className="mb-2 text-base text-[#9a8a7a] font-raleway">Category</p>
         <div className="max-h-52 overflow-y-auto pr-1 scrollbar-thin">
-          {categoryList.map((cat) => (
-            <label key={cat} className="flex items-center gap-2.5 mb-1.5 cursor-pointer">
+          {/* Default 'All Categories' Radio Button */}
+          <label className="flex items-center gap-2.5 mb-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="category_filter"
+              value="All Categories"
+              checked={selectedCategory === 'All Categories'}
+              onChange={() => handleCategoryChange('All Categories')}
+              className="accent-[#7a6050] w-4 h-4 shrink-0"
+            />
+            <span className={`text-sm font-raleway transition-colors ${
+              selectedCategory === 'All Categories' ? 'text-[#3a2a1a] font-semibold' : 'text-[#5a4a3a]'
+            }`}>
+              All Categories
+            </span>
+          </label>
+
+          {/* Dynamic Categories from API */}
+          {categories.map((cat) => (
+            <label key={cat.id || cat.slug} className="flex items-center gap-2.5 mb-1.5 cursor-pointer">
               <input
                 type="radio"
                 name="category_filter"
-                value={cat}
-                checked={selectedCategory === cat}
-                onChange={() => handleCategoryChange(cat)}
+                value={cat.slug}
+                checked={selectedCategory === cat.slug}
+                onChange={() => handleCategoryChange(cat.slug)}
                 className="accent-[#7a6050] w-4 h-4 shrink-0"
               />
               <span className={`text-sm font-raleway transition-colors ${
-                selectedCategory === cat ? 'text-[#3a2a1a] font-semibold' : 'text-[#5a4a3a]'
+                selectedCategory === cat.slug ? 'text-[#3a2a1a] font-semibold' : 'text-[#5a4a3a]'
               }`}>
-                {cat}
+                {cat.name}
               </span>
             </label>
           ))}
@@ -286,7 +310,7 @@ const BrowseVendors = memo(() => {
           <div className="flex flex-wrap gap-2 mb-4 z-100">
             {selectedCategory !== 'All Categories' && (
               <span className="inline-flex items-center gap-1 bg-[#e8dfd6] text-[#5a4030] text-xs font-raleway px-3 py-1 rounded-full lowercase">
-                {selectedCategory}
+                {selectedCategoryName}
                 <button onClick={() => { setSelectedCategory('All Categories'); setCurrentPage(1); }}><X size={11} /></button>
               </span>
             )}

@@ -2,12 +2,32 @@ import React, { useRef } from 'react';
 import { CalendarDays, ChevronDown, Sparkles } from 'lucide-react';
 import { useGetCategoriesQuery, useGetStatesQuery } from '../../../../store/features/couple/coupleDashboard';
 
+const PreferencesSkeleton = () => (
+  <section className='mb-6 rounded-2xl border border-[#D4A57426] bg-white px-4 py-5 md:px-5 animate-pulse'>
+    <div className='mb-4 flex items-center gap-2'>
+      <div className='h-5 w-5 rounded bg-[#ece9e2]' />
+      <div className='h-8 w-48 rounded bg-[#ece9e2]' />
+    </div>
+
+    <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] lg:items-end'>
+      {[...Array(6)].map((_, index) => (
+        <div key={index} className='space-y-1.5'>
+          <div className='h-4 w-16 rounded bg-[#ece9e2]' />
+          <div className='h-10 w-full rounded bg-[#ece9e2]' />
+        </div>
+      ))}
+      <div className='h-10 w-24 rounded bg-[#ece9e2]' />
+    </div>
+  </section>
+);
+
 const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
   const dateInputRef = useRef(null);
-  const { data: categories = [] } = useGetCategoriesQuery();
-  const { data: statesData } = useGetStatesQuery();
+  
+  const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const { data: statesData, isLoading: isStatesLoading } = useGetStatesQuery();
   const states = statesData?.data || statesData || [];
- 
+
   const handleDateChange = (e) => {
     const raw = e.target.value; 
     if (!raw) {
@@ -17,16 +37,20 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
     
     setPreferences({ ...preferences, date: raw, _dateDisplay: raw });
   };
- 
+
+  if (isCategoriesLoading || isStatesLoading) {
+    return <PreferencesSkeleton />;
+  }
+
   return (
     <section className='mb-6 rounded-2xl border border-[#D4A57426] bg-white px-4 py-5 md:px-5'>
       <div className='mb-4 flex items-center gap-2'>
         <Sparkles className='h-4 w-4 text-[#d49a57]' />
         <h2 className='m-0 font-playfair text-[34px] leading-none text-[#4b4b4b]'>Your Preferences</h2>
       </div>
- 
+
       <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] lg:items-end'>
- 
+
         {/* Min Price */}
         <div>
           <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>Min Price ($)</label>
@@ -38,7 +62,7 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             className='h-10 w-full rounded-md border border-[#D4A57426] bg-[#FDFCFC] px-3 font-raleway text-sm text-[#303030] outline-none focus:border-[#aebea9]'
           />
         </div>
- 
+
         {/* Max Price */}
         <div>
           <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>Max Price ($)</label>
@@ -50,7 +74,7 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             className='h-10 w-full rounded-md border border-[#D4A57426] bg-[#FDFCFC] px-3 font-raleway text-sm text-[#303030] outline-none focus:border-[#aebea9]'
           />
         </div>
- 
+
         {/* Date Picker */}
         <div>
           <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>Date</label>
@@ -67,7 +91,7 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             />
           </div>
         </div>
- 
+
         {/* State dropdown */}
         <div>
           <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>State</label>
@@ -75,7 +99,6 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             <select
               value={preferences.state || ''}
               onChange={(e) => {
-                // Reset city when state changes
                 setPreferences({ ...preferences, state: e.target.value, city: '' });
               }}
               className='h-10 w-full appearance-none rounded-md border border-[#D4A57426] bg-[#FDFCFC] px-3 pr-9 font-raleway text-sm text-[#303030] outline-none focus:border-[#aebea9]'
@@ -90,8 +113,8 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6f6f6f]' />
           </div>
         </div>
- 
-        {/* City dropdown — depends on selected state */}
+
+        {/* City dropdown */}
         <div>
           <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>City</label>
           <div className='relative'>
@@ -105,7 +128,7 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
               {preferences.state &&
                 states
                   .find((s) => (s.slug || s.name) === preferences.state)
-                  ?.cities?.map((city) => (
+                  ?.[statesData?.data ? 'cities' : 'cities']?.map((city) => (
                     <option key={city.id || city.slug || city.name} value={city.slug || city.name}>
                       {city.name}
                     </option>
@@ -114,19 +137,7 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6f6f6f]' />
           </div>
         </div>
-{/*  
-        Search keyword
-        <div>
-          <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>Search</label>
-          <input
-            type='text'
-            value={preferences.search || ''}
-            onChange={(e) => setPreferences({ ...preferences, search: e.target.value })}
-            placeholder='Vendor name...'
-            className='h-10 w-full rounded-md border border-[#D4A57426] bg-[#FDFCFC] px-3 font-raleway text-sm text-[#303030] outline-none focus:border-[#aebea9]'
-          />
-        </div> */}
- 
+
         {/* Category */}
         <div>
           <label className='mb-1.5 block font-raleway text-base font-medium text-[#2f2f2f]'>Category</label>
@@ -146,7 +157,7 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
             <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6f6f6f]' />
           </div>
         </div>
- 
+
         {/* Search Button */}
         <button
           type='button'
@@ -159,5 +170,5 @@ const MatchVendorPreferences = ({ preferences, setPreferences, onSearch }) => {
     </section>
   );
 };
- 
+
 export default MatchVendorPreferences;
