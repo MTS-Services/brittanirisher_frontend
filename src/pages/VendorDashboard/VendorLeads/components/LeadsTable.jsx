@@ -1,3 +1,4 @@
+import React from 'react';
 import { MoreVertical } from 'lucide-react';
 import LeadsOptionsMenu from './LeadsOptionsMenu';
 import StatusBadge from './StatusBadge';
@@ -22,9 +23,9 @@ const LeadsTable = ({ leads, openMenuId, onMenuToggle, onSeeDetails, onDelete, o
         <tbody className='divide-y divide-gray-50'>
           {leads.map((lead, index) => (
             <tr key={lead.id} className='transition-colors hover:bg-gray-50/50'>
-              <td className='px-6 py-3.5 text-sm font-medium text-gray-800'>{lead.name}</td>
-              <td className='px-6 py-3.5 text-sm text-gray-500'>{lead.email}</td>
-              <td className='px-6 py-3.5 text-sm text-gray-500'>{lead.phone}</td>
+              <td className='px-6 py-3.5 text-sm font-medium text-gray-800'>{lead.senderName}</td>
+              <td className='px-6 py-3.5 text-sm text-gray-500'>{lead.senderEmail}</td>
+              <td className='px-6 py-3.5 text-sm text-gray-500'>{lead.senderPhone}</td>
               <td className='px-6 py-3.5'>
                 <StatusBadge status={lead.status} />
               </td>

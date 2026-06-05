@@ -1,10 +1,11 @@
+import React from 'react';
 import { CheckCircle2, Clock3, Eye, Trash2 } from 'lucide-react';
 
-const STATUS_OPTIONS = [ 'Pending', 'Contracted'];
+const STATUS_OPTIONS = ['NEW', 'PENDING', 'REPLIED', 'IGNORED', 'CONTRACTED'];
 
 const statusIconMap = {
-  Pending: Clock3,
-  Contracted: CheckCircle2,
+  PENDING: Clock3,
+  CONTRACTED: CheckCircle2,
 };
 
 const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStatusChange }) => (
@@ -14,6 +15,7 @@ const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStat
     }`}
     onClick={(event) => event.stopPropagation()}
   >
+    {/* See Details Button */}
     <button
       type='button'
       onClick={() => onSeeDetails(lead)}
@@ -22,6 +24,8 @@ const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStat
       <Eye size={14} className='text-[#6b7280]' />
       <span>See Details</span>
     </button>
+
+    {/* Delete Button */}
     <button
       type='button'
       onClick={() => onDelete(lead.id)}
@@ -36,11 +40,18 @@ const LeadsOptionsMenu = ({ lead, openUp = false, onSeeDetails, onDelete, onStat
         key={status}
         type='button'
         onClick={() => onStatusChange(lead.id, status)}
-        className={`flex w-full items-center gap-2 px-4 py-1.5 text-left text-[14px] hover:bg-[#f7f7f7] ${lead.status === status ? 'text-[#111]' : 'text-[#666]'}`}
+        className={`flex w-full items-center gap-2 px-4 py-1.5 text-left text-[14px] hover:bg-[#f7f7f7] ${
+          lead.status === status ? 'text-[#111] font-medium bg-gray-50/50' : 'text-[#666]'
+        }`}
       >
         {(() => {
           const Icon = statusIconMap[status];
-          return Icon ? <Icon size={14} className={lead.status === status ? 'text-[#111]' : 'text-[#6b7280]'} /> : null;
+          return Icon ? (
+            <Icon 
+              size={14} 
+              className={lead.status === status ? 'text-[#111]' : 'text-[#6b7280]'} 
+            />
+          ) : null;
         })()}
         <span>{status}</span>
       </button>

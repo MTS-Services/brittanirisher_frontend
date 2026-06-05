@@ -1,17 +1,74 @@
-import { apiSlice } from '../../../apiSlice';
-
+import { apiSlice } from "../../apiSlice";
 
 const vendordashboardApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getVendorStatus: builder.query({
-  query: () => ({
+      query: () => ({
         url: `/vendor-profiles/my/profile`,
-        method: 'GET',
+        method: "GET",
       }),
-
-
-    })
     }),
-});
 
-export const { useGetVendorStatusQuery } = vendordashboardApi;
+    getVendodasrhboarStatus: builder.query({
+      query: () => ({
+        url: `/dashboard/vendor-data`,
+        method: "GET",
+      }),
+    }),
+
+    getVendorChartData: builder.query({
+      query: () => ({
+        url: `/dashboard/vendor-chart`,
+        method: "GET",
+      }),
+    }),
+
+    getEnquiries: builder.query({
+      query: (page = 1) => ({
+        url: `/enquiries?page=${page}`,
+        method: "GET",
+      }),
+    }),
+    getEnquiryById: builder.query({
+      query: (id) => ({
+        url: `/enquiries/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateEnquiryStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/enquiries/${id}`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: ['Enquiries', 'EnquiryDetails'], 
+    }),
+
+    deleteEnquiry: builder.mutation({
+      query: (id) => ({
+        url: `/enquiries/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Enquiries'],
+    }),
+  }),
+});
+const {
+  useGetVendorStatusQuery,
+  useGetVendodasrhboarStatusQuery,
+  useGetVendorChartDataQuery,
+  useGetEnquiriesQuery,
+  useGetEnquiryByIdQuery,
+  useUpdateEnquiryStatusMutation, 
+  useDeleteEnquiryMutation       
+} = vendordashboardApi;
+
+export {
+  useGetVendorStatusQuery,
+  useGetVendodasrhboarStatusQuery,
+  useGetVendorChartDataQuery,
+  useGetEnquiriesQuery,
+  useGetEnquiryByIdQuery,
+  useUpdateEnquiryStatusMutation, 
+  useDeleteEnquiryMutation 
+};

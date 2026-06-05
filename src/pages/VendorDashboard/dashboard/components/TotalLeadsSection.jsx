@@ -19,13 +19,13 @@ const TotalLeadsSection = ({ data }) => {
         <h2 className='font-playfair text-[28px] leading-none text-[#2d2d2d]'>
           Total Leads
         </h2>
-        <button
+        {/* <button
           type='button'
           className='inline-flex items-center gap-1 rounded-sm border border-[#e2e2e2] bg-[#fdfdfc] px-2 py-1 font-raleway text-[10px] leading-4 text-[#807a74]'
         >
           This year
           <ChevronDown size={12} />
-        </button>
+        </button> */}
       </div>
 
       <div className='mt-4 h-80 w-full'>
