@@ -51,6 +51,23 @@ const vendordashboardApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Enquiries'],
     }),
+  getVendorCalendar: builder.query({
+      query: ({ vendorId, year, month }) => ({
+        url: `/vendor-availabilities/calendar`,
+        method: 'GET',
+        params: { vendorId, year, month },
+      }),
+      providesTags: ['Calendar'],
+    }),
+
+    saveBulkMonthAvailability: builder.mutation({
+      query: (body) => ({
+        url: `/vendor-availabilities/bulk/month`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Calendar'], 
+    }),
   }),
 });
 const {
@@ -60,7 +77,8 @@ const {
   useGetEnquiriesQuery,
   useGetEnquiryByIdQuery,
   useUpdateEnquiryStatusMutation, 
-  useDeleteEnquiryMutation       
+  useDeleteEnquiryMutation,
+  useGetVendorCalendarQuery, useSaveBulkMonthAvailabilityMutation       
 } = vendordashboardApi;
 
 export {
@@ -70,5 +88,6 @@ export {
   useGetEnquiriesQuery,
   useGetEnquiryByIdQuery,
   useUpdateEnquiryStatusMutation, 
-  useDeleteEnquiryMutation 
+  useDeleteEnquiryMutation,
+  useGetVendorCalendarQuery, useSaveBulkMonthAvailabilityMutation 
 };

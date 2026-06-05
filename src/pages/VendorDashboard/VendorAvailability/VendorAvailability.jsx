@@ -1,45 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, MoveRight } from 'lucide-react';
+import { useGetVendorCalendarQuery, useSaveBulkMonthAvailabilityMutation } from '../../../store/features/vendor/vendorDashboardApi'; 
 
-const initialMonth = new Date(2025, 8, 1);
+const initialMonth = new Date(2026, 8, 1);
 
 const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
 const weekdayLabels = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-const baseBookings = {
-  '2025-09-06': 'booked',
-  '2025-09-07': 'booked',
-  '2025-09-13': 'booked',
-  '2025-09-14': 'booked',
-  '2025-09-20': 'booked',
-  '2025-09-21': 'booked',
-  '2025-09-27': 'booked',
-  '2025-09-28': 'booked',
-};
-
 const dateKey = (date) => date.toISOString().slice(0, 10);
-
 const toLocalDate = (year, month, day) => new Date(year, month, day, 12, 0, 0, 0);
-
 const getMondayIndex = (dayIndex) => (dayIndex === 0 ? 6 : dayIndex - 1);
-
 const getMonthTitle = (date) => `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 
-const getGridCells = (monthDate, overrides) => {
+const getGridCells = (monthDate, apiBookedDays, overrides) => {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
   const firstDay = toLocalDate(year, month, 1);
@@ -49,6 +26,7 @@ const getGridCells = (monthDate, overrides) => {
 
   const cells = [];
 
+  // Previous Month Offset
   for (let index = startOffset; index > 0; index -= 1) {
     const previousDate = toLocalDate(year, month, 1 - index);
     cells.push({
@@ -60,20 +38,32 @@ const getGridCells = (monthDate, overrides) => {
     });
   }
 
+  // Current Month Days
   for (let day = 1; day <= lastDay.getDate(); day += 1) {
     const currentDate = toLocalDate(year, month, day);
-    const key = dateKey(currentDate);
-    const defaultStatus = currentDate.getDay() === 0 || currentDate.getDay() === 6 ? 'booked' : 'available';
+    const key = dateKey(currentDate); 
+
+    const defaultStatus = 'available';
+
+    const apiDayData = apiBookedDays.find(d => {
+      if (d.blockedDate) {
+        return d.blockedDate.slice(0, 10) === key;
+      }
+      return false;
+    });
+    
+    const apiStatus = apiDayData ? apiDayData.status.toLowerCase() : null;
 
     cells.push({
       key,
       day,
       date: currentDate,
       inMonth: true,
-      status: overrides[key] || baseBookings[key] || defaultStatus,
+      status: overrides[key] || apiStatus || defaultStatus,
     });
   }
 
+  // Next Month Offset
   for (let day = 1; day <= endOffset; day += 1) {
     const nextDate = toLocalDate(year, month + 1, day);
     cells.push({
@@ -106,19 +96,39 @@ const AvailabilityLegend = () => (
 );
 
 const VendorAvailability = () => {
+  const VENDOR_ID = "a19b012c-59fc-45bd-84e9-9743e55c6733";
+
   const [monthDate, setMonthDate] = useState(initialMonth);
   const [overrides, setOverrides] = useState({});
-  const [selectedDate, setSelectedDate] = useState('2025-09-11');
+  const [selectedDate, setSelectedDate] = useState('2026-09-11');
   const [saveState, setSaveState] = useState('');
 
-  const cells = useMemo(() => getGridCells(monthDate, overrides), [monthDate, overrides]);
+  const currentYear = monthDate.getFullYear();
+  const currentMonthValue = monthDate.getMonth() + 1; 
+
+  const { data: apiResponse, isLoading } = useGetVendorCalendarQuery({
+    vendorId: VENDOR_ID,
+    year: currentYear,
+    month: currentMonthValue
+  });
+
+  const [saveBulkMonth] = useSaveBulkMonthAvailabilityMutation();
+
+  const apiBookedDays = apiResponse?.data?.days || [];
+
+  useEffect(() => {
+    setOverrides({});
+    setSaveState('');
+  }, [monthDate]);
+
+  const cells = useMemo(() => {
+    return getGridCells(monthDate, apiBookedDays, overrides);
+  }, [monthDate, apiBookedDays, overrides]);
 
   const monthLabel = getMonthTitle(monthDate);
 
   const handleDayClick = (cell) => {
-    if (!cell.inMonth) {
-      return;
-    }
+    if (!cell.inMonth) return;
 
     const nextStatus = cell.status === 'booked' ? 'available' : 'booked';
 
@@ -130,8 +140,22 @@ const VendorAvailability = () => {
     setSaveState('');
   };
 
-  const handleSave = () => {
-    setSaveState(`Published ${Object.values(overrides).filter((value) => value === 'booked').length || 0} booked dates`);
+  const handleSave = async () => {
+    try {
+      const bulkPayload = cells
+        .filter(cell => cell.inMonth)
+        .map(cell => ({
+          date: cell.key,
+          status: cell.status === 'booked' ? 'BOOKED' : 'AVAILABLE'
+        }));
+
+      await saveBulkMonth(bulkPayload).unwrap();
+      setSaveState(`Published successfully for ${monthLabel}!`);
+      setOverrides({}); 
+    } catch (error) {
+      console.error("Failed to save calendar data: ", error);
+      setSaveState("Error updating calendar. Try again.");
+    }
   };
 
   return (
@@ -146,11 +170,10 @@ const VendorAvailability = () => {
 
         <section className='mt-8 w-full flex-1'>
           <div className='flex items-center justify-between gap-4'>
-            <h2 className='font-playfair text-2xl leading-none text-[#2b221d]  lg:text-3xl'>{monthLabel}</h2>
+            <h2 className='font-playfair text-2xl leading-none text-[#2b221d] lg:text-3xl'>{monthLabel}</h2>
             <div className='flex items-center gap-3'>
               <button
                 type='button'
-                aria-label='Previous month'
                 onClick={() => setMonthDate((current) => toLocalDate(current.getFullYear(), current.getMonth() - 1, 1))}
                 className='flex h-10 w-10 items-center justify-center rounded-full border border-[#b9c7b1] text-[#2c241f] transition hover:bg-[#f3f6f1]'
               >
@@ -158,7 +181,6 @@ const VendorAvailability = () => {
               </button>
               <button
                 type='button'
-                aria-label='Next month'
                 onClick={() => setMonthDate((current) => toLocalDate(current.getFullYear(), current.getMonth() + 1, 1))}
                 className='flex h-10 w-10 items-center justify-center rounded-full border border-[#b9c7b1] text-[#2c241f] transition hover:bg-[#f3f6f1]'
               >
@@ -167,43 +189,47 @@ const VendorAvailability = () => {
             </div>
           </div>
 
-          <div className='mt-5 overflow-hidden rounded-sm border border-[#bfd0b8]'>
-            <div className='grid grid-cols-7 border-b border-[#bfd0b8] bg-white'>
-              {weekdayLabels.map((label) => (
-                <div key={label} className='border-r border-[#bfd0b8] py-3 text-center text-[16px] font-medium tracking-wide text-[#2b221d] sm:py-4  lg:py-5  last:border-r-0'>
-                  {label}
-                </div>
-              ))}
-            </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-96 text-gray-400">Loading calendar availability...</div>
+          ) : (
+            <div className='mt-5 overflow-hidden rounded-sm border border-[#bfd0b8]'>
+              <div className='grid grid-cols-7 border-b border-[#bfd0b8] bg-white'>
+                {weekdayLabels.map((label) => (
+                  <div key={label} className='border-r border-[#bfd0b8] py-3 text-center text-[16px] font-medium tracking-wide text-[#2b221d] sm:py-4 lg:py-5 last:border-r-0'>
+                    {label}
+                  </div>
+                ))}
+              </div>
 
-            <div className='grid grid-cols-7'>
-              {cells.map((cell) => {
-                const isSelected = selectedDate === cell.key;
-                const isBooked = cell.status === 'booked';
-                const isUnavailable = cell.status === 'unavailable';
+              <div className='grid grid-cols-7'>
+                {cells.map((cell) => {
+                  const isSelected = selectedDate === cell.key;
+                  const isBooked = cell.status === 'booked';
+                  const isUnavailable = cell.status === 'unavailable';
 
-                return (
-                  <button
-                    key={cell.key}
-                    type='button'
-                    onClick={() => handleDayClick(cell)}
-                    className={`relative aspect-square border-r border-b border-[#bfd0b8] text-center transition last:border-r-0 lg:aspect-auto lg:h-38 ${
-                      isUnavailable
-                        ? 'bg-[#fafafa] text-[#d4d4d4]'
-                        : isBooked
-                          ? 'bg-[#a1af9b] text-white hover:brightness-[0.98]'
-                          : 'bg-white text-[#26211f] hover:bg-[#f4f7f2]'
-                    } ${isSelected ? 'ring-2 ring-inset ring-[#62715f]' : ''}`}
-                    disabled={isUnavailable}
-                  >
-                    <span className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[18px] font-normal leading-none sm:text-[20px] lg:text-[22px]'>
-                      {cell.day}
-                    </span>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={cell.key}
+                      type='button'
+                      onClick={() => handleDayClick(cell)}
+                      className={`relative aspect-square border-r border-b border-[#bfd0b8] text-center transition last:border-r-0 lg:aspect-auto lg:h-22 ${
+                        isUnavailable
+                          ? 'bg-[#fafafa] text-[#d4d4d4]'
+                          : isBooked
+                            ? 'bg-[#a1af9b] text-white hover:brightness-[0.98]' 
+                            : 'bg-white text-[#26211f] hover:bg-[#f4f7f2]'       
+                      } ${isSelected ? 'ring-2 ring-inset ring-[#62715f]' : ''}`}
+                      disabled={isUnavailable}
+                    >
+                      <span className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[18px] font-normal leading-none sm:text-[20px] lg:text-[22px]'>
+                        {cell.day}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className='mt-6'>
             <AvailabilityLegend />
@@ -215,12 +241,12 @@ const VendorAvailability = () => {
             <button
               type='button'
               onClick={handleSave}
-              className='inline-flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-[#556151] px-4 text-base text-white shadow-[0_6px_16px_rgba(85,97,81,0.25)] transition hover:bg-[#465146] sm:h-16 sm:w-auto sm:min-w-55 sm:px-6 ]'
+              className='inline-flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-[#556151] px-4 text-base text-white shadow-[0_6px_16px_rgba(85,97,81,0.25)] transition hover:bg-[#465146] sm:h-16 sm:w-auto sm:min-w-55 sm:px-6'
             >
               <span>Save &amp; Publish</span>
-              <span className='text-base leading-none'>→</span>
+              <span className='text-base leading-none'><MoveRight size={18} /></span>
             </button>
-            {saveState ? <p className='text-[16px] text-[#62715f]'>{saveState}</p> : null}
+            {saveState ? <p className='text-[16px] text-[#62715f] font-medium'>{saveState}</p> : null}
           </div>
         </section>
       </main>
