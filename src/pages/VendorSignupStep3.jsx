@@ -1,13 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Eye, EyeOff } from 'lucide-react';
 import { ROUTES } from '../config';
+import { useCreateVendorProfileMutation } from '../../src/store/features/auth/authApi';
 
 const VendorSignupStep3 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // vendorSignupInitialData contains: name, email, location, state, city, serviceCategory
+  // passed via router state from VendorSignup → Step1 → Step2 → Step3
+  const vendorSignupInitialData = location.state?.vendorSignupInitialData || {};
+
+  const [createVendorProfile, { isLoading }] = useCreateVendorProfileMutation();
+
   const [packages, setPackages] = useState(formData.packages || []);
   const [currentPackage, setCurrentPackage] = useState({
-    name: '',
+    packageName: '',   // ✅ was: name
+    badge: '',         // ✅ new field
     features: [],
     price: '',
   });
@@ -17,11 +27,12 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState(formData.password || '');
   const [confirmPassword, setConfirmPassword] = useState(formData.confirmPassword || '');
+  const [error, setError] = useState('');
 
   const handleAddPackage = () => {
-    if (currentPackage.name && currentPackage.price) {
+    if (currentPackage.packageName && currentPackage.price) {
       setPackages([...packages, currentPackage]);
-      setCurrentPackage({ name: '', features: [], price: '' });
+      setCurrentPackage({ packageName: '', badge: '', features: [], price: '' });
       setNewFeature('');
     }
   };
@@ -31,7 +42,6 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
     if (!val) return;
     setCurrentPackage((prev) => ({ ...prev, features: [...prev.features, val] }));
     setNewFeature('');
-    // focus the newly added input after render
     setTimeout(() => {
       const idx = featuresRef.current.length - 1;
       if (featuresRef.current[idx]) featuresRef.current[idx].focus();
@@ -39,29 +49,94 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
   };
 
   const handleRemoveFeature = (index) => {
-    setCurrentPackage((prev) => ({ ...prev, features: prev.features.filter((_, i) => i !== index) }));
-    // clean up ref
+    setCurrentPackage((prev) => ({
+      ...prev,
+      features: prev.features.filter((_, i) => i !== index),
+    }));
     featuresRef.current = featuresRef.current.filter((_, i) => i !== index);
-  };
-
-  const handleNext = () => {
-    if (password === confirmPassword && password.length >= 6) {
-      onFormChange({
-        ...formData,
-        packages,
-        password,
-        confirmPassword,
-      });
-      navigate(ROUTES.LOGIN, { replace: true });
-    }
   };
 
   const handleRemovePackage = (index) => {
     setPackages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleNext = async () => {
+    setError('');
+
+    if (!password || password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    const updatedFormData = { ...formData, packages, password, confirmPassword };
+    onFormChange(updatedFormData);
+
+    // ─── Build FormData (multipart/form-data) ───────────────────────────────
+    const fd = new FormData();
+
+    // Fields from VendorSignup (step 0) — passed via router state
+    fd.append('name',       vendorSignupInitialData.name            || '');
+    fd.append('email',      vendorSignupInitialData.email           || '');
+    fd.append('location',   vendorSignupInitialData.location        || '');
+    fd.append('Address',    vendorSignupInitialData.location        || '');
+    fd.append('stateId',    vendorSignupInitialData.state           || '');
+    fd.append('cityId',     vendorSignupInitialData.city            || '');
+    fd.append('categoryId', vendorSignupInitialData.serviceCategory || '');
+
+    // Fields from Step 1
+    fd.append('businessName',        updatedFormData.businessName         || '');
+    fd.append('highlightedServices', updatedFormData.highlightedServices  || ''); // ✅ added
+    fd.append('experienceYears',     updatedFormData.experience           || '');
+    fd.append('speciality',          updatedFormData.speciality           || '');
+    fd.append('aboutMe',             updatedFormData.aboutMe              || '');
+
+    // Fields from Step 2 — each image as a separate File entry under key "images"
+    (updatedFormData.portfolioImages || []).forEach((img) => {
+      if (img instanceof File) {
+        fd.append('images', img);
+      }
+    });
+
+    // ✅ package as JSON — exact format backend expects
+    const cleanPackages = packages.map((pkg) => ({
+      packageName: pkg.packageName,
+      price: Number(pkg.price),       // must be number, not string
+      badge: pkg.badge,
+      isActive: true,                 // required by backend
+      features: pkg.features,
+    }));
+    fd.append('package', JSON.stringify(cleanPackages));
+
+    fd.append('packageId', updatedFormData.packageId || '');
+
+    fd.append('password', password);
+
+    // ─── Submit ─────────────────────────────────────────────────────────────
+    try {
+      await createVendorProfile(fd).unwrap();
+      navigate(ROUTES.LOGIN, { replace: true });
+    } catch (err) {
+      console.error('Vendor profile creation failed:', err);
+      setError(
+        err?.data?.message || 'Something went wrong. Please try again.'
+      );
+    }
+  };
+
   const handlePrevious = () => {
-    navigate('/vendor-signup-flow?step=2');
+    onFormChange({
+      ...formData,
+      packages,
+      password,
+      confirmPassword,
+    });
+    navigate('/vendor-signup-flow?step=2', {
+      state: location.state,
+    });
   };
 
   return (
@@ -111,7 +186,7 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
           <header className='space-y-4'>
             <div className='flex items-center justify-between'>
               <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
-                Complete your Profile
+                {/* Complete your Profile */}
               </h1>
               <p className='font-raleway text-[14px] text-[#2d3036]'>Step 3 of 3</p>
             </div>
@@ -134,9 +209,21 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>Package Name</label>
                 <input
                   type='text'
-                  value={currentPackage.name}
-                  onChange={(e) => setCurrentPackage({ ...currentPackage, name: e.target.value })}
+                  value={currentPackage.packageName}  // ✅ was: currentPackage.name
+                  onChange={(e) => setCurrentPackage({ ...currentPackage, packageName: e.target.value })}
                   placeholder='Enter Package Name'
+                  className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
+                />
+              </div>
+
+              {/* ✅ Package Badge — new field */}
+              <div className='space-y-2'>
+                <label className='block font-raleway text-[16px] text-[#2d3036]'>Package Badge</label>
+                <input
+                  type='text'
+                  value={currentPackage.badge}
+                  onChange={(e) => setCurrentPackage({ ...currentPackage, badge: e.target.value })}
+                  placeholder='e.g. Best Seller, Popular, Premium'
                   className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                 />
               </div>
@@ -151,11 +238,22 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                         ref={(el) => (featuresRef.current[i] = el)}
                         type='text'
                         value={f}
-                        onChange={(e) => setCurrentPackage((prev) => ({ ...prev, features: prev.features.map((fv, idx) => idx === i ? e.target.value : fv) }))}
+                        onChange={(e) =>
+                          setCurrentPackage((prev) => ({
+                            ...prev,
+                            features: prev.features.map((fv, idx) =>
+                              idx === i ? e.target.value : fv
+                            ),
+                          }))
+                        }
                         placeholder={`Feature ${i + 1}`}
                         className='flex-1 rounded-lg border border-[#2d3036] bg-white px-4 py-2 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                       />
-                      <button type='button' onClick={() => handleRemoveFeature(i)} className='flex h-12 items-center justify-center rounded-lg bg-[#f0e9e1] p-2'>
+                      <button
+                        type='button'
+                        onClick={() => handleRemoveFeature(i)}
+                        className='flex h-12 items-center justify-center rounded-lg bg-[#f0e9e1] p-2'
+                      >
                         Remove
                       </button>
                     </div>
@@ -185,7 +283,6 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
               <div className='space-y-2'>
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>Package Price</label>
                 <div className='flex items-center'>
-                  {/* <span className='font-raleway text-[16px] text-[#9ca1aa]'>$</span> */}
                   <input
                     type='number'
                     value={currentPackage.price}
@@ -212,17 +309,30 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                     <div key={idx} className='rounded bg-white p-3'>
                       <div className='flex items-start justify-between'>
                         <div>
-                          <p className='font-raleway font-medium text-[#2d3036]'>{pkg.name}</p>
+                          <p className='font-raleway font-medium text-[#2d3036]'>{pkg.packageName}</p>
+                          {pkg.badge && (
+                            <span className='inline-block rounded-full bg-[#a7b9a6] px-2 py-0.5 font-raleway text-[12px] text-[#464e46]'>
+                              {pkg.badge}
+                            </span>
+                          )}
                           <p className='font-raleway text-[14px] text-[#615d58]'>${pkg.price}</p>
                         </div>
                         <div className='flex items-center gap-2'>
-                          <button type='button' onClick={() => handleRemovePackage(idx)} className='text-sm text-[#9ca1aa]'>Remove</button>
+                          <button
+                            type='button'
+                            onClick={() => handleRemovePackage(idx)}
+                            className='text-sm text-[#9ca1aa]'
+                          >
+                            Remove
+                          </button>
                         </div>
                       </div>
                       {pkg.features && pkg.features.length > 0 && (
                         <ul className='mt-3 space-y-1'>
                           {pkg.features.map((f, i) => (
-                            <li key={i} className='text-[14px] text-[#615d58]'>• {f}</li>
+                            <li key={i} className='text-[14px] text-[#615d58]'>
+                              • {f}
+                            </li>
                           ))}
                         </ul>
                       )}
@@ -275,21 +385,28 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                 </div>
               </div>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <p className='font-raleway text-[14px] text-red-500'>{error}</p>
+            )}
           </form>
 
           {/* Navigation Buttons */}
           <div className='flex items-center justify-between gap-4 pt-6'>
             <button
               onClick={handlePrevious}
-              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
+              disabled={isLoading}
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed'
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5'
+              disabled={isLoading}
+              className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed'
             >
-              NEXT
+              {isLoading ? 'Submitting...' : 'NEXT'}
             </button>
           </div>
         </div>

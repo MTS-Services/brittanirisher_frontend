@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react";
+import toast from "react-hot-toast"; 
 import { useGetVendorDetailQuery, useSendEnquiryMutation, useGetVendorCalendarQuery } from "../../src/store/features/public/publicApi"; 
 import { useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard"; 
 import { useSEO } from "../hooks/useSEO";
@@ -194,19 +195,20 @@ const VendorDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
 
-const calendarParams = useMemo(() => {
-  if (!id) return null;
-  return {
-    vendorId: id,
-    month: String(month.getMonth() + 1), 
-    year: month.getFullYear()
-  };
-}, [id, month]);
+  const calendarParams = useMemo(() => {
+    if (!id) return null;
+    return {
+      vendorId: id,
+      month: String(month.getMonth() + 1), 
+      year: month.getFullYear()
+    };
+  }, [id, month]);
 
-const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCalendarQuery(
+  const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCalendarQuery(
     calendarParams, 
     { skip: !id } 
   );
+
   useEffect(() => {
     if (vendor && typeof vendor.isFavorite !== "undefined") {
       setIsFavorite(vendor.isFavorite);
@@ -280,7 +282,7 @@ const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCal
     setBookingStatus("loading");
     setTimeout(() => {
       setBookingStatus("done");
-      window.alert(`Booking request sent for ${formatDate(selectedDate)} — ${vendor.businessName}`);
+      toast.success(`Booking request sent for ${formatDate(selectedDate)} — ${vendor.businessName}`);
     }, 700);
   };
 
@@ -293,6 +295,7 @@ const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCal
     const message = form.message.value.trim();
 
     if (!name || !phone || !email) {
+      toast.error("Please fill in all required fields.");
       return;
     }
 
@@ -307,8 +310,10 @@ const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCal
 
     try {
       await sendEnquiry(enquiryPayload).unwrap();
+      toast.success("Inquiry sent successfully!");
       form.reset();
     } catch (error) {
+      toast.error(error?.data?.message || "Failed to send inquiry. Please try again.");
     }
   };
 
@@ -318,9 +323,10 @@ const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCal
 
     try {
       await saveVendor({ vendorId: id }).unwrap();
+      toast.success(previousState ? "Removed from favorites" : "Added to favorites");
     } catch (error) {
       setIsFavorite(previousState);
-      
+      toast.error("Failed to update favorite status.");
     }
   };
 
@@ -431,7 +437,7 @@ const { data: calendarResponse, isLoading: isCalendarLoading } = useGetVendorCal
         {/* Availability Calendar */}
         <div className="bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 font-raleway flex flex-col justify-between border border-[#eadfcd] relative">
           
-          {/* Calendar Internal Loading overlay (When user switches months) */}
+          {/* Calendar Internal Loading overlay */}
           {isCalendarLoading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-md">
               <span className="text-xs text-[#6b7c65] font-semibold animate-pulse">Updating calendar...</span>

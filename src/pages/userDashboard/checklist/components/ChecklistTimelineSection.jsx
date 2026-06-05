@@ -1,28 +1,25 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { CircleCheck, Circle } from 'lucide-react';
-import toast from 'react-hot-toast'; // টোস্ট ইমপোর্ট করা হয়েছে
+import toast from 'react-hot-toast'; 
 
 const ChecklistTimelineSection = ({ section, onToggleTask, onAddAnotherTask }) => {
   const tasks = section.tasks || [];
   const completedCount = tasks.filter(task => task.isCompleted).length;
   const totalCount = tasks.length;
 
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-   
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-   
-    if (totalCount > 0 && completedCount === totalCount) {
+ 
+  const handleTaskClick = (taskId, currentStatus) => {
+    const nextStatus = !currentStatus;
+    
+    
+    if (nextStatus && completedCount + 1 === totalCount) {
       toast.success(`"${section.title}" section completed! `, {
         id: `completed-${section.id || section.title}`, 
       });
     }
-  }, [completedCount, totalCount, section.title, section.id]);
+
+    onToggleTask(taskId, nextStatus);
+  };
 
   return (
     <section className='rounded-2xl border border-[#D4A57426] bg-white px-4 py-4 font-raleway'>
@@ -37,7 +34,7 @@ const ChecklistTimelineSection = ({ section, onToggleTask, onAddAnotherTask }) =
         {tasks.map((task) => (
           <div
             key={task.id}
-            onClick={() => onToggleTask(task.id, !task.isCompleted)}
+            onClick={() => handleTaskClick(task.id, task.isCompleted)} 
             className='flex min-h-10 cursor-pointer items-center rounded-lg border border-[#D4A57426] bg-[#FDFCFC] px-3 select-none transition hover:bg-[#F9F7F5]'
             role='checkbox'
             aria-checked={task.isCompleted}
@@ -45,7 +42,7 @@ const ChecklistTimelineSection = ({ section, onToggleTask, onAddAnotherTask }) =
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onToggleTask(task.id, !task.isCompleted);
+                handleTaskClick(task.id, task.isCompleted); 
               }
             }}
           >

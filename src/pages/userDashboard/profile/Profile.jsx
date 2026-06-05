@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast'; 
 import { 
   useGetCoupleProfileQuery, 
   useUpdateCoupleProfileMutation,
   useGetStatesQuery
 } from '../../../store/features/couple/coupleDashboard';
+import { useChangePasswordMutation } from '../../../store/features/auth/authApi'; 
 
 const ProfileSkeleton = () => (
   <div className="w-full animate-pulse">
-  <div className="mb-6 h-8 w-48 rounded bg-[#ece9e2]"></div>
+    <div className="mb-6 h-8 w-48 rounded bg-[#ece9e2]"></div>
     <div className="mb-8 rounded-lg border border-[#e0dcd7] bg-white p-6">
       <div className="mb-6 h-6 w-32 rounded bg-[#ece9e2]"></div>
       <div className="mb-6 flex gap-4">
@@ -33,6 +35,7 @@ const Profile = () => {
   const { data: profileResponse, isLoading: isProfileLoading } = useGetCoupleProfileQuery();
   const { data: statesResponse } = useGetStatesQuery();
   const [updateProfile, { isLoading: isUpdating }] = useUpdateCoupleProfileMutation();
+  const [changePassword, { isLoading: isPasswordUpdating }] = useChangePasswordMutation();
 
   const [profileForm, setProfileForm] = useState({
     fullName: '',
@@ -45,7 +48,7 @@ const Profile = () => {
   });
 
   const [passwordForm, setPasswordForm] = useState({
-    oldPassword: '',
+    currentPassword: '', 
     newPassword: '',
     confirmPassword: '',
   });
@@ -130,17 +133,36 @@ const Profile = () => {
       }
 
       await updateProfile(payload).unwrap();
+      toast.success('Profile details updated successfully!');
     } catch (error) {
       console.error('Failed to save profile:', error);
+      toast.error(error?.data?.message || 'Failed to update profile. Please try again.');
     }
   };
 
-  const handleSavePassword = () => {
-    if (passwordForm.newPassword === passwordForm.confirmPassword) {
-      console.log('Password changed successfully');
-      setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
-    } else {
-      console.log('Passwords do not match');
+  const handleSavePassword = async () => {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast.error('Please fill in all password fields');
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('New passwords do not match!');
+      return;
+    }
+
+    try {
+      await changePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword
+      }).unwrap();
+
+      toast.success('Password changed successfully!');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error('Failed to change password:', error);
+      toast.error(error?.data?.message || 'Failed to change password. Please try again.');
     }
   };
 
@@ -157,6 +179,7 @@ const Profile = () => {
         <p className='mt-2 text-base text-[#7a7a7a]'>Manage your wedding details and personal information</p>
       </header>
 
+      {/* Account Details Section */}
       <article className='mb-8 rounded-lg border border-[#e0dcd7] bg-white px-4 py-6'>
         <h2 className='mb-6 text-lg font-semibold text-[#1b1b1b]'>Account Details</h2>
 
@@ -285,6 +308,7 @@ const Profile = () => {
         </button>
       </article>
 
+      {/* Change Password Section */}
       <article className='rounded-lg border border-[#e0dcd7] bg-white px-4 py-6'>
         <h2 className='mb-6 text-lg font-semibold text-[#1b1b1b]'>Change Password</h2>
 
@@ -293,8 +317,8 @@ const Profile = () => {
             <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>Old Password</label>
             <input
               type='password'
-              name='oldPassword'
-              value={passwordForm.oldPassword}
+              name='currentPassword' 
+              value={passwordForm.currentPassword}
               onChange={handlePasswordChange}
               className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
             />
@@ -325,9 +349,10 @@ const Profile = () => {
 
         <button
           onClick={handleSavePassword}
-          className='mt-6 rounded-md bg-[#b4c4b1] px-6 py-2 text-sm font-medium text-[#2f3a2f] transition hover:bg-[#a4b5a2]'
+          disabled={isPasswordUpdating} 
+          className='mt-6 rounded-md bg-[#b4c4b1] px-6 py-2 text-sm font-medium text-[#2f3a2f] transition hover:bg-[#a4b5a2] disabled:opacity-50'
         >
-          Save
+          {isPasswordUpdating ? 'Changing...' : 'Save'}
         </button>
       </article>
     </section>

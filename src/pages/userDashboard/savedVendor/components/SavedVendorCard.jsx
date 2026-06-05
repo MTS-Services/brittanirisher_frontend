@@ -1,12 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // ১. Link ইম্পোর্ট করুন
 import { DollarSign, Heart, MapPin, Trash2 } from 'lucide-react';
-import { API_CONFIG } from '../../../../config';
+import { API_CONFIG, ROUTES } from '../../../../config'; 
 
 const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => {
   const baseUrl = ""; 
   const imageUrl = vendor.portfolioImage?.startsWith('http') 
     ? vendor.portfolioImage 
     : `${baseUrl}${vendor.portfolioImage}`;
+
+  const vendorId = vendor.id || vendor._id;
+  const detailsUrl = ROUTES.VENDOR_DETAILS.replace(':id', vendorId);
 
   return (
     <article className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md'>
@@ -16,7 +20,7 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
           alt={vendor.name}
           className='h-full w-full object-cover'
           onError={(event) => {
-            event.target.src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(vendor.name)}`;
+            event.target.src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(vendor.name || 'Vendor')}`;
           }}
         />
 
@@ -25,17 +29,17 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
         </span>
 
         <div className='absolute right-3 top-3 flex items-center gap-2'>
-          <button
-            onClick={() => onRemove?.(vendor.id)}
+          {/* <button
+            onClick={() => onRemove?.(vendorId)}
             type='button'
             className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1f1f1f] transition hover:bg-[#f4f4f4]'
             aria-label='Remove saved vendor'
           >
             <Trash2 size={18} />
-          </button>
+          </button> */}
 
           <button
-            onClick={() => onToggleFavorite(vendor.id)}
+            onClick={() => onToggleFavorite(vendorId)}
             type='button'
             className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#d6b18d] transition hover:bg-[#f4f4f4] hover:text-[#c89d74]'
             aria-label='Toggle favorite'
@@ -59,12 +63,12 @@ const SavedVendorCard = ({ vendor, isFavorite, onToggleFavorite, onRemove }) => 
           <span className='font-raleway capitalize'>{vendor.location}</span>
         </div>
 
-        <button
-          type='button'
-          className='w-full rounded-xl bg-[#9dad9a] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#8fa18d]'
+        <Link
+          to={detailsUrl}
+          className='block w-full text-center rounded-xl bg-[#9dad9a] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#8fa18d]'
         >
           View Profile
-        </button>
+        </Link>
       </div>
     </article>
   );

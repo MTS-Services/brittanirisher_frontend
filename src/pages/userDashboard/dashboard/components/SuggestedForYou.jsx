@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Sparkles, ChevronLeft, ChevronRight,  } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SuggestedCard from './SuggestedCard';
 
 const CardSkeleton = () => (
@@ -26,9 +27,14 @@ const SuggestedForYou = ({ items = [], meta, isLoading, onPageChange }) => {
           <Sparkles size={22} className='text-[#D4A574]' />
           <h2 className='text-2xl font-raleway font-medium text-[#2d2d2d]'>Suggested For You</h2>
         </div>
-        <button className='text-sm font-raleway font-medium text-[#9a9a9a] hover:text-[#5a5a5a]'>
+
+        <Link to="/browse-vendors" className='text-sm font-raleway font-medium text-[#9a9a9a] hover:text-[#5a5a5a] underline'>
           View all
-        </button>
+        </Link>
+
+        {/* <button className='text-sm font-raleway font-medium text-[#9a9a9a] hover:text-[#5a5a5a]'>
+          View all
+        </button> */}
       </div>
 
       {isLoading ? (

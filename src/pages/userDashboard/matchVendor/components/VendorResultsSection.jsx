@@ -1,30 +1,21 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; 
 import { DollarSign, Heart, MapPin, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast'; 
 import { useSaveVendorMutation } from '../../../../store/features/couple/coupleDashboard'; 
-import { API_CONFIG } from "../../../../config";
+import { API_CONFIG, ROUTES } from "../../../../../src/config/index"; 
 
-// স্কেলিটন লোডার কম্পোনেন্ট (১টি কার্ডের জন্য)
 const VendorCardSkeleton = () => (
   <div className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm animate-pulse'>
-    {/* ইমেজের জন্য স্কেলিটন প্লেসহোল্ডার */}
     <div className='h-48 bg-[#ece9e2]' />
-    
-    {/* টেক্সটের জন্য স্কেলিটন প্লেসহোল্ডার */}
     <div className='px-3 py-2.5 space-y-3'>
-      {/* টাইটেল */}
       <div className='h-5 w-3/4 rounded bg-[#ece9e2]' />
-      {/* ক্যাটাগরি */}
       <div className='h-4 w-1/2 rounded bg-[#ece9e2]' />
-      
       <div className='space-y-2 pt-1'>
-        {/* প্রাইস রেঞ্জ */}
         <div className='h-3.5 w-2/3 rounded bg-[#ece9e2]' />
-        {/* লোকেশন */}
         <div className='h-3.5 w-1/2 rounded bg-[#ece9e2]' />
       </div>
-      
-      {/* বাটন */}
-      <div className='h-8 w-full rounded bg-[#ece9e2] mt-2' />
+      <div className='h-8 w-full rounded bg-[#ece9e2]' mt-2 />
     </div>
   </div>
 );
@@ -32,11 +23,13 @@ const VendorCardSkeleton = () => (
 const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
   const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
 
-  const handleSaveToggle = async (vendorId) => {
+  const handleSaveToggle = async (vendorId, isCurrentlySaved) => {
     try {
       await saveVendor({ vendorId }).unwrap();
+      toast.success(isCurrentlySaved ? "Removed from favorites" : "Added to favorites");
     } catch (error) {
       console.error("Failed to save vendor:", error);
+      toast.error("Failed to update favorite status. Please try again.");
     }
   };
 
@@ -44,7 +37,6 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
     return (
       <section className='mb-6'>
         <div className='mb-4 h-6 w-56 animate-pulse rounded bg-[#ece9e2]' />
-        
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
           {[...Array(4)].map((_, index) => (
             <VendorCardSkeleton key={index} />
@@ -90,9 +82,12 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
               ? `$${vendor.packagePriceRange.low.toLocaleString()} - $${vendor.packagePriceRange.high.toLocaleString()}`
               : 'Price on request';
 
+          const vendorId = vendor.id || vendor._id;
+          const detailsUrl = ROUTES.VENDOR_DETAILS.replace(':id', vendorId);
+
           return (
             <article
-              key={vendor.id}
+              key={vendorId}
               className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md'
             >
               <div className='relative h-48 bg-[#ece9e2]'>
@@ -114,7 +109,7 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
 
                 <button
                   type='button'
-                  onClick={() => handleSaveToggle(vendor.id)}
+                  onClick={() => handleSaveToggle(vendorId, vendor.isSaved)}
                   disabled={isSaving} 
                   className={`absolute right-2 top-2 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d9d7d2] bg-white/95 transition hover:bg-white disabled:opacity-70 ${
                     vendor.isSaved ? 'text-[#d6b28d]' : 'text-[#a8a8a8] hover:text-[#d6b28d]'
@@ -141,12 +136,12 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
                   <span>{vendor.location || `${vendor.city || ''}${vendor.city && vendor.state ? ', ' : ''}${vendor.state || ''}` || '—'}</span>
                 </div>
 
-                <button
-                  type='button'
-                  className='w-full rounded-md bg-[#A7B9A6] px-3 py-1.5 text-sm font-medium text-white transition hover:bg-[#8fa18d]'
+                <Link
+                  to={detailsUrl}
+                  className='block w-full text-center rounded-md bg-[#A7B9A6] px-3 py-1.5 text-sm font-medium text-white transition hover:bg-[#8fa18d]'
                 >
                   View Profile
-                </button>
+                </Link>
               </div>
             </article>
           );

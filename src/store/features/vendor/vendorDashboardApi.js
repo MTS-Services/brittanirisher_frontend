@@ -38,36 +38,89 @@ const vendordashboardApi = apiSlice.injectEndpoints({
     updateEnquiryStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/enquiries/${id}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: { status },
       }),
-      invalidatesTags: ['Enquiries', 'EnquiryDetails'], 
+      invalidatesTags: ["Enquiries", "EnquiryDetails"],
     }),
 
     deleteEnquiry: builder.mutation({
       query: (id) => ({
         url: `/enquiries/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Enquiries'],
+      invalidatesTags: ["Enquiries"],
     }),
-  getVendorCalendar: builder.query({
+    getVendorCalendar: builder.query({
       query: ({ vendorId, year, month }) => ({
         url: `/vendor-availabilities/calendar`,
-        method: 'GET',
+        method: "GET",
         params: { vendorId, year, month },
       }),
-      providesTags: ['Calendar'],
+      providesTags: ["Calendar"],
     }),
 
     saveBulkMonthAvailability: builder.mutation({
       query: (body) => ({
         url: `/vendor-availabilities/bulk/month`,
-        method: 'POST',
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['Calendar'], 
+      invalidatesTags: ["Calendar"],
     }),
+    updateVendorProfile: builder.mutation({
+      query: (formData) => ({
+        url: `/vendor-profiles/update`,
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["VendorProfile"],
+    }),
+    deletePortfolioImage: builder.mutation({
+  query: (imageId) => ({
+    url: `/vendor-profiles/portfolio/${imageId}`,
+    method: 'DELETE',
+  }),
+  invalidatesTags: ['VendorProfile'],
+}),
+getVendorPackageById: builder.query({
+  query: (id) => ({
+    url: `/vendor-package/${id}`,
+    method: 'GET',
+  }),
+  providesTags: (result, error, id) => [{ type: 'VendorPackages', id }],
+}),
+
+createVendorPackage: builder.mutation({
+  query: (body) => ({
+    url: `/vendor-package`,
+    method: 'POST',
+    body,
+  }),
+  invalidatesTags: ['VendorPackages'],
+}),
+
+updateVendorPackage: builder.mutation({
+  query: ({ id, body }) => ({
+    url: `/vendor-package/${id}`,
+    method: 'PATCH',
+    body,
+  }),
+  invalidatesTags: (result, error, { id }) => [
+    { type: 'VendorPackages', id },
+    'VendorPackages',
+  ],
+}),
+deleteVendorPackage: builder.mutation({
+  query: (id) => ({
+    url: `/vendor-package/${id}`,
+    method: 'DELETE',
+  }),
+  invalidatesTags: (result, error, id) => [
+    { type: 'VendorPackages', id },
+    'VendorPackages',
+  ],
+}),
   }),
 });
 const {
@@ -76,9 +129,16 @@ const {
   useGetVendorChartDataQuery,
   useGetEnquiriesQuery,
   useGetEnquiryByIdQuery,
-  useUpdateEnquiryStatusMutation, 
+  useUpdateEnquiryStatusMutation,
   useDeleteEnquiryMutation,
-  useGetVendorCalendarQuery, useSaveBulkMonthAvailabilityMutation       
+  useGetVendorCalendarQuery,
+  useSaveBulkMonthAvailabilityMutation,
+  useUpdateVendorProfileMutation,
+  useDeletePortfolioImageMutation,
+  useCreateVendorPackageMutation,
+  useGetVendorPackageByIdQuery,
+  useUpdateVendorPackageMutation,
+  useDeleteVendorPackageMutation 
 } = vendordashboardApi;
 
 export {
@@ -87,7 +147,14 @@ export {
   useGetVendorChartDataQuery,
   useGetEnquiriesQuery,
   useGetEnquiryByIdQuery,
-  useUpdateEnquiryStatusMutation, 
+  useUpdateEnquiryStatusMutation,
   useDeleteEnquiryMutation,
-  useGetVendorCalendarQuery, useSaveBulkMonthAvailabilityMutation 
+  useGetVendorCalendarQuery,
+  useSaveBulkMonthAvailabilityMutation,
+  useUpdateVendorProfileMutation,
+  useDeletePortfolioImageMutation,
+  useCreateVendorPackageMutation,
+  useGetVendorPackageByIdQuery,
+  useUpdateVendorPackageMutation,
+  useDeleteVendorPackageMutation 
 };

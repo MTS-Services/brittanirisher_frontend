@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../../../config/index'; 
 
 const SuggestedCard = ({ item }) => {
   const formatPrice = (price) => {
@@ -13,6 +15,10 @@ const SuggestedCard = ({ item }) => {
   const displayPrice = item?.packagePriceRange 
     ? `${formatPrice(item.packagePriceRange.low)} - ${formatPrice(item.packagePriceRange.high)}`
     : 'Price N/A';
+
+
+  const vendorId = item?.id || item?._id;
+  const detailsUrl = ROUTES.VENDOR_DETAILS.replace(':id', vendorId);
 
   return (
     <div className='flex h-full flex-col rounded-lg font-raleway border border-[#f0eee9] p-4 transition-shadow hover:shadow-sm'>
@@ -31,9 +37,12 @@ const SuggestedCard = ({ item }) => {
 
       <p className='mb-5 text-sm text-[#6b6b6b] font-medium'>{displayPrice}</p>
 
-      <button className='mt-auto w-full rounded-lg bg-[#A3B79C] py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#8d9f87]'>
+      <Link 
+        to={detailsUrl} 
+        className='mt-auto w-full text-center rounded-lg bg-[#A3B79C] py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#8d9f87]'
+      >
         View Details
-      </button>
+      </Link>
     </div>
   );
 };
