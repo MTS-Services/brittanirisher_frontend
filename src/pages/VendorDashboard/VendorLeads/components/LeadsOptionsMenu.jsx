@@ -1,10 +1,21 @@
 import React from 'react';
-import { CheckCircle2, Clock3, Eye, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock3,
+  Eye,
+  MailOpen,
+  Sparkles,
+  Trash2,
+  XCircle,
+} from 'lucide-react';
 
 const STATUS_OPTIONS = ['NEW', 'PENDING', 'REPLIED', 'IGNORED', 'CONTRACTED'];
 
 const statusIconMap = {
+  NEW: Sparkles,
   PENDING: Clock3,
+  REPLIED: MailOpen,
+  IGNORED: XCircle,
   CONTRACTED: CheckCircle2,
 };
 

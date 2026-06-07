@@ -72,59 +72,103 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
       return;
     }
 
-    const updatedFormData = { ...formData, packages, password, confirmPassword };
+    const stagedPackages = [...packages];
+    if (
+      currentPackage.packageName?.trim() &&
+      currentPackage.price !== ''
+    ) {
+      stagedPackages.push({
+        ...currentPackage,
+        packageName: currentPackage.packageName.trim(),
+      });
+    }
+
+    if (!stagedPackages.length) {
+      setError('Please add at least one package before continuing.');
+      return;
+    }
+
+    const updatedFormData = {
+      ...formData,
+      packages: stagedPackages,
+      password,
+      confirmPassword,
+    };
     onFormChange(updatedFormData);
 
-    // ─── Build FormData (multipart/form-data) ───────────────────────────────
-    const fd = new FormData();
-
-    // Fields from VendorSignup (step 0) — passed via router state
-    fd.append('name',       vendorSignupInitialData.name            || '');
-    fd.append('email',      vendorSignupInitialData.email           || '');
-    fd.append('location',   vendorSignupInitialData.location        || '');
-    fd.append('Address',    vendorSignupInitialData.location        || '');
-    fd.append('stateId',    vendorSignupInitialData.state           || '');
-    fd.append('cityId',     vendorSignupInitialData.city            || '');
-    fd.append('categoryId', vendorSignupInitialData.serviceCategory || '');
-
-    // Fields from Step 1
-    fd.append('businessName',        updatedFormData.businessName         || '');
-    fd.append('highlightedServices', updatedFormData.highlightedServices  || ''); // ✅ added
-    fd.append('experienceYears',     updatedFormData.experience           || '');
-    fd.append('speciality',          updatedFormData.speciality           || '');
-    fd.append('aboutMe',             updatedFormData.aboutMe              || '');
-
-    // Fields from Step 2 — each image as a separate File entry under key "images"
-    (updatedFormData.portfolioImages || []).forEach((img) => {
-      if (img instanceof File) {
-        fd.append('images', img);
-      }
-    });
-
-    // ✅ package as JSON — exact format backend expects
-    const cleanPackages = packages.map((pkg) => ({
-      packageName: pkg.packageName,
-      price: Number(pkg.price),       // must be number, not string
-      badge: pkg.badge,
-      isActive: true,                 // required by backend
-      features: pkg.features,
+    const cleanPackages = stagedPackages.map((pkg) => ({
+      packageName: String(pkg.packageName || '').trim(),
+      price: Number.isFinite(Number(pkg.price)) ? Number(pkg.price) : 0,
+      badge: String(pkg.badge || '').trim(),
+      isActive: true,
+      features: Array.isArray(pkg.features)
+        ? pkg.features.map((feature) => String(feature || '').trim()).filter(Boolean)
+        : [],
     }));
-    fd.append('package', JSON.stringify(cleanPackages));
 
-    fd.append('packageId', updatedFormData.packageId || '');
+    const packageCandidates = [
+      JSON.stringify(cleanPackages),
+      cleanPackages.length === 1 ? JSON.stringify(cleanPackages[0]) : null,
+      JSON.stringify({ packages: cleanPackages }),
+    ].filter(Boolean);
 
-    fd.append('password', password);
+    const buildVendorFormData = (packageValue) => {
+      const fd = new FormData();
 
-    // ─── Submit ─────────────────────────────────────────────────────────────
-    try {
-      await createVendorProfile(fd).unwrap();
-      navigate(ROUTES.LOGIN, { replace: true });
-    } catch (err) {
-      console.error('Vendor profile creation failed:', err);
-      setError(
-        err?.data?.message || 'Something went wrong. Please try again.'
-      );
+      // Fields from VendorSignup (step 0) — passed via router state
+      fd.append('name', vendorSignupInitialData.name || '');
+      fd.append('email', vendorSignupInitialData.email || '');
+      fd.append('location', vendorSignupInitialData.location || '');
+      fd.append('Address', vendorSignupInitialData.location || '');
+      fd.append('stateId', vendorSignupInitialData.state || '');
+      fd.append('cityId', vendorSignupInitialData.city || '');
+      fd.append('categoryId', vendorSignupInitialData.serviceCategory || '');
+
+      // Fields from Step 1
+      fd.append('businessName', updatedFormData.businessName || '');
+      fd.append('highlightedServices', updatedFormData.highlightedServices || '');
+      fd.append('experienceYears', updatedFormData.experience || '');
+      fd.append('speciality', updatedFormData.speciality || '');
+      fd.append('aboutMe', updatedFormData.aboutMe || '');
+
+      // Fields from Step 2 — each image as a separate File entry under key "images"
+      (updatedFormData.portfolioImages || []).forEach((img) => {
+        if (img instanceof File) {
+          fd.append('images', img);
+        }
+      });
+
+      fd.append('package', packageValue);
+      fd.append('password', password);
+      return fd;
+    };
+
+    // ─── Submit with parser-safe fallback payload shapes ───────────────────
+    let lastError = null;
+    for (const packageValue of packageCandidates) {
+      try {
+        const fd = buildVendorFormData(packageValue);
+        await createVendorProfile(fd).unwrap();
+        navigate(ROUTES.LOGIN, { replace: true });
+        return;
+      } catch (err) {
+        lastError = err;
+        const backendMessage = String(err?.data?.message || err?.data?.error || '');
+        const isPackageJsonError = backendMessage.toLowerCase().includes('invalid json format inside')
+          && backendMessage.toLowerCase().includes('package');
+
+        if (!isPackageJsonError) {
+          break;
+        }
+      }
     }
+
+    console.error('Vendor profile creation failed:', lastError);
+    setError(
+      lastError?.data?.message ||
+      lastError?.data?.error ||
+      'Something went wrong. Please try again.'
+    );
   };
 
   const handlePrevious = () => {

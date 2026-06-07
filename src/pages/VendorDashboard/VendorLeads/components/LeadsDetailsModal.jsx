@@ -27,7 +27,7 @@ const LeadsDetailsModal = ({ leadId, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={onClose}>
       <div
         className="w-full rounded-[14px] bg-white shadow-[0_18px_60px_rgba(0,0,0,0.35)]"
-        style={{ maxWidth: "390px" }}
+        style={{ maxWidth: "550px" }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-[#f0f0f0] px-5 py-4">
@@ -44,8 +44,10 @@ const LeadsDetailsModal = ({ leadId, onClose }) => {
         ) : lead ? (
           <div className="px-5 py-4">
             <div className="flex items-center gap-2">
-              <UserIcon />
-              <span className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#8a8a8a]">
+        <div className="flex h-8 w- items-center justify-center rounded-full  text-2xl text-[#6b7280]">
+                <UserIcon  />
+        </div>
+              <span className="text-base   text-[#8a8a8a]">
                 Customer Information
               </span>
             </div>
@@ -54,11 +56,11 @@ const LeadsDetailsModal = ({ leadId, onClose }) => {
               <p className="text-[20px] font-semibold leading-tight text-[#111]">
                 {lead.senderName}
               </p>
-              <p className="mt-1 text-[14px] text-[#5f5f5f]">{lead.senderPhone}</p>
-              <p className="mt-1 text-[14px] text-[#5f5f5f]">{lead.senderEmail}</p>
+              <p className="mt-1 text-[14px] md:text-base text-[#5f5f5f]">{lead.senderPhone}</p>
+              <p className="mt-1 text-[14px] md:text-base text-[#5f5f5f]">{lead.senderEmail}</p>
             </div>
 
-            <div className="mt-3 text-[12px] font-medium uppercase tracking-[0.14em] text-[#8a8a8a]">
+            <div className="mt-3 text-[12px] md:text-base font-semibold   text-[#111]">
               Client's Details
             </div>
             <p className="mt-2 text-[15px] leading-[1.6] text-[#222]">
