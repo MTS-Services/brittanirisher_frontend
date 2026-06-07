@@ -17,12 +17,37 @@ const applyPrimaryColor = (color) => {
 };
 
 const listener = createListenerMiddleware();
+let logoutTimeoutId = null;
+
+const clearLogoutTimer = () => {
+  if (logoutTimeoutId) {
+    window.clearTimeout(logoutTimeoutId);
+    logoutTimeoutId = null;
+  }
+};
+
+const scheduleAutoLogout = (dispatch, expiresAt) => {
+  clearLogoutTimer();
+  if (!expiresAt) return;
+
+  const delayMs = expiresAt - Date.now();
+  if (delayMs <= 0) {
+    dispatch(logout());
+    return;
+  }
+
+  logoutTimeoutId = window.setTimeout(() => {
+    dispatch(logout());
+  }, delayMs);
+};
 
 // Auth persistence
 listener.startListening({
   actionCreator: loginSuccess,
-  effect: (action) => {
+  effect: (action, api) => {
     const accessToken = action.payload.accessToken || action.payload.token;
+    const tokenExpiresAt = api.getState().auth.tokenExpiresAt;
+
     localStorage.setItem('token', accessToken);
     localStorage.setItem('accessToken', accessToken);
     if (action.payload.refreshToken) {
@@ -40,18 +65,27 @@ listener.startListening({
     } else {
       localStorage.removeItem('expiresIn');
     }
+    if (tokenExpiresAt) {
+      localStorage.setItem('tokenExpiresAt', String(tokenExpiresAt));
+    } else {
+      localStorage.removeItem('tokenExpiresAt');
+    }
     localStorage.setItem('user', JSON.stringify(action.payload.user));
+
+    scheduleAutoLogout(api.dispatch, tokenExpiresAt);
   },
 });
 
 listener.startListening({
   actionCreator: logout,
   effect: () => {
+    clearLogoutTimer();
     localStorage.removeItem('token');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('tokenType');
     localStorage.removeItem('expiresIn');
+    localStorage.removeItem('tokenExpiresAt');
     localStorage.removeItem('user');
   },
 });
@@ -106,5 +140,8 @@ const store = configureStore({
 
 // Apply initial primary color on store creation
 applyPrimaryColor(store.getState().theme.primaryColor);
+
+// Schedule auto-logout after rehydration if token has a known expiry timestamp.
+scheduleAutoLogout(store.dispatch, store.getState().auth.tokenExpiresAt);
 
 export default store;

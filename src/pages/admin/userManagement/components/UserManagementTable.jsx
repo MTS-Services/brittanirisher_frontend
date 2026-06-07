@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreVertical } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useUpdateVendorStatusMutation } from '../../../../store/features/admin/adminVendor/adminVendorApi';
 
-export default function UserManagementTable({ activeTab, pagedRows }) {
+export default function UserManagementTable({ activeTab, pagedRows, isLoading }) {
   const [openId, setOpenId] = useState(null);
   const [menuPos, setMenuPos] = useState(null);
   const menuRef = useRef(null);
+  const [updateVendorStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateVendorStatusMutation();
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -38,12 +42,24 @@ export default function UserManagementTable({ activeTab, pagedRows }) {
     setMenuPos({ top, left });
   };
 
-  const handleAction = (action, row) => {
+  const handleAction = async (status, row) => {
     setOpenId(null);
     setMenuPos(null);
-    // placeholder for actual action handlers
-    // eslint-disable-next-line no-console
-    console.log(action, row);
+
+    if (!row?.id) {
+      toast.error('Vendor not found.');
+      return;
+    }
+
+    try {
+      await updateVendorStatus({
+        id: row.id,
+        status,
+      }).unwrap();
+      toast.success(`Vendor status updated to ${status}.`);
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to update vendor status.');
+    }
   };
 
   return (
@@ -75,8 +91,21 @@ export default function UserManagementTable({ activeTab, pagedRows }) {
         </thead>
 
         <tbody className='divide-y divide-gray-100'>
-          {pagedRows.map((row) => (
-            <tr key={row.email} className='hover:bg-gray-50/60 transition-colors'>
+          {isLoading ? (
+            <tr>
+              <td colSpan={activeTab === 'couple' ? 9 : 7} className='px-4 py-10 text-center text-sm text-gray-500'>
+                Loading users...
+              </td>
+            </tr>
+          ) : pagedRows.length === 0 ? (
+            <tr>
+              <td colSpan={activeTab === 'couple' ? 9 : 7} className='px-4 py-10 text-center text-sm text-gray-500'>
+                No users found.
+              </td>
+            </tr>
+          ) : (
+            pagedRows.map((row) => (
+            <tr key={row.id || row.email} className='hover:bg-gray-50/60 transition-colors'>
               <td className='px-4 py-4 text-gray-800'>{row.name}</td>
               <td className='px-4 py-4 text-gray-600'>{row.email}</td>
               <td className='px-4 py-4 text-gray-600'>{row.phone}</td>
@@ -97,10 +126,10 @@ export default function UserManagementTable({ activeTab, pagedRows }) {
                   <td className='px-4 py-4 text-center'>
                     <button
                       type='button'
-                      data-action-button={row.email}
-                      onClick={(e) => toggleMenu(row.email, e)}
+                      data-action-button={row.id || row.email}
+                      onClick={(e) => toggleMenu(row.id || row.email, e)}
                       className='inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition'
-                      aria-expanded={openId === row.email}
+                      aria-expanded={openId === (row.id || row.email)}
                       aria-label='Open action menu'
                     >
                       <MoreVertical size={16} />
@@ -109,7 +138,8 @@ export default function UserManagementTable({ activeTab, pagedRows }) {
                 </>
               )}
             </tr>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
 
@@ -126,24 +156,27 @@ export default function UserManagementTable({ activeTab, pagedRows }) {
             >
               <button
                 type='button'
-                onClick={() => handleAction('details', pagedRows.find((row) => row.email === openId))}
-                className='block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50'
+                disabled={isUpdatingStatus}
+                onClick={() => handleAction('PENDING', pagedRows.find((row) => (row.id || row.email) === openId))}
+                className='block w-full px-4 py-3 text-left text-sm text-amber-600 hover:bg-gray-50 disabled:opacity-50'
               >
-                See Details
+                Set Pending
               </button>
               <button
                 type='button'
-                onClick={() => handleAction('suspend', pagedRows.find((row) => row.email === openId))}
-                className='block w-full px-4 py-3 text-left text-sm text-orange-500 hover:bg-gray-50'
+                disabled={isUpdatingStatus}
+                onClick={() => handleAction('APPROVED', pagedRows.find((row) => (row.id || row.email) === openId))}
+                className='block w-full px-4 py-3 text-left text-sm text-green-600 hover:bg-gray-50 disabled:opacity-50'
               >
-                Suspend
+                Set Approved
               </button>
               <button
                 type='button'
-                onClick={() => handleAction('active', pagedRows.find((row) => row.email === openId))}
-                className='block w-full px-4 py-3 text-left text-sm text-green-600 hover:bg-gray-50'
+                disabled={isUpdatingStatus}
+                onClick={() => handleAction('REJECTED', pagedRows.find((row) => (row.id || row.email) === openId))}
+                className='block w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-gray-50 disabled:opacity-50'
               >
-                Active
+                Set Rejected
               </button>
             </div>,
             document.body,

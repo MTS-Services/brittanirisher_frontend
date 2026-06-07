@@ -6,6 +6,10 @@ export default function SettingsItemModal({
   title,
   placeholder,
   submitLabel,
+  value,
+  onChange,
+  onSubmit,
+  isSubmitting,
   onClose,
 }) {
   if (!open) {
@@ -41,15 +45,19 @@ export default function SettingsItemModal({
             <input
               type='text'
               placeholder={placeholder}
+              value={value}
+              onChange={(event) => onChange?.(event.target.value)}
               className='w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#A7B9A6] focus:bg-white'
             />
           </div>
 
           <button
             type='button'
+            onClick={onSubmit}
+            disabled={isSubmitting}
             className='w-full rounded-lg bg-[#A7B9A6] px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:opacity-95'
           >
-            {submitLabel}
+            {isSubmitting ? 'Saving...' : submitLabel}
           </button>
         </div>
       </div>

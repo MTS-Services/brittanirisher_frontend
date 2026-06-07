@@ -7,6 +7,7 @@ const vendordashboardApi = apiSlice.injectEndpoints({
         url: `/vendor-profiles/my/profile`,
         method: "GET",
       }),
+      providesTags: ["VendorProfile"],
     }),
 
     getVendodasrhboarStatus: builder.query({
@@ -22,18 +23,81 @@ const vendordashboardApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    getVendorPackages: builder.query({
+      query: () => ({
+        url: `/vendor-package`,
+        method: "GET",
+      }),
+      providesTags: ["VendorPackages"],
+    }),
+    getBookings: builder.query({
+      query: ({ page = 1, limit = 10, status } = {}) => ({
+        url: `/bookings`,
+        method: "GET",
+        params: {
+          page,
+          limit,
+          ...(status ? { status } : {}),
+        },
+      }),
+      providesTags: (result) => {
+        const bookings = result?.data || [];
+        return [
+          "Bookings",
+          ...bookings.map((booking) => ({ type: "BookingDetails", id: booking.id })),
+        ];
+      },
+    }),
+    createBooking: builder.mutation({
+      query: (body) => ({
+        url: `/bookings`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Bookings"],
+    }),
+    getBookingById: builder.query({
+      query: (id) => ({
+        url: `/bookings/${id}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "BookingDetails", id }],
+    }),
+    updateBooking: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/bookings/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        "Bookings",
+        { type: "BookingDetails", id },
+      ],
+    }),
+    deleteBooking: builder.mutation({
+      query: (id) => ({
+        url: `/bookings/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [
+        "Bookings",
+        { type: "BookingDetails", id },
+      ],
+    }),
 
     getEnquiries: builder.query({
       query: (page = 1) => ({
         url: `/enquiries?page=${page}`,
         method: "GET",
       }),
+      providesTags: ["Enquiries"],
     }),
     getEnquiryById: builder.query({
       query: (id) => ({
         url: `/enquiries/${id}`,
         method: "GET",
       }),
+      providesTags: (result, error, id) => [{ type: "EnquiryDetails", id }],
     }),
     updateEnquiryStatus: builder.mutation({
       query: ({ id, status }) => ({
@@ -127,6 +191,12 @@ const {
   useGetVendorStatusQuery,
   useGetVendodasrhboarStatusQuery,
   useGetVendorChartDataQuery,
+  useGetVendorPackagesQuery,
+  useGetBookingsQuery,
+  useCreateBookingMutation,
+  useLazyGetBookingByIdQuery,
+  useUpdateBookingMutation,
+  useDeleteBookingMutation,
   useGetEnquiriesQuery,
   useGetEnquiryByIdQuery,
   useUpdateEnquiryStatusMutation,
@@ -145,6 +215,12 @@ export {
   useGetVendorStatusQuery,
   useGetVendodasrhboarStatusQuery,
   useGetVendorChartDataQuery,
+  useGetVendorPackagesQuery,
+  useGetBookingsQuery,
+  useCreateBookingMutation,
+  useLazyGetBookingByIdQuery,
+  useUpdateBookingMutation,
+  useDeleteBookingMutation,
   useGetEnquiriesQuery,
   useGetEnquiryByIdQuery,
   useUpdateEnquiryStatusMutation,

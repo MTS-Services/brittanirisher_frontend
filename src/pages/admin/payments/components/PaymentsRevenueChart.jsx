@@ -9,20 +9,11 @@ import {
   YAxis,
 } from 'recharts';
 import { ChevronDown } from 'lucide-react';
+import { useGetAdminDashboardChartsQuery } from '../../../../store/features/admin/adminDashboard/adminDashboardApi';
 
-const revenueData = [
-  { month: 'Jan', value: 3200 },
-  { month: 'Feb', value: 2800 },
-  { month: 'Mar', value: 5200 },
-  { month: 'Apr', value: 4100 },
-  { month: 'May', value: 4600 },
-  { month: 'Jun', value: 3900 },
-  { month: 'Jul', value: 4300 },
-  { month: 'Aug', value: 5800 },
-  { month: 'Sep', value: 7200 },
-  { month: 'Oct', value: 6100 },
-  { month: 'Nov', value: 5400 },
-  { month: 'Dec', value: 6800 },
+const PERIOD_OPTIONS = [
+  { value: 'this_year', label: 'This Year' },
+  { value: 'previous_year', label: 'Previous Year' },
 ];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -40,7 +31,17 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function PaymentsRevenueChart() {
-  const [period, setPeriod] = useState('This year');
+  const [period, setPeriod] = useState('this_year');
+
+  const { data, isLoading } = useGetAdminDashboardChartsQuery(period, {
+    refetchOnMountOrArgChange: true,
+    refetchOnWindowFocus: true,
+  });
+
+  const revenueData = (data?.data || []).map((item) => ({
+    month: item.month,
+    value: Number(item.revenue) || 0,
+  }));
 
   return (
     <div className='bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6'>
@@ -54,16 +55,31 @@ export default function PaymentsRevenueChart() {
           </p>
         </div>
 
-        <button
-          className='flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 bg-white hover:bg-gray-50 transition shrink-0'
-          onClick={() => {}}
-        >
-          {period}
-          <ChevronDown size={14} className='text-gray-400' />
-        </button>
+        <div className='relative shrink-0'>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className='appearance-none text-xs sm:text-sm text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 pr-7 bg-white hover:bg-gray-50 transition'
+          >
+            {PERIOD_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={14}
+            className='pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400'
+          />
+        </div>
       </div>
 
       <div className='w-full h-52 sm:h-64 lg:h-72'>
+        {isLoading ? (
+          <div className='flex h-full items-center justify-center text-sm text-gray-500'>
+            Loading chart data...
+          </div>
+        ) : (
         <ResponsiveContainer width='100%' height='100%'>
           <AreaChart
             data={revenueData}
@@ -112,6 +128,7 @@ export default function PaymentsRevenueChart() {
             />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

@@ -1,57 +1,8 @@
 import React, { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Check, Search, X } from 'lucide-react';
-
-const PLANS = [
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: '$00',
-    period: '/month',
-    description: 'Perfect for new wedding professionals just starting out.',
-    features: [
-      'Profile listing',
-      'Portfolio (10 items)',
-      'Direct Leads',
-      'Basic Support',
-    ],
-    excluded: ['Featured Placement', 'Analytics Dashboard','Review Management'],
-  },
-  {
-    id: 'professional',
-    name: 'Professional',
-    price: '$25',
-    period: '/month',
-    description: 'The most popular choice for established small businesses.',
-    featured: true,
-    features: [
-      'Priority Listing',
-      'Unlimited Portfolio',
-      'Lead Notifications',
-      'Review management',
-      'Basic support',
-    ],
-    excluded: ['Top-tier placement ','Top-Tier Placement'],
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    price: '$75',
-    period: '/month',
-    description: 'Maximum exposure for the wedding industry leaders.',
-    features: [
-      'Top-tier placement',
-      'Unlimited everything',
-      'Advanced analytics',
-      'Account manager',
-      'Lead Verification',
-    ],
-    excluded: [],
-  },
-];
+import { Check, X } from 'lucide-react';
+import { useGetSubscriptionPlansQuery } from '../../../store/features/public/publicApi';
 
 const PricingCard = memo(({ plan }) => {
-  const navigate = useNavigate();
   return (
     <article
       className={`relative rounded-lg border p-4 md:p-6 flex flex-col h-full shadow-sm ${
@@ -70,28 +21,32 @@ const PricingCard = memo(({ plan }) => {
       <Search size={28} />
     </div> */}
 
-    <h3 className='mt-5 font-playfair text-3xl'>{plan.name}</h3>
+    <h3 className='mt-5 font-playfair text-3xl'>{plan.planName}</h3>
     <div className='mt-3 flex items-end gap-1'>
-      <span className='font-playfair font-bold text-5xl leading-none'>{plan.price}</span>
+      <span className='font-playfair font-bold text-5xl leading-none'>${plan.priceMonthly}</span>
       <span className={`pb-1 text-sm ${plan.featured ? 'text-white' : 'text-[#857F7A]'}`}>
-        {plan.period}
+        /{(plan.validFor || 'month').toLowerCase()}
       </span>
     </div>
     <p className={`mt-4 mb-3 font-raleway text-base md:text-lg leading-7 ${plan.featured ? 'text-white' : 'text-[#857F7A]'}`}>
-      {plan.description}
+      {plan.sortDescription}
     </p>
   <div className={` border-t ${plan.featured ? 'text-white' : 'text-[#857F7A]'}`} />
     <ul className='mt-6 mb-6 space-y-3 text-sm'>
-      {plan.features.map((feature) => (
-        <li key={feature} className='flex items-center gap-2 font-raleway '>
+      {plan.featuresAllowed
+        ?.filter((feature) => feature.isIncluded)
+        .map((feature, index) => (
+        <li key={`${feature.name}-${index}`} className='flex items-center gap-2 font-raleway '>
           <Check size={16} className={plan.featured ? 'text-[#16B21B]' : 'text-[#16B21B]'} />
-          <span className='text-sm '>{feature}</span>
+          <span className='text-sm '>{feature.name}</span>
         </li>
       ))}
-      {plan.excluded.map((feature) => (
-        <li key={feature} className='flex font-raleway  items-center gap-2 opacity-80'>
+      {plan.featuresAllowed
+        ?.filter((feature) => !feature.isIncluded)
+        .map((feature, index) => (
+        <li key={`${feature.name}-excluded-${index}`} className='flex font-raleway  items-center gap-2 opacity-80'>
           <X size={16} className={plan.featured ? 'text-white/70' : 'text-[#6b6b6b]'} />
-          <span >{feature}</span>
+          <span>{feature.name}</span>
         </li>
       ))}
     </ul>
@@ -114,6 +69,9 @@ const PricingCard = memo(({ plan }) => {
 PricingCard.displayName = 'PricingCard';
 
 const PricingSection = memo(() => {
+  const { data, isLoading } = useGetSubscriptionPlansQuery();
+  const plans = data?.data || [];
+
   return (
     <section id='pricing' className='relative overflow-hidden pt-14 sm:pt-20 md:pb-6'>
       {/* <div className='absolute left-0 top-10 h-52 w-52 rounded-full  blur-3xl' /> */}
@@ -128,11 +86,23 @@ const PricingSection = memo(() => {
           </p>
         </header>
 
-        <div className='mt-10 max-w-6xl mx-auto grid gap-8 md:gap-5 lg:grid-cols-3 auto-rows-fr'>
-          {PLANS.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} />
-          ))}
-        </div>
+        {isLoading ? (
+          <p className='mt-10 text-center text-base text-[#606060]'>Loading plans...</p>
+        ) : plans.length === 0 ? (
+          <p className='mt-10 text-center text-base text-[#606060]'>No pricing plans found.</p>
+        ) : (
+          <div className='mt-10 max-w-6xl mx-auto grid gap-8 md:gap-5 lg:grid-cols-3 auto-rows-fr'>
+            {plans.map((plan) => (
+              <PricingCard
+                key={plan.id}
+                plan={{
+                  ...plan,
+                  featured: String(plan.planName || '').toLowerCase() === 'professional',
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
       {/* Decorative image removed from here — placed between sections in HomeContent */}
     </section>

@@ -14,6 +14,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: '/wedding-styles',
         method: 'GET',
       }),
+      providesTags: ['WeddingStyle'],
     }),
     createCoupleProfile: builder.mutation({
       query: (body) => ({
@@ -36,6 +37,21 @@ export const authApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    getProfile: builder.query({
+      query: () => ({
+        url: '/auth/profile',
+        method: 'GET',
+      }),
+      providesTags: ['User'],
+    }),
+    updateProfile: builder.mutation({
+      query: (body) => ({
+        url: '/auth/profile',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -43,7 +59,9 @@ export const {
   useLoginMutation,
   useCreateCoupleProfileMutation,
   useGetWeddingStylesQuery,
-    useCreateVendorProfileMutation,
-    useChangePasswordMutation,
+  useCreateVendorProfileMutation,
+  useChangePasswordMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
 
 } = authApi;

@@ -40,7 +40,7 @@ export default function UserTypeTabs({
         </button>
       </div>
 
-      {activeTab === 'vendor' && (
+      {/* {activeTab === 'vendor' && (
         <label className='flex items-center gap-2 text-base text-gray-600 sm:self-auto'>
           <span className='inline-flex items-center gap-2 shrink-0'>
             <Funnel size={16} />
@@ -64,7 +64,7 @@ export default function UserTypeTabs({
             />
           </div>
         </label>
-      )}
+      )} */}
     </div>
   );
 }

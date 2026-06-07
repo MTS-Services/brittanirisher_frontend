@@ -151,7 +151,7 @@ export default function PendingVendorApprovals({
     if (!deleteTarget?.id) return;
 
     try {
-      await deleteVendor(deleteTarget.id).unwrap();
+      await deleteVendor({ id: deleteTarget.id }).unwrap();
       toast.success('Vendor deleted successfully.');
       setDeleteTarget(null);
     } catch (error) {

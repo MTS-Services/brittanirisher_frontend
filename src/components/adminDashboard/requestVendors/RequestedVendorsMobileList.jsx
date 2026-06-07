@@ -1,7 +1,29 @@
 import { MoreVertical } from "lucide-react";
 import VendorStatusBadge from "./VendorStatusBadge";
 
-export default function RequestedVendorsMobileList({ paged, openId, toggleMenu }) {
+export default function RequestedVendorsMobileList({
+  paged,
+  openId,
+  toggleMenu,
+  isLoading,
+  emptyMessage,
+}) {
+  if (isLoading) {
+    return (
+      <div className="sm:hidden px-5 py-8 text-center text-sm text-gray-500">
+        Loading vendors...
+      </div>
+    );
+  }
+
+  if (paged.length === 0) {
+    return (
+      <div className="sm:hidden px-5 py-8 text-center text-sm text-gray-500">
+        {emptyMessage}
+      </div>
+    );
+  }
+
   return (
     <div className="sm:hidden divide-y divide-gray-50">
       {paged.map((vendor) => (

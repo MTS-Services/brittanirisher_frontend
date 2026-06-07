@@ -7,11 +7,31 @@ const Field = ({ label, value }) => (
   </div>
 );
 
-export default function UserManagementCardList({ activeTab, pagedRows }) {
+export default function UserManagementCardList({
+  activeTab,
+  pagedRows,
+  isLoading,
+}) {
+  if (isLoading) {
+    return (
+      <div className='lg:hidden px-5 py-8 text-center text-sm text-gray-500'>
+        Loading users...
+      </div>
+    );
+  }
+
+  if (!pagedRows.length) {
+    return (
+      <div className='lg:hidden px-5 py-8 text-center text-sm text-gray-500'>
+        No users found.
+      </div>
+    );
+  }
+
   return (
     <div className='lg:hidden divide-y divide-gray-100'>
       {pagedRows.map((row) => (
-        <div key={row.email} className='p-4 sm:p-5'>
+        <div key={row.id || row.email} className='p-4 sm:p-5'>
           <div className='flex items-start justify-between gap-3'>
             <div>
               <p className='text-base font-semibold text-gray-900'>{row.name}</p>

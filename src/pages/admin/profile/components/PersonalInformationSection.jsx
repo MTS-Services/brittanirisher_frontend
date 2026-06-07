@@ -2,6 +2,8 @@ export default function PersonalInformationSection({
   personalInfo,
   onPersonalInfoChange,
   onSave,
+  isLoading,
+  isSaving,
 }) {
   return (
     <section>
@@ -19,6 +21,7 @@ export default function PersonalInformationSection({
               name="fullName"
               value={personalInfo.fullName}
               onChange={onPersonalInfoChange}
+              disabled={isLoading || isSaving}
               placeholder="MD. ismail Molla"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#A7B9A6] focus:bg-white"
             />
@@ -32,6 +35,7 @@ export default function PersonalInformationSection({
               name="phone"
               value={personalInfo.phone}
               onChange={onPersonalInfoChange}
+              disabled={isLoading || isSaving}
               placeholder="(918) 655-0116"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#A7B9A6] focus:bg-white"
             />
@@ -46,7 +50,7 @@ export default function PersonalInformationSection({
             type="email"
             name="email"
             value={personalInfo.email}
-            onChange={onPersonalInfoChange}
+              readOnly
             placeholder="jackson.graham@example.com"
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#A7B9A6] focus:bg-white"
           />
@@ -56,9 +60,10 @@ export default function PersonalInformationSection({
           <button
             type="button"
             onClick={onSave}
+            disabled={isLoading || isSaving}
             className="inline-flex rounded-lg bg-[#A7B9A6] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-95"
           >
-            Save
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>

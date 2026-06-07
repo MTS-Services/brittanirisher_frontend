@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Mail, Phone, MapPin, CalendarDays, Wallet, ChevronDown, Eye, EyeOff } from 'lucide-react';
 import { useDispatch } from 'react-redux';
@@ -44,8 +44,8 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
     cityName: '',
     address: '',
     style: '',
-    weddingDate: '2026-12-24',
-    budget: '$10,000',
+    weddingDate: '',
+    budget: '',
     password: '',
     confirmPassword: '',
   });
@@ -85,19 +85,6 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
     );
   }, [cityOptions, form.city]);
 
-  useEffect(() => {
-    if (audience !== 'couple') {
-      return;
-    }
-
-    if (!form.style && styleOptions.length > 0) {
-      setForm((current) => ({
-        ...current,
-        style: styleOptions[0].id,
-      }));
-    }
-  }, [audience, form.style, styleOptions]);
-
   const updateField = (field) => (event) => {
     const { value } = event.target;
     setForm((current) => {
@@ -135,6 +122,11 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
 
     if (form.password !== form.confirmPassword) {
       toast.error('Passwords do not match!');
+      return;
+    }
+
+    if (!form.style || !form.weddingDate || !form.budget.trim()) {
+      toast.error('Wedding style, wedding date, and budget are required.');
       return;
     }
 

@@ -4,8 +4,6 @@ import { ChevronDown } from 'lucide-react';
 import { ROUTES } from '../config';
 import { useGetCategoriesQuery, useGetStatesQuery } from '../../src/store/features/couple/coupleDashboard';
 
-const SPECIALTY_OPTIONS = ['None', 'Bar Service', 'Mixology', 'Signature Cocktails'];
-
 const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false }) => {
   const navigate = useNavigate();
 
@@ -21,7 +19,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
     city: '',
     location: '',
     serviceCategory: '',
-    bartendingSpecialties: SPECIALTY_OPTIONS[0],
+    bartendingSpecialties: '',
   });
 
   const [availableCities, setAvailableCities] = useState([]);
@@ -33,38 +31,20 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
     : [];
 
   useEffect(() => {
-    if (cleanCategories.length > 0 && !form.serviceCategory) {
-      setForm((current) => ({
-        ...current,
-        serviceCategory: cleanCategories[0].name,
-      }));
-    }
-  }, [cleanCategories, form.serviceCategory]);
-
-  useEffect(() => {
     if (form.state && statesData?.data) {
       const selectedStateObj = statesData.data.find((s) => s.id === form.state);
       if (selectedStateObj && selectedStateObj.cities) {
         setAvailableCities(selectedStateObj.cities);
-        if (selectedStateObj.cities.length > 0) {
-          setForm((current) => ({ ...current, city: selectedStateObj.cities[0].id }));
-        } else {
-          setForm((current) => ({ ...current, city: '' }));
-        }
+        setForm((current) => {
+          const hasCity = selectedStateObj.cities.some((city) => city.id === current.city);
+          return hasCity ? current : { ...current, city: '' };
+        });
       }
     } else {
       setAvailableCities([]);
+      setForm((current) => ({ ...current, city: '' }));
     }
   }, [form.state, statesData]);
-
-  useEffect(() => {
-    if (statesData?.data?.length > 0 && !form.state) {
-      setForm((current) => ({
-        ...current,
-        state: statesData.data[0].id,
-      }));
-    }
-  }, [statesData, form.state]);
 
   const updateField = (field) => (event) => {
     const { value } = event.target;

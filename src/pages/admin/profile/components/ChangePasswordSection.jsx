@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
-export default function ChangePasswordSection({ passwords, onPasswordChange, onSave }) {
+export default function ChangePasswordSection({
+  passwords,
+  onPasswordChange,
+  onSave,
+  isSaving,
+}) {
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -89,9 +94,10 @@ export default function ChangePasswordSection({ passwords, onPasswordChange, onS
           <button
             type='button'
             onClick={onSave}
+            disabled={isSaving}
             className='inline-flex rounded-lg bg-[#A7B9A6] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-95'
           >
-            Save
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>
