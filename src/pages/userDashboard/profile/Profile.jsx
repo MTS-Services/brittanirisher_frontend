@@ -31,6 +31,40 @@ const ProfileSkeleton = () => (
   </div>
 );
 
+const formatDateForInput = (value) => {
+  if (!value) return '';
+
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return value.slice(0, 10);
+  }
+
+  const dateObj = new Date(value);
+  if (Number.isNaN(dateObj.getTime())) return '';
+
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateForDisplay = (value) => {
+  if (!value) return '';
+
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? `${value}T00:00:00`
+    : value;
+
+  const dateObj = new Date(normalized);
+  if (Number.isNaN(dateObj.getTime())) return value;
+
+  return dateObj.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: '2-digit',
+  });
+};
+
 const Profile = () => {
   const { data: profileResponse, isLoading: isProfileLoading } = useGetCoupleProfileQuery();
   const { data: statesResponse } = useGetStatesQuery();
@@ -58,20 +92,12 @@ const Profile = () => {
   useEffect(() => {
     if (profileResponse?.data) {
       const serverData = profileResponse.data;
-      
-      let formattedDate = '';
-      if (serverData.weddingDate) {
-        const dateObj = new Date(serverData.weddingDate);
-        formattedDate = !isNaN(dateObj.getTime()) 
-          ? dateObj.toLocaleDateString('en-US') 
-          : '';
-      }
 
       setProfileForm((prev) => ({
         ...prev,
         fullName: serverData.name || '',
         phoneNumber: serverData.phone || '',
-        weddingDate: formattedDate,
+        weddingDate: formatDateForInput(serverData.weddingDate),
         weddingBudget: serverData.budget !== undefined ? String(serverData.budget) : '',
         streetAddress: serverData.location || '',
       }));
@@ -126,10 +152,7 @@ const Profile = () => {
       };
 
       if (profileForm.weddingDate) {
-        const parsedDate = new Date(profileForm.weddingDate);
-        if (!isNaN(parsedDate.getTime())) {
-          payload.weddingDate = parsedDate.toISOString();
-        }
+        payload.weddingDate = `${profileForm.weddingDate}T12:00:00.000Z`;
       }
 
       await updateProfile(payload).unwrap();
@@ -200,7 +223,9 @@ const Profile = () => {
               {profileForm.fullName || 'Emma & Michael'}
             </h3>
             {profileForm.weddingDate && (
-              <p className='mt-1 text-sm text-[#7a7a7a]'>Getting married on {profileForm.weddingDate}</p>
+              <p className='mt-1 text-sm text-[#7a7a7a]'>
+                Getting married on {formatDateForDisplay(profileForm.weddingDate)}
+              </p>
             )}
           </div>
         </div>
@@ -278,11 +303,10 @@ const Profile = () => {
           <div>
             <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>Wedding Date</label>
             <input
-              type='text'
+              type='date'
               name='weddingDate'
               value={profileForm.weddingDate}
               onChange={handleProfileChange}
-              placeholder='MM/DD/YYYY'
               className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
             />
           </div>
