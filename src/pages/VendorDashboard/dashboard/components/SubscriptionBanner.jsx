@@ -1,5 +1,6 @@
 import React from "react";
 import { BadgeCheck } from "lucide-react";
+import { useGetVendorStatusQuery } from "../../../../store/features/vendor/vendorDashboardApi";
 
 export default function SubscriptionBanner({
   vendorName = "N/A",
@@ -11,6 +12,15 @@ export default function SubscriptionBanner({
 
   patternImageSrc = "/pattern-bg.png" 
 }) {
+  const { data: vendorProfileResponse } = useGetVendorStatusQuery();
+
+  const resolvedVendorName =
+    vendorProfileResponse?.data?.businessName ||
+    vendorProfileResponse?.data?.companyName ||
+    vendorProfileResponse?.data?.fullName ||
+    vendorName ||
+    "Vendor";
+
   return (
     <section className="relative flex w-full overflow-hidden rounded-lg border border-[#ebe5db] bg-[#F7F5F1] px-4 py-4 shadow-sm sm:px-6 sm:py-6 lg:px-8 lg:py-8">
       
@@ -19,7 +29,7 @@ export default function SubscriptionBanner({
         <img
           src="/right.webp"
           alt="Background Pattern"
-          className="h-full w-full object-cover object-left-top opacity-90"
+          className="h-full w-full object-cover object-top-left opacity-90"
         />
       </div>
 
@@ -31,7 +41,7 @@ export default function SubscriptionBanner({
         </div>
 
         <h1 className="mt-5 max-w-xl font-playfair text-2xl leading-tight text-[#111111] sm:text-4xl font-medium ">
-          Welcome back, {vendorName}
+          Welcome back, {resolvedVendorName}
         </h1>
 
         <p className="mt-4 max-w-xl text-base font-raleway leading-relaxed text-[#57534e]">

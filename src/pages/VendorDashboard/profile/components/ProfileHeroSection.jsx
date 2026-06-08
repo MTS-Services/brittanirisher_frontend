@@ -1,15 +1,37 @@
 import { BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../../config';
+import { useGetVendodasrhboarStatusQuery } from '../../../../store/features/vendor/vendorDashboardApi';
 
 const ProfileHeroSection = ({ vendor }) => {
   const navigate = useNavigate();
+  const { data: statusResponse } = useGetVendodasrhboarStatusQuery();
+
+  const dashboardData = statusResponse?.data;
+  const subscription = dashboardData?.lastSubscription;
+
   const vendorDisplayName =
     vendor?.businessName ||
     vendor?.companyName ||
     vendor?.name ||
     vendor?.fullName ||
     'Vendor';
+
+  const activePackageName = subscription?.plan?.planName || 'N/A';
+  const monthlyPrice = subscription?.plan?.priceMonthly;
+  const planPrice = monthlyPrice != null ? `$${monthlyPrice}` : 'N/A';
+  const description =
+    subscription?.plan?.sortDescription ||
+    'Manage your subscription, keep your profile active, and continue receiving quality leads from brides.';
+
+  let formattedExpiryDate = 'N/A';
+  if (subscription?.endsAt) {
+    const dateObj = new Date(subscription.endsAt);
+    const day = dateObj.getUTCDate();
+    const month = dateObj.getUTCMonth() + 1;
+    const year = dateObj.getUTCFullYear();
+    formattedExpiryDate = `${day}/${month}/${year}`;
+  }
 
   return (
     <section className='relative flex w-full overflow-hidden rounded-lg border border-[#ebe5db] bg-[#F7F5F1] px-4 py-4 shadow-sm sm:px-6 sm:py-6 lg:px-8 lg:py-8'>
@@ -24,7 +46,7 @@ const ProfileHeroSection = ({ vendor }) => {
     <div className='relative z-10 w-full max-w-2xl lg:w-[60%]'>
       <span className='inline-flex items-center gap-1.5 rounded-full bg-[#B6C5B1] px-3.5 py-1.5 text-xs font-medium text-white shadow-sm'>
         <BadgeCheck size={16} strokeWidth={2} />
-        Subscription Active
+        {subscription?.status === 'ACTIVE' ? 'Subscription Active' : 'Subscription Inactive'}
       </span>
 
       <h1 className='mt-5 max-w-xl font-playfair text-2xl font-medium leading-tight text-[#111111] sm:text-4xl'>
@@ -32,26 +54,26 @@ const ProfileHeroSection = ({ vendor }) => {
       </h1>
 
       <p className='mt-4 max-w-xl text-base leading-relaxed text-[#57534e]'>
-        Manage your subscription, keep your profile active, and continue receiving quality leads from brides.
+        {description}
       </p>
 
       <div className='mt-8 flex flex-wrap gap-10 sm:gap-14'>
         <div>
           <div className='text-base text-black'>Active Package</div>
-          <div className='mt-2 text-2xl font-medium text-[#111111]'>Starter</div>
+          <div className='mt-2 text-2xl font-medium text-[#111111]'>{activePackageName}</div>
         </div>
 
         <div>
           <div className='text-base text-black'>Price</div>
           <div className='mt-2 text-2xl font-medium text-[#111111]'>
-            $79
+            {planPrice}
             <span className='ml-1 text-[13px] font-normal text-[#7a756f]'>/month</span>
           </div>
         </div>
 
         <div>
           <div className='text-base text-black'>Expiry Date</div>
-          <div className='mt-2 text-2xl font-medium text-[#111111]'>5/12/2026</div>
+          <div className='mt-2 text-2xl font-medium text-[#111111]'>{formattedExpiryDate}</div>
         </div>
       </div>
 
