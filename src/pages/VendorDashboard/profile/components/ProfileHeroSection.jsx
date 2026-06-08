@@ -2,8 +2,14 @@ import { BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../../config';
 
-const ProfileHeroSection = () => {
+const ProfileHeroSection = ({ vendor }) => {
   const navigate = useNavigate();
+  const vendorDisplayName =
+    vendor?.businessName ||
+    vendor?.companyName ||
+    vendor?.name ||
+    vendor?.fullName ||
+    'Vendor';
 
   return (
     <section className='relative flex w-full overflow-hidden rounded-lg border border-[#ebe5db] bg-[#F7F5F1] px-4 py-4 shadow-sm sm:px-6 sm:py-6 lg:px-8 lg:py-8'>
@@ -22,7 +28,7 @@ const ProfileHeroSection = () => {
       </span>
 
       <h1 className='mt-5 max-w-xl font-playfair text-2xl font-medium leading-tight text-[#111111] sm:text-4xl'>
-        Welcome back, Sarah Photography Studio
+        Welcome back, {vendorDisplayName}
       </h1>
 
       <p className='mt-4 max-w-xl text-base leading-relaxed text-[#57534e]'>
