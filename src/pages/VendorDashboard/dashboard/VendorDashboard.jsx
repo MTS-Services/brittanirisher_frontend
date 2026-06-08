@@ -1,12 +1,15 @@
 import React from 'react';
 import { BookCopy, CalendarDays, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import SubscriptionBanner from './components/SubscriptionBanner';
 import StatsCardsSection from './components/StatsCardsSection';
 import UpcomingWeddingsSection from './components/UpcomingWeddingsSection';
 import NewInquiriesSection from './components/NewInquiriesSection';
 import TotalLeadsSection from './components/TotalLeadsSection';
+import { ROUTES } from '../../../config';
 import { useGetVendodasrhboarStatusQuery,useGetVendorChartDataQuery } from '../../../store/features/vendor/vendorDashboardApi'; 
 const VendorDashboard = () => {
+  const navigate = useNavigate();
   const { 
     data: statusResponse, 
     isLoading: isStatusLoading, 
@@ -22,7 +25,7 @@ const VendorDashboard = () => {
 
   if (isStatusLoading || isChartLoading) {
     return (
-      <div className="flex min-h-[400px] w-full items-center justify-center font-raleway text-[#0c0c0c]">
+      <div className="flex min-h-100 w-full items-center justify-center font-raleway text-[#0c0c0c]">
         Loading Dashboard and Chart Data...
       </div>
     );
@@ -30,7 +33,7 @@ const VendorDashboard = () => {
 
   if (statusError || chartError) {
     return (
-      <div className="flex min-h-[400px] w-full items-center justify-center font-raleway text-red-600">
+      <div className="flex min-h-100 w-full items-center justify-center font-raleway text-red-600">
         Failed to load dashboard data. Please try again later.
       </div>
     );
@@ -85,6 +88,7 @@ const VendorDashboard = () => {
         expiryDate={formattedExpiryDate}
         isActive={subscription?.status === 'ACTIVE'}
         description={subscription?.plan?.sortDescription}
+        onUpgrade={() => navigate(ROUTES.VENDOR_PRICING)}
       />
 
       <StatsCardsSection cards={statCards} />

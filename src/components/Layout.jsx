@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useRef } from 'react';
 import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { LogIn, Menu, X, ChevronDown } from 'lucide-react';
 import Footer from './home/footer/Footer';
@@ -6,6 +6,7 @@ import { APP_CONFIG, ROUTES } from '../config';
 import ScrollToTop from './ScrollToTop';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectUser } from '../store/slices/authSlice';
+import useGlobalGsapAnimations from '../hooks/useGlobalGsapAnimations';
 
 const NAV_LINKS = [
   { to: ROUTES.HOME, label: 'Home', end: true },
@@ -23,10 +24,13 @@ const INACTIVE_MOBILE = 'nav-link block rounded-sm px-4 py-3 text-[#4a453d] tran
 
 const Layout = memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const contentRef = useRef(null);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const location = useLocation();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
+
+  useGlobalGsapAnimations(contentRef);
 
   const userRole = (user?.role || '').toUpperCase();
   const dashboardRoute =
@@ -155,7 +159,7 @@ const Layout = memo(() => {
         )}
       </nav>
 
-      <main className='flex-1 min-h-0'>
+      <main ref={contentRef} className='flex-1 min-h-0'>
         <Outlet />
       </main>
 

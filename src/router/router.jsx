@@ -11,7 +11,7 @@ import Layout from '../components/Layout';
 import AdminLayout from '../components/layout/Layout';
 import DummyRoutePage from '../components/DummyRoutePage';
 import { ROUTES } from '../config';
-import { selectIsAuthenticated } from '../store/slices/authSlice';
+import { selectIsAuthenticated, selectUser } from '../store/slices/authSlice';
 import NotFound from '../pages/NotFound';
 
 const Home = lazy(() => import('../components/home/HomeContent'));
@@ -34,6 +34,19 @@ const VendorBookings = lazy(
 );
 const VendorAvailability = lazy(
   () => import('../pages/VendorDashboard/VendorAvailability/VendorAvailability'),
+);
+const VendorPricing = lazy(() => import('../pages/VendorDashboard/pricing/VendorPricing'));
+const VendorPaymentSuccess = lazy(
+  () => import('../pages/VendorDashboard/pricing/VendorPaymentSuccess')
+);
+const VendorBillingRedirect = lazy(
+  () => import('../pages/VendorDashboard/pricing/VendorBillingRedirect')
+);
+const RegistrationSuccess = lazy(
+  () => import('../pages/VendorDashboard/pricing/RegistrationSuccess')
+);
+const RegistrationCancel = lazy(
+  () => import('../pages/VendorDashboard/pricing/RegistrationCancel')
 );
 const VendorProfile = lazy(() => import('../pages/VendorDashboard/profile/VendorProfile'));
 const UserDashboard = lazy(() => import('../pages/userDashboard/dashboard/UserDashboard'));
@@ -91,6 +104,17 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const VendorOnlyRoute = ({ children }) => {
+  const user = useSelector(selectUser);
+  const role = (user?.role || '').toLowerCase();
+
+  if (role !== 'vendor') {
+    return <Navigate to={ROUTES.HOME} replace />;
+  }
+
+  return children;
+};
+
 const DashboardSection = ({ title, description, bullets }) => (
   <DummyRoutePage
     eyebrow='Dashboard Section'
@@ -134,6 +158,71 @@ const router = createBrowserRouter(
         element={
           <Suspense >
             <Signup />
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.VENDOR_PRICING}
+        element={
+          <Suspense>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <VendorPricing />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.VENDOR_BILLING_CALLBACK}
+        element={
+          <Suspense>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <VendorBillingRedirect />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.VENDOR_PAYMENT_SUCCESS}
+        element={
+          <Suspense>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <VendorPaymentSuccess />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.REGISTRATION_SUCCESS}
+        element={
+          <Suspense>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <RegistrationSuccess />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.REGISTRATION_CANCEL}
+        element={
+          <Suspense>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <RegistrationCancel />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
           </Suspense>
         }
       />

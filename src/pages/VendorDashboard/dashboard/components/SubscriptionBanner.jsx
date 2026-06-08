@@ -2,7 +2,7 @@ import React from "react";
 import { BadgeCheck } from "lucide-react";
 
 export default function SubscriptionBanner({
-  vendorName = "Sarah Photography Studio",
+  vendorName = "N/A",
   planName = "N/A",
   planPrice = "N/A",
   expiryDate = "N/A",

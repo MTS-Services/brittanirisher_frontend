@@ -22,7 +22,12 @@ const LeadsTable = ({ leads, openMenuId, onMenuToggle, onSeeDetails, onDelete, o
         </thead>
         <tbody className='divide-y divide-gray-50'>
           {leads.map((lead, index) => (
-            <tr key={lead.id} className='transition-colors hover:bg-gray-50/50'>
+            <tr
+              key={lead.id}
+              data-lead-row
+              data-lead-card
+              className='transition-colors hover:bg-gray-50/50'
+            >
               <td className='px-6 py-3.5 text-sm font-medium text-gray-800'>{lead.senderName}</td>
               <td className='px-6 py-3.5 text-sm text-gray-500'>{lead.senderEmail}</td>
               <td className='px-6 py-3.5 text-sm text-gray-500'>{lead.senderPhone}</td>

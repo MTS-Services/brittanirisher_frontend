@@ -140,6 +140,14 @@ const vendordashboardApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["VendorProfile"],
     }),
+    updateSubscription: builder.mutation({
+      query: ({ planId }) => ({
+        url: `/vendor-profiles/update-subscription`,
+        method: 'POST',
+        body: { planId },
+      }),
+      invalidatesTags: ['VendorProfile'],
+    }),
     deletePortfolioImage: builder.mutation({
   query: (imageId) => ({
     url: `/vendor-profiles/portfolio/${imageId}`,
@@ -204,6 +212,7 @@ const {
   useGetVendorCalendarQuery,
   useSaveBulkMonthAvailabilityMutation,
   useUpdateVendorProfileMutation,
+  useUpdateSubscriptionMutation,
   useDeletePortfolioImageMutation,
   useCreateVendorPackageMutation,
   useGetVendorPackageByIdQuery,
@@ -228,6 +237,7 @@ export {
   useGetVendorCalendarQuery,
   useSaveBulkMonthAvailabilityMutation,
   useUpdateVendorProfileMutation,
+  useUpdateSubscriptionMutation,
   useDeletePortfolioImageMutation,
   useCreateVendorPackageMutation,
   useGetVendorPackageByIdQuery,

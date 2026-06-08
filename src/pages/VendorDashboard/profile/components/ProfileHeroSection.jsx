@@ -1,7 +1,12 @@
 import { BadgeCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../../../config';
 
-const ProfileHeroSection = () => (
-  <section className='relative flex w-full overflow-hidden rounded-lg border border-[#ebe5db] bg-[#F7F5F1] px-4 py-4 shadow-sm sm:px-6 sm:py-6 lg:px-8 lg:py-8'>
+const ProfileHeroSection = () => {
+  const navigate = useNavigate();
+
+  return (
+    <section className='relative flex w-full overflow-hidden rounded-lg border border-[#ebe5db] bg-[#F7F5F1] px-4 py-4 shadow-sm sm:px-6 sm:py-6 lg:px-8 lg:py-8'>
     <div className='absolute inset-y-0 right-0 z-0 hidden w-1/2 lg:block'>
       <img
         src='/right.webp'
@@ -46,12 +51,14 @@ const ProfileHeroSection = () => (
 
       <button
         type='button'
+        onClick={() => navigate(ROUTES.VENDOR_PRICING)}
         className='mt-8 inline-flex items-center rounded-xl bg-[#A3B79C] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#8d9f87]'
       >
         Upgrade Plan
       </button>
     </div>
   </section>
-);
+  );
+};
 
 export default ProfileHeroSection;

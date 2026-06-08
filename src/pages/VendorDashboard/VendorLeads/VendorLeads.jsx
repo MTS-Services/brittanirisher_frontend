@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import LeadsDetailsModal from './components/LeadsDetailsModal';
 import LeadsMobileList from './components/LeadsMobileList';
 import LeadsTable from './components/LeadsTable';

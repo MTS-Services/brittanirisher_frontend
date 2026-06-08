@@ -204,7 +204,7 @@ const Sidebar = ({
         className='flex-1 overflow-y-auto px-3 py-5'
         aria-label='Main navigation'
       >
-        <p className='px-3 mb-3 text-base font-semibold text-gray-800 uppercase tracking-[0.05em]'>
+        <p className='mb-3 px-3 text-base font-semibold uppercase tracking-wider text-gray-800'>
           Main Menu
         </p>
         <ul className='space-y-1.5' role='list'>

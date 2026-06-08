@@ -5,7 +5,7 @@ import StatusBadge from './StatusBadge';
 const LeadsMobileList = ({ leads, openMenuId, onMenuToggle, onSeeDetails, onDelete, onStatusChange }) => (
   <section className='divide-y divide-gray-50 sm:hidden'>
     {leads.map((lead, index) => (
-      <article key={lead.id} className='px-5 py-4'>
+      <article key={lead.id} data-lead-row data-lead-card className='px-5 py-4'>
         <div className='flex items-start justify-between gap-3'>
           <div className='min-w-0'>
             <h3 className='truncate text-sm font-semibold text-gray-800'>{lead.name}</h3>
