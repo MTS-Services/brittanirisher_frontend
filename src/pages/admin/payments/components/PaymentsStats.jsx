@@ -6,6 +6,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useGetAdminPaymentCardQuery } from '../../../../store/features/admin/adminDashboard/adminDashboardApi';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
 const formatCurrency = (value) => {
   const numeric = Number(value ?? 0);
@@ -69,12 +70,18 @@ export default function PaymentsStats() {
 
   return (
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5'>
-      {stats.map((stat) => (
-        <StatCard key={stat.label} {...stat} />
-      ))}
-      {isLoading && (
-        <p className='col-span-full text-sm text-gray-500'>Loading payment stats...</p>
-      )}
+      {isLoading
+        ? Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={`payment-stat-skeleton-${index}`}
+              className='rounded-xl border border-gray-100 bg-white shadow-sm p-4 h-full'
+            >
+              <SkeletonBlock className='h-4 w-28 rounded' />
+              <SkeletonBlock className='mt-3 h-8 w-24 rounded' />
+              <SkeletonBlock className='mt-2 h-3 w-20 rounded' />
+            </div>
+          ))
+        : stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
     </div>
   );
 }

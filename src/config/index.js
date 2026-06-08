@@ -26,6 +26,7 @@ export const ROUTES = {
   ADMIN_PAYMENTS: '/admin/payments',
   ADMIN_SETTINGS: '/admin/settings',
   ADMIN_PROFILE: '/admin/profile',
+  ADMIN_MESSAGES: '/admin/messages',
   ADMIN_EMAILS: '/admin/emails',
   ADMIN_LEADS: '/admin/leads',
   ADMIN_ORDERS: '/admin/orders',

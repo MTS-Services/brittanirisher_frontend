@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { ChevronDown } from 'lucide-react';
 import { useGetAdminDashboardChartsQuery } from '../../../store/features/admin/adminDashboard/adminDashboardApi';
+import { SkeletonBlock } from '../../skeletons/LoadingSkeletons';
 
 // const revenueData = [
 //   { month: 'Jan', value: 3200 },
@@ -151,8 +152,17 @@ export default function RevenueChart() {
 
       <div className='w-full h-52 sm:h-64 lg:h-72'>
         {isLoading ? (
-          <div className='flex h-full items-center justify-center text-sm font-raleway text-gray-500'>
-            Loading chart...
+          <div className='h-full rounded-lg border border-gray-100 bg-[#fcfbf8] p-4'>
+            <div className='mb-4 flex items-end justify-between'>
+              <SkeletonBlock className='h-20 w-8 rounded' />
+              <SkeletonBlock className='h-28 w-8 rounded' />
+              <SkeletonBlock className='h-24 w-8 rounded' />
+              <SkeletonBlock className='h-32 w-8 rounded' />
+              <SkeletonBlock className='h-36 w-8 rounded' />
+              <SkeletonBlock className='h-26 w-8 rounded' />
+              <SkeletonBlock className='h-30 w-8 rounded' />
+            </div>
+            <SkeletonBlock className='h-3 w-full rounded' />
           </div>
         ) : isError ? (
           <div className='flex h-full items-center justify-center rounded-lg border border-red-100 bg-red-50 px-3 text-sm font-raleway text-red-600'>

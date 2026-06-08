@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { MoreVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useUpdateVendorStatusMutation } from '../../../../store/features/admin/adminVendor/adminVendorApi';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
 export default function UserManagementTable({ activeTab, pagedRows, isLoading }) {
   const [openId, setOpenId] = useState(null);
@@ -92,11 +93,15 @@ export default function UserManagementTable({ activeTab, pagedRows, isLoading })
 
         <tbody className='divide-y divide-gray-100'>
           {isLoading ? (
-            <tr>
-              <td colSpan={activeTab === 'couple' ? 9 : 7} className='px-4 py-10 text-center text-sm text-gray-500'>
-                Loading users...
-              </td>
-            </tr>
+            Array.from({ length: 6 }).map((_, index) => (
+              <tr key={`user-table-skeleton-${index}`}>
+                {Array.from({ length: activeTab === 'couple' ? 9 : 7 }).map((__, cellIndex) => (
+                  <td key={`user-table-skeleton-cell-${index}-${cellIndex}`} className='px-4 py-4'>
+                    <SkeletonBlock className='h-4 w-full rounded' />
+                  </td>
+                ))}
+              </tr>
+            ))
           ) : pagedRows.length === 0 ? (
             <tr>
               <td colSpan={activeTab === 'couple' ? 9 : 7} className='px-4 py-10 text-center text-sm text-gray-500'>

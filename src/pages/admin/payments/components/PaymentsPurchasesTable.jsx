@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useGetAdminPaymentPurchasesQuery } from '../../../../store/features/admin/adminDashboard/adminDashboardApi';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
 const TableCell = ({ children, className = '' }) => (
   <td className={`px-4 py-4 text-sm text-gray-600 ${className}`}>{children}</td>
@@ -86,11 +87,18 @@ export default function PaymentsPurchasesTable() {
             </thead>
             <tbody className='divide-y divide-gray-100'>
               {isLoading ? (
-                <tr>
-                  <td colSpan={6} className='px-4 py-10 text-center text-sm text-gray-500'>
-                    Loading purchases...
-                  </td>
-                </tr>
+                Array.from({ length: 6 }).map((_, index) => (
+                  <tr key={`purchase-skeleton-row-${index}`}>
+                    {Array.from({ length: 6 }).map((__, cellIndex) => (
+                      <td
+                        key={`purchase-skeleton-cell-${index}-${cellIndex}`}
+                        className='px-4 py-4'
+                      >
+                        <SkeletonBlock className='h-4 w-full rounded' />
+                      </td>
+                    ))}
+                  </tr>
+                ))
               ) : pagedPurchases.length === 0 ? (
                 <tr>
                   <td colSpan={6} className='px-4 py-10 text-center text-sm text-gray-500'>
@@ -115,7 +123,17 @@ export default function PaymentsPurchasesTable() {
 
         <div className='lg:hidden divide-y divide-gray-100'>
           {isLoading ? (
-            <div className='p-4 sm:p-5 text-sm text-gray-500'>Loading purchases...</div>
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={`purchase-mobile-skeleton-${index}`} className='p-4 sm:p-5'>
+                <SkeletonBlock className='h-5 w-32 rounded' />
+                <SkeletonBlock className='mt-2 h-4 w-40 rounded' />
+                <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                  <SkeletonBlock className='h-14 w-full rounded-lg' />
+                  <SkeletonBlock className='h-14 w-full rounded-lg' />
+                  <SkeletonBlock className='h-14 w-full rounded-lg' />
+                </div>
+              </div>
+            ))
           ) : pagedPurchases.length === 0 ? (
             <div className='p-4 sm:p-5 text-sm text-gray-500'>No purchases found.</div>
           ) : (

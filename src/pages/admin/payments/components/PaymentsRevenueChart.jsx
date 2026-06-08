@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { ChevronDown } from 'lucide-react';
 import { useGetAdminDashboardChartsQuery } from '../../../../store/features/admin/adminDashboard/adminDashboardApi';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
 const PERIOD_OPTIONS = [
   { value: 'this_year', label: 'This Year' },
@@ -76,8 +77,17 @@ export default function PaymentsRevenueChart() {
 
       <div className='w-full h-52 sm:h-64 lg:h-72'>
         {isLoading ? (
-          <div className='flex h-full items-center justify-center text-sm text-gray-500'>
-            Loading chart data...
+          <div className='h-full rounded-lg border border-gray-100 bg-[#fcfbf8] p-4'>
+            <div className='mb-4 flex items-end justify-between'>
+              <SkeletonBlock className='h-16 w-7 rounded' />
+              <SkeletonBlock className='h-24 w-7 rounded' />
+              <SkeletonBlock className='h-20 w-7 rounded' />
+              <SkeletonBlock className='h-32 w-7 rounded' />
+              <SkeletonBlock className='h-28 w-7 rounded' />
+              <SkeletonBlock className='h-18 w-7 rounded' />
+              <SkeletonBlock className='h-24 w-7 rounded' />
+            </div>
+            <SkeletonBlock className='h-3 w-full rounded' />
           </div>
         ) : (
         <ResponsiveContainer width='100%' height='100%'>

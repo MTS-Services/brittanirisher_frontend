@@ -49,6 +49,7 @@ export const apiSlice = createApi({
     'Calendar',
     'Category',
     'WeddingStyle',
+    'Message',
     'SubscriptionPlan',
     'Bookings',
     'BookingDetails',

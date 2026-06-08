@@ -9,6 +9,7 @@ import {
   useGetAdminVendorQuery,
   useUpdateVendorStatusMutation,
 } from '../../../store/features/admin/adminVendor/adminVendorApi';
+import { SkeletonBlock } from '../../skeletons/LoadingSkeletons';
 
 const formatDate = (value) => {
   if (!value) return '-';
@@ -218,14 +219,27 @@ export default function PendingVendorApprovals({
           </thead>
           <tbody className='divide-y divide-gray-50'>
             {isLoading ? (
-              <tr>
-                <td
-                  colSpan={5}
-                  className='px-6 py-10 text-center text-sm font-raleway text-gray-500'
-                >
-                  Loading vendors...
-                </td>
-              </tr>
+              Array.from({ length: 6 }).map((_, index) => (
+                <tr key={`pending-vendor-skeleton-${index}`}>
+                  <td className='px-6 py-3.5'>
+                    <SkeletonBlock className='h-4 w-28 rounded' />
+                  </td>
+                  <td className='px-6 py-3.5'>
+                    <SkeletonBlock className='h-4 w-20 rounded' />
+                  </td>
+                  <td className='px-6 py-3.5'>
+                    <SkeletonBlock className='h-4 w-24 rounded' />
+                  </td>
+                  <td className='px-6 py-3.5'>
+                    <SkeletonBlock className='h-7 w-20 rounded-full' />
+                  </td>
+                  <td className='px-6 py-3.5'>
+                    <div className='flex justify-center'>
+                      <SkeletonBlock className='h-8 w-8 rounded-lg' />
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : paged.length === 0 ? (
               <tr>
                 <td
@@ -274,8 +288,13 @@ export default function PendingVendorApprovals({
       {/* Mobile Cards */}
       <div className='sm:hidden divide-y divide-gray-50'>
         {isLoading ? (
-          <div className='px-5 py-6 text-center text-sm font-raleway text-gray-500'>
-            Loading vendors...
+          <div className='px-5 py-4 space-y-3'>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={`pending-mobile-skeleton-${index}`} className='space-y-2'>
+                <SkeletonBlock className='h-4 w-32 rounded' />
+                <SkeletonBlock className='h-3 w-44 rounded' />
+              </div>
+            ))}
           </div>
         ) : paged.length === 0 ? (
           <div className='px-5 py-6 text-center text-sm font-raleway text-gray-500'>

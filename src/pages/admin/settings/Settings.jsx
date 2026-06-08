@@ -7,6 +7,7 @@ import SettingsSubscriptionModal from './components/SettingsSubscriptionModal';
 import SettingsDeleteConfirmModal from './components/SettingsDeleteConfirmModal';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { SkeletonBlock } from '../../../components/skeletons/LoadingSkeletons';
 import {
   useCreateAdminSubscriptionPlanMutation,
   useCreateAdminCategoryMutation,
@@ -344,7 +345,14 @@ export default function Settings() {
             onActionClick={() => setActiveModal('category')}
           >
             {isCategoriesLoading ? (
-              <p className='text-sm text-gray-500'>Loading categories...</p>
+              <div className='flex flex-wrap gap-2'>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <SkeletonBlock
+                    key={`category-skeleton-${index}`}
+                    className='h-8 w-24 rounded-full'
+                  />
+                ))}
+              </div>
             ) : (
               <SettingsChipRow
                 items={categories}
@@ -359,7 +367,14 @@ export default function Settings() {
             onActionClick={() => setActiveModal('style')}
           >
             {isWeddingStylesLoading ? (
-              <p className='text-sm text-gray-500'>Loading wedding styles...</p>
+              <div className='flex flex-wrap gap-2'>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <SkeletonBlock
+                    key={`style-skeleton-${index}`}
+                    className='h-8 w-28 rounded-full'
+                  />
+                ))}
+              </div>
             ) : (
               <SettingsChipRow
                 items={weddingStyles}
@@ -374,7 +389,20 @@ export default function Settings() {
             onActionClick={openAddPricingModal}
           >
             {isPlansLoading ? (
-              <p className='text-sm text-gray-500'>Loading pricing plans...</p>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`pricing-skeleton-${index}`}
+                    className='rounded-2xl border border-gray-100 bg-white p-5'
+                  >
+                    <SkeletonBlock className='h-5 w-28 rounded' />
+                    <SkeletonBlock className='mt-3 h-8 w-20 rounded' />
+                    <SkeletonBlock className='mt-4 h-4 w-full rounded' />
+                    <SkeletonBlock className='mt-2 h-4 w-5/6 rounded' />
+                    <SkeletonBlock className='mt-6 h-9 w-full rounded-lg' />
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'>
                 {subscriptionPlans.map((plan) => {

@@ -35,6 +35,7 @@ const MENU_BY_ROLE = {
     { name: 'Payments', path: ROUTES.ADMIN_PAYMENTS, icon: CreditCard },
     { name: 'Settings', path: ROUTES.ADMIN_SETTINGS, icon: Settings },
     { name: 'Profile', path: ROUTES.ADMIN_PROFILE, icon: UserCircle2 },
+    { name: 'Messages', path: ROUTES.ADMIN_MESSAGES, icon: Mail },
   ],
   vendor: [
     { name: 'Overview', path: ROUTES.VENDOR_DASHBOARD, icon: LayoutDashboard },

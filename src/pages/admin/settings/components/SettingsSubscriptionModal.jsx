@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
 export default function SettingsSubscriptionModal({
   open,
@@ -39,7 +40,17 @@ export default function SettingsSubscriptionModal({
 
         <div className='space-y-5 px-5 py-5 sm:px-6 sm:py-6'>
           {isLoading ? (
-            <p className='text-sm text-gray-500'>Loading subscription details...</p>
+            <div className='space-y-4'>
+              <SkeletonBlock className='h-11 w-full rounded-lg' />
+              <SkeletonBlock className='h-28 w-full rounded-lg' />
+              <div className='grid gap-4 sm:grid-cols-3'>
+                <SkeletonBlock className='h-11 w-full rounded-lg' />
+                <SkeletonBlock className='h-11 w-full rounded-lg' />
+                <SkeletonBlock className='h-11 w-full rounded-lg' />
+              </div>
+              <SkeletonBlock className='h-11 w-full rounded-lg' />
+              <SkeletonBlock className='h-11 w-36 rounded-lg' />
+            </div>
           ) : (
             <>
           <div>

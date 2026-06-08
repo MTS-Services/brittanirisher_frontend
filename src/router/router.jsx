@@ -82,6 +82,7 @@ const Settings = lazy(
 const Profile = lazy(
   () => import('../pages/admin/profile/components/Profile')
 );
+const Messages = lazy(() => import('../pages/admin/Messages'));
 
 const segFor = (baseRoute) => (route) => route.replace(`${baseRoute}/`, '');
 const adminSeg = segFor(ROUTES.ADMIN);
@@ -254,6 +255,7 @@ const router = createBrowserRouter(
         <Route path={adminSeg(ROUTES.ADMIN_PAYMENTS)} element={<Payments />} />
         <Route path={adminSeg(ROUTES.ADMIN_SETTINGS)} element={<Settings />} />
         <Route path={adminSeg(ROUTES.ADMIN_PROFILE)} element={<Profile />} />
+        <Route path={adminSeg(ROUTES.ADMIN_MESSAGES)} element={<Messages />} />
         <Route path={adminSeg(ROUTES.ADMIN_EMAILS)} element={<Emails />} />
         <Route path={adminSeg(ROUTES.ADMIN_LEADS)} element={<Leads />} />
         <Route path={adminSeg(ROUTES.ADMIN_ORDERS)} element={<Orders />} />

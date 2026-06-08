@@ -1,5 +1,6 @@
 import { MoreVertical } from "lucide-react";
 import VendorStatusBadge from "./VendorStatusBadge";
+import { SkeletonBlock } from "../../skeletons/LoadingSkeletons";
 
 export default function RequestedVendorsTable({
   paged,
@@ -32,14 +33,30 @@ export default function RequestedVendorsTable({
         </thead>
         <tbody className="divide-y divide-gray-50">
           {isLoading ? (
-            <tr>
-              <td colSpan={5} className="px-6 py-10 text-center text-sm text-gray-500">
-                Loading vendors...
-              </td>
-            </tr>
+            Array.from({ length: 6 }).map((_, index) => (
+              <tr key={`skeleton-row-${index}`}>
+                <td className="px-6 py-3.5">
+                  <SkeletonBlock className="h-4 w-28 rounded" />
+                </td>
+                <td className="px-6 py-3.5">
+                  <SkeletonBlock className="h-4 w-24 rounded" />
+                </td>
+                <td className="px-6 py-3.5">
+                  <SkeletonBlock className="h-4 w-20 rounded" />
+                </td>
+                <td className="px-6 py-3.5">
+                  <SkeletonBlock className="h-7 w-20 rounded-full" />
+                </td>
+                <td className="px-6 py-3.5">
+                  <div className="flex justify-center">
+                    <SkeletonBlock className="h-8 w-8 rounded-lg" />
+                  </div>
+                </td>
+              </tr>
+            ))
           ) : paged.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-6 py-10 text-center text-sm text-gray-500">
+              <td colSpan={5} className="px-6 py-10 text-center text-base text-gray-500">
                 {emptyMessage}
               </td>
             </tr>
