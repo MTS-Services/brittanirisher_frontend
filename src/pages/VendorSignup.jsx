@@ -64,7 +64,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
 
   const categoryOptions = cleanCategories.map((cat) => ({
     label: cat.name,
-    value: cat.name,
+    value: cat.id || cat._id || cat.name,
   }));
 
   const stateOptions =

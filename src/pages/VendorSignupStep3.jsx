@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Eye, EyeOff } from 'lucide-react';
 import { ROUTES } from '../config';
-import { useCreateVendorProfileMutation } from '../../src/store/features/auth/authApi';
+import { useCreateVendorProfileMutation } from '../store/features/vendor/vendorSignupApi';
 
 const VendorSignupStep3 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
@@ -14,13 +14,19 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
 
   const [createVendorProfile, { isLoading }] = useCreateVendorProfileMutation();
 
-  const [packages, setPackages] = useState(formData.packages || []);
+  const [packages, setPackages] = useState(
+    Array.isArray(formData.packages) ? formData.packages : [],
+  );
   const [currentPackage, setCurrentPackage] = useState({
     packageName: '',   // ✅ was: name
     badge: '',         // ✅ new field
     features: [],
     price: '',
   });
+
+
+
+
   const featuresRef = useRef([]);
   const [newFeature, setNewFeature] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +78,7 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
       return;
     }
 
-    const stagedPackages = [...packages];
+    const stagedPackages = Array.isArray(packages) ? [...packages] : [];
     if (
       currentPackage.packageName?.trim() &&
       currentPackage.price !== ''
@@ -82,7 +88,6 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
         packageName: currentPackage.packageName.trim(),
       });
     }
-
     if (!stagedPackages.length) {
       setError('Please add at least one package before continuing.');
       return;
@@ -106,20 +111,14 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
         : [],
     }));
 
-    const packageCandidates = [
-      JSON.stringify(cleanPackages),
-      cleanPackages.length === 1 ? JSON.stringify(cleanPackages[0]) : null,
-      JSON.stringify({ packages: cleanPackages }),
-    ].filter(Boolean);
-
-    const buildVendorFormData = (packageValue) => {
+    const buildVendorFormData = () => {
       const fd = new FormData();
 
       // Fields from VendorSignup (step 0) — passed via router state
       fd.append('name', vendorSignupInitialData.name || '');
+      fd.append('phone', vendorSignupInitialData.phone || '');
       fd.append('email', vendorSignupInitialData.email || '');
       fd.append('location', vendorSignupInitialData.location || '');
-      fd.append('Address', vendorSignupInitialData.location || '');
       fd.append('stateId', vendorSignupInitialData.state || '');
       fd.append('cityId', vendorSignupInitialData.city || '');
       fd.append('categoryId', vendorSignupInitialData.serviceCategory || '');
@@ -138,37 +137,26 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
         }
       });
 
-      fd.append('package', packageValue);
+      console.log('Submitting vendor profile with data:==========', cleanPackages)
+
+      // Backend expects the package field as a JSON stringified array.
+      fd.append('package', JSON.stringify(cleanPackages));
       fd.append('password', password);
       return fd;
     };
 
-    // ─── Submit with parser-safe fallback payload shapes ───────────────────
-    let lastError = null;
-    for (const packageValue of packageCandidates) {
-      try {
-        const fd = buildVendorFormData(packageValue);
-        await createVendorProfile(fd).unwrap();
-        navigate(ROUTES.LOGIN, { replace: true });
-        return;
-      } catch (err) {
-        lastError = err;
-        const backendMessage = String(err?.data?.message || err?.data?.error || '');
-        const isPackageJsonError = backendMessage.toLowerCase().includes('invalid json format inside')
-          && backendMessage.toLowerCase().includes('package');
-
-        if (!isPackageJsonError) {
-          break;
-        }
-      }
+    try {
+      const fd = buildVendorFormData();
+      await createVendorProfile(fd).unwrap();
+      navigate(ROUTES.LOGIN, { replace: true });
+    } catch (lastError) {
+      console.error('Vendor profile creation failed:', lastError);
+      setError(
+        lastError?.data?.message ||
+        lastError?.data?.error ||
+        'Something went wrong. Please try again.'
+      );
     }
-
-    console.error('Vendor profile creation failed:', lastError);
-    setError(
-      lastError?.data?.message ||
-      lastError?.data?.error ||
-      'Something went wrong. Please try again.'
-    );
   };
 
   const handlePrevious = () => {

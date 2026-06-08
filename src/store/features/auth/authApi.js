@@ -28,6 +28,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: '/vendor-profiles',
         method: 'POST',
         body, // FormData — do NOT set Content-Type manually
+        formData: true, // Custom flag to indicate FormData usage
       }),
     }),
     changePassword: builder.mutation({
@@ -59,7 +60,6 @@ export const {
   useLoginMutation,
   useCreateCoupleProfileMutation,
   useGetWeddingStylesQuery,
-  useCreateVendorProfileMutation,
   useChangePasswordMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,
