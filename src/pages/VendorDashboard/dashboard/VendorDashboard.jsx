@@ -6,6 +6,7 @@ import StatsCardsSection from './components/StatsCardsSection';
 import UpcomingWeddingsSection from './components/UpcomingWeddingsSection';
 import NewInquiriesSection from './components/NewInquiriesSection';
 import TotalLeadsSection from './components/TotalLeadsSection';
+import { DashboardSkeleton } from '../../../components/skeletons/LoadingSkeletons';
 import { ROUTES } from '../../../config';
 import { useGetVendodasrhboarStatusQuery,useGetVendorChartDataQuery } from '../../../store/features/vendor/vendorDashboardApi'; 
 const VendorDashboard = () => {
@@ -24,11 +25,7 @@ const VendorDashboard = () => {
   } = useGetVendorChartDataQuery();
 
   if (isStatusLoading || isChartLoading) {
-    return (
-      <div className="flex min-h-100 w-full items-center justify-center font-raleway text-[#0c0c0c]">
-        Loading Dashboard and Chart Data...
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (statusError || chartError) {

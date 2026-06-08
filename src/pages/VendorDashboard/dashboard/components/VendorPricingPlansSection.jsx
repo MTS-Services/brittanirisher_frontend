@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import { Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { PricingSkeleton } from '../../../../components/skeletons/LoadingSkeletons';
 import { useGetSubscriptionPlansQuery } from '../../../../store/features/public/publicApi';
 import { useUpdateSubscriptionMutation } from '../../../../store/features/vendor/vendorDashboardApi';
 
@@ -122,7 +123,7 @@ const VendorPricingPlansSection = () => {
         </div>
       </div>
 
-      {isLoading ? <p className='mt-8 text-sm text-[#6d645a]'>Loading plans...</p> : null}
+      {isLoading ? <PricingSkeleton /> : null}
       {error ? (
         <p className='mt-8 text-sm text-red-600'>Failed to load pricing plans. Please try again.</p>
       ) : null}

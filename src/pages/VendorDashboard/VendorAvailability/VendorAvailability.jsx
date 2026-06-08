@@ -1,6 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MoveRight } from 'lucide-react';
-import { useGetVendorCalendarQuery, useSaveBulkMonthAvailabilityMutation } from '../../../store/features/vendor/vendorDashboardApi'; 
+import {
+  useGetVendorCalendarQuery,
+  useGetVendorPackagesQuery,
+  useSaveBulkMonthAvailabilityMutation,
+} from '../../../store/features/vendor/vendorDashboardApi'; 
 
 const initialMonth = new Date(2026, 8, 1);
 
@@ -15,6 +19,12 @@ const dateKey = (date) => date.toISOString().slice(0, 10);
 const toLocalDate = (year, month, day) => new Date(year, month, day, 12, 0, 0, 0);
 const getMondayIndex = (dayIndex) => (dayIndex === 0 ? 6 : dayIndex - 1);
 const getMonthTitle = (date) => `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+const normalizeStatus = (status) => String(status || '').trim().toLowerCase();
+
+const getApiDateKey = (dayData) => {
+  const rawDate = dayData?.blockedDate || dayData?.date || dayData?.blocked_date;
+  return rawDate ? String(rawDate).slice(0, 10) : null;
+};
 
 const getGridCells = (monthDate, apiBookedDays, overrides) => {
   const year = monthDate.getFullYear();
@@ -45,21 +55,15 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
 
     const defaultStatus = 'available';
 
-    const apiDayData = apiBookedDays.find(d => {
-      if (d.blockedDate) {
-        return d.blockedDate.slice(0, 10) === key;
-      }
-      return false;
-    });
-    
-    const apiStatus = apiDayData ? apiDayData.status.toLowerCase() : null;
+    const apiDayData = apiBookedDays.find((dayData) => getApiDateKey(dayData) === key);
+    const apiStatus = normalizeStatus(apiDayData?.status);
 
     cells.push({
       key,
       day,
       date: currentDate,
       inMonth: true,
-      status: overrides[key] || apiStatus || defaultStatus,
+      status: overrides[key] || (apiStatus === 'booked' ? 'booked' : defaultStatus),
     });
   }
 
@@ -96,8 +100,6 @@ const AvailabilityLegend = () => (
 );
 
 const VendorAvailability = () => {
-  const VENDOR_ID = "a19b012c-59fc-45bd-84e9-9743e55c6733";
-
   const [monthDate, setMonthDate] = useState(initialMonth);
   const [overrides, setOverrides] = useState({});
   const [selectedDate, setSelectedDate] = useState('2026-09-11');
@@ -106,10 +108,32 @@ const VendorAvailability = () => {
   const currentYear = monthDate.getFullYear();
   const currentMonthValue = monthDate.getMonth() + 1; 
 
+  const { data: vendorPackagesResponse } = useGetVendorPackagesQuery();
+
+  const resolvedVendorId = useMemo(() => {
+    const packages = Array.isArray(vendorPackagesResponse?.data)
+      ? vendorPackagesResponse.data
+      : [];
+
+    if (!packages.length) return null;
+
+    const firstPackage = packages[0] || {};
+    return (
+      firstPackage.vendorId ||
+      firstPackage.vendor_id ||
+      firstPackage.vendorProfileId ||
+      firstPackage.vendorProfile?.id ||
+      firstPackage.vendor?.id ||
+      null
+    );
+  }, [vendorPackagesResponse]);
+
   const { data: apiResponse, isLoading } = useGetVendorCalendarQuery({
-    vendorId: VENDOR_ID,
+    vendorId: resolvedVendorId,
     year: currentYear,
     month: currentMonthValue
+  }, {
+    skip: !resolvedVendorId,
   });
 
   const [saveBulkMonth] = useSaveBulkMonthAvailabilityMutation();
@@ -216,7 +240,7 @@ const VendorAvailability = () => {
                         isUnavailable
                           ? 'bg-[#fafafa] text-[#d4d4d4]'
                           : isBooked
-                            ? 'bg-[#a1af9b] text-white hover:brightness-[0.98]' 
+                            ? 'bg-[#a4b1a0] text-white hover:brightness-[0.98]' 
                             : 'bg-white text-[#26211f] hover:bg-[#f4f7f2]'       
                       } ${isSelected ? 'ring-2 ring-inset ring-[#62715f]' : ''}`}
                       disabled={isUnavailable}

@@ -4,6 +4,7 @@ import LeadsMobileList from './components/LeadsMobileList';
 import LeadsTable from './components/LeadsTable';
 import VendorLeadsPagination from './components/VendorLeadsPagination';
 import VendorLeadsHeader from './components/VendorLeadsHeader';
+import { ListSkeleton } from '../../../components/skeletons/LoadingSkeletons';
 import { useGetEnquiriesQuery,useUpdateEnquiryStatusMutation, 
   useDeleteEnquiryMutation  } from '../../../store/features/vendor/vendorDashboardApi'; 
 
@@ -51,7 +52,7 @@ export default function VendorLeads() {
   };
 
   if (isLoading) {
-    return <div className="flex py-20 justify-center font-raleway text-gray-500">Loading leads...</div>;
+    return <ListSkeleton rows={perPage} />;
   }
 
   if (error) {

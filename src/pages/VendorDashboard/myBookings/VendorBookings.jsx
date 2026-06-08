@@ -8,6 +8,7 @@ import BookingSummaryCards from "./components/BookingSummaryCards";
 import BookingTabsActions from "./components/BookingTabsActions";
 import NewBookingModal from "./components/NewBookingModal";
 import ViewDetailsModal from "./components/ViewDetailsModal";
+import { BookingsSkeleton } from "../../../components/skeletons/LoadingSkeletons";
 import {
   useCreateBookingMutation,
   useDeleteBookingMutation,
@@ -313,9 +314,7 @@ const VendorBookings = () => {
         onDelete={handleDeleteBooking}
       />
 
-      {isBookingsLoading ? (
-        <p className="mt-5 text-center text-sm text-[#6a6a6a]">Loading bookings...</p>
-      ) : null}
+      {isBookingsLoading ? <BookingsSkeleton /> : null}
 
       <BookingsPagination
         currentPage={currentPage}

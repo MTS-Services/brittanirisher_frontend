@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
 import { ROUTES } from "../config";
 import { useGetSubscriptionPlansQuery } from "../store/features/public/publicApi";
+import { PricingSkeleton } from "../components/skeletons/LoadingSkeletons";
 
 const HERO_IMAGE = "/Vendor_Pricing.png";
 const FLOWER_LEFT_IMAGE = "/Footer_img.png";
@@ -185,7 +186,7 @@ const PricingPage = memo(() => {
           </div>
 
           {isLoading ? (
-            <p className="mt-10 text-center text-base text-[#606060]">Loading plans...</p>
+            <PricingSkeleton />
           ) : plans.length === 0 ? (
             <p className="mt-10 text-center text-base text-[#606060]">No pricing plans found.</p>
           ) : (

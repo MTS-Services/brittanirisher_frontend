@@ -1,5 +1,6 @@
 import { Check, Mail, Phone, X } from "lucide-react";
 import ModalShell from "./ModalShell";
+import { SkeletonBlock } from "../../../../components/skeletons/LoadingSkeletons";
 
 const formatModalDate = (dateString) => {
   if (!dateString) {
@@ -28,7 +29,22 @@ const ViewDetailsModal = ({
   return (
     <ModalShell onClose={onClose} widthClass="max-w-[800px]">
       {isLoading ? (
-        <div className="px-6 py-10 text-center text-[#6f6f6f]">Loading booking details...</div>
+        <div className="space-y-5 px-6 py-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <SkeletonBlock className="h-20 w-20 rounded-full" />
+              <div className="space-y-3">
+                <SkeletonBlock className="h-6 w-48" />
+                <SkeletonBlock className="h-4 w-40" />
+                <SkeletonBlock className="h-4 w-44" />
+              </div>
+            </div>
+            <SkeletonBlock className="h-10 w-10 rounded-full" />
+          </div>
+
+          <SkeletonBlock className="h-40 w-full rounded-xl" />
+          <SkeletonBlock className="h-32 w-full rounded-xl" />
+        </div>
       ) : (
         <>
       <div className="flex items-start justify-between px-6 pb-4 pt-5">

@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import Layout from '../components/Layout';
 import AdminLayout from '../components/layout/Layout';
 import DummyRoutePage from '../components/DummyRoutePage';
+import { RouteSkeleton } from '../components/skeletons/LoadingSkeletons';
 import { ROUTES } from '../config';
 import { selectIsAuthenticated, selectUser } from '../store/slices/authSlice';
 import NotFound from '../pages/NotFound';
@@ -130,7 +131,7 @@ const router = createBrowserRouter(
     <>
       <Route
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <Layout />
           </Suspense>
         }
@@ -147,7 +148,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.LOGIN}
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <Login />
           </Suspense>
         }
@@ -156,7 +157,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.SIGNUP}
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <Signup />
           </Suspense>
         }
@@ -165,7 +166,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR_PRICING}
         element={
-          <Suspense>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <VendorOnlyRoute>
                 <VendorPricing />
@@ -178,7 +179,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR_BILLING_CALLBACK}
         element={
-          <Suspense>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <VendorOnlyRoute>
                 <VendorBillingRedirect />
@@ -191,7 +192,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR_PAYMENT_SUCCESS}
         element={
-          <Suspense>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <VendorOnlyRoute>
                 <VendorPaymentSuccess />
@@ -204,7 +205,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.REGISTRATION_SUCCESS}
         element={
-          <Suspense>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <VendorOnlyRoute>
                 <RegistrationSuccess />
@@ -217,7 +218,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.REGISTRATION_CANCEL}
         element={
-          <Suspense>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <VendorOnlyRoute>
                 <RegistrationCancel />
@@ -230,7 +231,7 @@ const router = createBrowserRouter(
       <Route
         path='/vendor-signup-flow'
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <VendorSignupFlow />
           </Suspense>
         }
@@ -239,7 +240,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.ADMIN}
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -272,7 +273,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR}
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -301,7 +302,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.USER}
         element={
-          <Suspense >
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>

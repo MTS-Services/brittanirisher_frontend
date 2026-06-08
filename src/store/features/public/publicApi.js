@@ -22,6 +22,13 @@ export const coupleDashboardApi = apiSlice.injectEndpoints({
         body: enquiryData,
       }),
     }),
+    sendMessage: builder.mutation({
+      query: (messageData) => ({
+        url: "/message",
+        method: "POST",
+        body: messageData,
+      }),
+    }),
     getVendorCalendar: builder.query({
       query: ({ vendorId, month, year }) => ({
         url: "/vendor-availabilities/calendar",
@@ -47,6 +54,7 @@ const {
   useGetVendorProfilesQuery,
   useGetVendorDetailQuery,
   useSendEnquiryMutation,
+  useSendMessageMutation,
   useGetVendorCalendarQuery,
   useGetSubscriptionPlansQuery,
 } = coupleDashboardApi;
@@ -55,6 +63,7 @@ export {
   useGetVendorProfilesQuery,
   useGetVendorDetailQuery,
   useSendEnquiryMutation,
+  useSendMessageMutation,
   useGetVendorCalendarQuery,
   useGetSubscriptionPlansQuery,
 };
