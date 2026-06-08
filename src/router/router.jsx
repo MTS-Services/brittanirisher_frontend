@@ -80,7 +80,7 @@ const Settings = lazy(
   () => import('../pages/admin/settings/Settings')
 );
 const Profile = lazy(
-  () => import('../pages/admin/profile/Profile')
+  () => import('../pages/admin/profile/components/Profile')
 );
 
 const segFor = (baseRoute) => (route) => route.replace(`${baseRoute}/`, '');

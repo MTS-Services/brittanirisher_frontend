@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MoveRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 import {
   useGetVendorCalendarQuery,
   useGetVendorPackagesQuery,
@@ -20,6 +21,12 @@ const toLocalDate = (year, month, day) => new Date(year, month, day, 12, 0, 0, 0
 const getMondayIndex = (dayIndex) => (dayIndex === 0 ? 6 : dayIndex - 1);
 const getMonthTitle = (date) => `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 const normalizeStatus = (status) => String(status || '').trim().toLowerCase();
+const formatDisplayDate = (dateString) => {
+  if (!dateString) return null;
+  const [year, month, day] = String(dateString).split('-');
+  if (!year || !month || !day) return dateString;
+  return `${day}/${month}/${year}`;
+};
 
 const getApiDateKey = (dayData) => {
   const rawDate = dayData?.blockedDate || dayData?.date || dayData?.blocked_date;
@@ -103,7 +110,6 @@ const VendorAvailability = () => {
   const [monthDate, setMonthDate] = useState(initialMonth);
   const [overrides, setOverrides] = useState({});
   const [selectedDate, setSelectedDate] = useState('2026-09-11');
-  const [saveState, setSaveState] = useState('');
 
   const currentYear = monthDate.getFullYear();
   const currentMonthValue = monthDate.getMonth() + 1; 
@@ -142,7 +148,6 @@ const VendorAvailability = () => {
 
   useEffect(() => {
     setOverrides({});
-    setSaveState('');
   }, [monthDate]);
 
   const cells = useMemo(() => {
@@ -161,7 +166,6 @@ const VendorAvailability = () => {
       [cell.key]: nextStatus,
     }));
     setSelectedDate(cell.key);
-    setSaveState('');
   };
 
   const handleSave = async () => {
@@ -174,11 +178,16 @@ const VendorAvailability = () => {
         }));
 
       await saveBulkMonth(bulkPayload).unwrap();
-      setSaveState(`Published successfully for ${monthLabel}!`);
+      const selectedDisplayDate = formatDisplayDate(selectedDate);
+      toast.success(
+        selectedDisplayDate
+          ? `Availability published successfully for ${selectedDisplayDate}.`
+          : `Availability published successfully for ${monthLabel}.`
+      );
       setOverrides({}); 
     } catch (error) {
       console.error("Failed to save calendar data: ", error);
-      setSaveState("Error updating calendar. Try again.");
+      toast.error(error?.data?.message || 'Error updating calendar. Try again.');
     }
   };
 
@@ -270,7 +279,6 @@ const VendorAvailability = () => {
               <span>Save &amp; Publish</span>
               <span className='text-base leading-none'><MoveRight size={18} /></span>
             </button>
-            {saveState ? <p className='text-[16px] text-[#62715f] font-medium'>{saveState}</p> : null}
           </div>
         </section>
       </main>
