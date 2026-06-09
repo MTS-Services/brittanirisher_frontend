@@ -1,80 +1,88 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import {
+  useGetCoupleExpenseQuery,
+  useGetCoupleExpenseByIdQuery,
+} from '../../../../store/features/couple/coupleDashboard'; 
 
-const budgetItems = [
-  {
-    title: 'Photography',
-    note: 'Family portraits before ceremony starts.',
-    amount: '$2,400',
-    vendorName: 'Md. Ismail Molla',
-    vendorPhone: '(207) 555-0119',
-    vendorEmail: 'michelle.rivera@example.com',
-  },
-  {
-    title: 'Videography',
-    note: 'Ceremony and reception full event coverage.',
-    amount: '$3,200',
-    vendorName: 'Rafid Hasan',
-    vendorPhone: '(207) 555-0137',
-    vendorEmail: 'rafid.hasan@example.com',
-  },
-  {
-    title: 'Floral Design',
-    note: 'Bouquets, stage decor, and table centerpieces.',
-    amount: '$1,900',
-    vendorName: 'Nusrat Jahan',
-    vendorPhone: '(207) 555-0161',
-    vendorEmail: 'nusrat.jahan@example.com',
-  },
-  {
-    title: 'Catering',
-    note: 'Dinner menu for 200 guests with dessert bar.',
-    amount: '$5,600',
-    vendorName: 'Sabbir Ahmed',
-    vendorPhone: '(207) 555-0148',
-    vendorEmail: 'sabbir.ahmed@example.com',
-  },
-  {
-    title: 'Dj & Music',
-    note: 'Live DJ set with sound and lighting setup.',
-    amount: '$2,100',
-    vendorName: 'Rifat Karim',
-    vendorPhone: '(207) 555-0188',
-    vendorEmail: 'rifat.karim@example.com',
-  },
-];
+// Skeleton Component
+const StatsSkeleton = () => (
+  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 animate-pulse">
+    {[1, 2, 3, 4].map((n) => (
+      <div key={n} className="h-28 rounded-lg border border-[#f0eee9] bg-[#ece9e2] p-6">
+        <div className="h-4 w-24 rounded bg-[#ece9e2] mb-3"></div>
+        <div className="h-8 w-32 rounded bg-[#ece9e2]"></div>
+      </div>
+    ))}
+  </div>
+);
 
 const BudgetItemsSection = () => {
-  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [selectedExpenseId, setSelectedExpenseId] = useState(null);
+
+
+
+  const { data: expenseItems = [], isLoading, isError } = useGetCoupleExpenseQuery();
+  const {
+    data: selectedExpense,
+    isLoading: isSelectedExpenseLoading,
+  } = useGetCoupleExpenseByIdQuery(selectedExpenseId, {
+    skip: !selectedExpenseId,
+  });
+
+  const getCategoryLabel = (expense) =>
+    expense?.category?.name || expense?.categoryName || expense?.category || 'No Category';
+
+  const getAmountLabel = (expense) => expense?.amount ?? expense?.expense ?? '0.00';
 
   const handleOpenExpense = (item) => {
-    setSelectedExpense(item);
+    setSelectedExpenseId(item.id || item._id || null);
   };
 
   const handleCloseExpense = () => {
-    setSelectedExpense(null);
+    setSelectedExpenseId(null);
   };
+
+ if (isLoading) {
+    return <StatsSkeleton />;
+  }
+
+  if (isError) {
+    return <div className="text-center mt-6 font-raleway text-red-500">Something went wrong while fetching expenses!</div>;
+  }
 
   return (
     <>
-      <div className='mt-6  grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5 font-raleway'>
-        {budgetItems.map((item) => (
-          <button
-            key={item.title}
-            type='button'
-            onClick={() => handleOpenExpense(item)}
-            className='rounded-xl border border-[#F3F4F6] bg-white p-4 text-left shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition hover:border-[#d9e1d8] hover:shadow-[0_4px_14px_rgba(0,0,0,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a4b5a2]'
-          >
-            <h3 className='m-0 text-[1.15rem] font-medium text-[#2f2f2f]'>{item.title}</h3>
-            <p className='mb-3 mt-2 text-base leading-relaxed text-[#555555]'>{item.note}</p>
-            <p className='m-0 text-[1.8rem] leading-none font-playfair text-[#1e1e1e] md:text-[2rem]'>
-              {item.amount}
-            </p>
-          </button>
-        ))}
+    <div className='mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5 font-raleway'>
+  {expenseItems.map((item) => (
+    <button
+      key={item.id || item._id}
+      type='button'
+      onClick={() => handleOpenExpense(item)}
+      className='rounded-xl border border-[#F3F4F6] bg-white p-4 text-left shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition hover:border-[#d9e1d8] hover:shadow-[0_4px_14px_rgba(0,0,0,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a4b5a2] flex flex-col justify-between'
+    >
+      <div>
+        <h3 className='m-0 text-[1.15rem] font-medium text-[#2f2f2f]'>
+          {getCategoryLabel(item)}
+        </h3>
+    
+        <p className='mb-3 mt-2 text-base leading-relaxed text-[#555555] block w-full overflow-hidden break-words line-clamp-2 h-[3rem]'>
+          {item.note}
+        </p>
       </div>
+      
+      <p className='m-0 text-[1.8rem] leading-none font-playfair text-[#1e1e1e] md:text-[2rem]'>
+        ${getAmountLabel(item)}
+      </p>
+    </button>
+  ))}
+</div>
 
-      {selectedExpense && (
+      {expenseItems.length === 0 && (
+        <div className="text-center mt-6 font-raleway text-[#555555]">No expenses found.</div>
+      )}
+
+      {selectedExpenseId && (
         <div
           className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'
           onClick={handleCloseExpense}
@@ -102,47 +110,58 @@ const BudgetItemsSection = () => {
             </div>
 
             <div className='space-y-3 font-raleway'>
+              {isSelectedExpenseLoading ? (
+                <div className='grid grid-cols-1 gap-3 animate-pulse'>
+                  <div className='h-4 w-24 rounded bg-gray-200' />
+                  <div className='h-5 w-full rounded bg-gray-200' />
+                  <div className='h-4 w-28 rounded bg-gray-200' />
+                  <div className='h-5 w-3/4 rounded bg-gray-200' />
+                </div>
+              ) : (
+                <>
               <div>
-                <p className='m-0 text-base text-[#3a3a3a]'>Category</p>
-                <p className='m-0 mt-1 text-lg leading-none text-[#1e1e1e]'>
-                  {selectedExpense.title}
+                <p className='m-0 text-base text-[#3a3a3a]'>Category : </p>
+                <p className='m-0 mt-1 text-lg leading-none font-semibold text-[#1e1e1e]'>
+                  {getCategoryLabel(selectedExpense)}
                 </p>
               </div>
 
               <div>
-                <p className='m-0 text-base text-[#3a3a3a]'>Vendor Name</p>
-                <p className='m-0 mt-1 text-lg leading-none text-[#1e1e1e]'>
-                  {selectedExpense.vendorName}
+                <p className='m-0 text-base text-[#3a3a3a]'>Vendor Name : </p>
+                <p className='m-0 mt-1 text-lg leading-none font-semibold text-[#1e1e1e]'>
+                  {selectedExpense.vendorName || 'N/A'}
                 </p>
               </div>
 
               <div>
-                <p className='m-0 text-base text-[#3a3a3a]'>Vendor Phone Number</p>
-                <p className='m-0 mt-1 text-lg leading-none text-[#1e1e1e]'>
-                  {selectedExpense.vendorPhone}
+                <p className='m-0 text-base text-[#3a3a3a]'>Vendor Phone Number : </p>
+                <p className='m-0 mt-1 text-lg font-semibold leading-none text-[#1e1e1e]'>
+                  {selectedExpense.vendorPhone || 'N/A'}
                 </p>
               </div>
 
               <div>
-                <p className='m-0 text-base text-[#3a3a3a]'>Vendor Email</p>
-                <p className='m-0 mt-1 text-lg leading-none break-all text-[#1e1e1e]'>
-                  {selectedExpense.vendorEmail}
+                <p className='m-0 text-base text-[#3a3a3a]'>Vendor Email : </p>
+                <p className='m-0 mt-1 text-lg font-semibold leading-none break-all text-[#1e1e1e]'>
+                  {selectedExpense.vendorEmail || 'N/A'}
                 </p>
               </div>
 
               <div>
-                <p className='m-0 text-base text-[#3a3a3a]'>Expense</p>
-                <p className='m-0 mt-1 text-lg leading-none text-[#1e1e1e]'>
-                  {selectedExpense.amount}
+                <p className='m-0 text-base text-[#3a3a3a]'>Expense : </p>
+                <p className='m-0 mt-1 text-lg font-semibold leading-none text-[#1e1e1e]'>
+                  ৳{getAmountLabel(selectedExpense)}
                 </p>
               </div>
 
-              <div>
-                <p className='m-0 text-base text-[#3a3a3a]'>Note</p>
-                <p className='m-0 mt-1 text-lg leading-tight text-[#1e1e1e]'>
-                  {selectedExpense.note}
-                </p>
-              </div>
+             <div className='grid grid-cols-1  gap-1 sm:gap-4 items-baseline'>
+            <p className='m-0 text-sm font-medium text-[#71717a] uppercase tracking-wider'>Note : </p>
+            <p className='m-0 text-base md:text-lg font-semibold text-[#3f3f46] sm:col-span-2 break-words text-justify leading-relaxed whitespace-pre-line'>
+              {selectedExpense?.note || 'No note added.'}
+            </p>
+          </div>
+                </>
+              )}
             </div>
           </div>
         </div>

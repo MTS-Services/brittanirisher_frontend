@@ -1,9 +1,12 @@
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useRef } from 'react';
 import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { LogIn, Menu, X, ChevronDown } from 'lucide-react';
 import Footer from './home/footer/Footer';
 import { APP_CONFIG, ROUTES } from '../config';
 import ScrollToTop from './ScrollToTop';
+import { useSelector } from 'react-redux';
+import { selectIsAuthenticated, selectUser } from '../store/slices/authSlice';
+import useGlobalGsapAnimations from '../hooks/useGlobalGsapAnimations';
 
 const NAV_LINKS = [
   { to: ROUTES.HOME, label: 'Home', end: true },
@@ -21,8 +24,21 @@ const INACTIVE_MOBILE = 'nav-link block rounded-sm px-4 py-3 text-[#4a453d] tran
 
 const Layout = memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const contentRef = useRef(null);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const location = useLocation();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
+
+  useGlobalGsapAnimations(contentRef);
+
+  const userRole = (user?.role || '').toUpperCase();
+  const dashboardRoute =
+    userRole === 'ADMIN'
+      ? ROUTES.ADMIN_DASHBOARD
+      : userRole === 'VENDOR'
+        ? ROUTES.VENDOR_DASHBOARD
+        : ROUTES.USER_DASHBOARD;
 
   const navLinkClass = (to) => ({ isActive }) => {
     if (to === ROUTES.BROWSE_VENDORS && location.pathname.startsWith('/vendors')) {
@@ -79,12 +95,11 @@ const Layout = memo(() => {
           </div>
 
           <div className='hidden items-center gap-3 lg:flex'>
-        
             <Link
-              to={ROUTES.SIGNUP}
+              to={isAuthenticated ? dashboardRoute : ROUTES.SIGNUP}
               className='inline-flex items-center gap-2 rounded-sm bg-[#a8baa8] px-4 py-2 text-sm font-medium text-[#4a453d] shadow-md shadow-[#4f5b4d]/20 transition-transform duration-200 hover:-translate-y-0.5'
             >
-              Sign Up
+              {isAuthenticated ? 'Dashboard' : 'Sign Up'}
             </Link>
           </div>
 
@@ -144,7 +159,7 @@ const Layout = memo(() => {
         )}
       </nav>
 
-      <main className='flex-1 min-h-0'>
+      <main ref={contentRef} className='flex-1 min-h-0'>
         <Outlet />
       </main>
 

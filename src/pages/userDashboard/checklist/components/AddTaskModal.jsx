@@ -1,14 +1,58 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Trash2, Plus } from 'lucide-react';
+import { toast } from 'react-hot-toast'; 
 
-const AddTaskModal = ({ isOpen, taskForm, onFieldChange, onClose, onSave }) => {
+const AddTaskModal = ({ isOpen, onClose, onSave, isSubmitting, editSection }) => {
+  const [taskTitle, setTaskTitle] = useState('');
+  const [currentTaskName, setCurrentTaskName] = useState('');
+  const [taskList, setTaskList] = useState([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (editSection) {
+        setTaskTitle(editSection.title || '');
+        const existingTasks = editSection.tasks?.map(t => t.taskName) || [];
+        setTaskList(existingTasks);
+      } else {
+        setTaskTitle('');
+        setTaskList([]);
+      }
+      setCurrentTaskName('');
+    }
+  }, [isOpen, editSection]);
+
   if (!isOpen) {
     return null;
   }
 
-  const handleSubmit = (event) => {
+  const handleAddTaskToList = () => {
+    if (!currentTaskName.trim()) return;
+    setTaskList((prev) => [...prev, currentTaskName.trim()]);
+    setCurrentTaskName('');
+  };
+
+  const handleRemoveTaskFromList = (indexToRemove) => {
+    setTaskList((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onSave();
+    if (!taskTitle.trim() || taskList.length === 0) return;
+
+    const trimmedTitle = taskTitle.trim();
+
+    try {
+      await onSave({
+        title: trimmedTitle,
+        tasks: taskList,
+      });
+
+      toast.success(`"${trimmedTitle}" created successfully!`);
+      
+      onClose(); 
+    } catch (error) {
+      toast.error('Failed to save');
+    }
   };
 
   return (
@@ -26,7 +70,7 @@ const AddTaskModal = ({ isOpen, taskForm, onFieldChange, onClose, onSave }) => {
       >
         <div className='mb-3 flex items-center justify-between'>
           <h2 id='task-modal-title' className='m-0 text-[2rem] text-[#212121]'>
-            Add Task
+            {editSection ? 'Update Section' : 'Add Task Section'}
           </h2>
           <button
             type='button'
@@ -38,17 +82,19 @@ const AddTaskModal = ({ isOpen, taskForm, onFieldChange, onClose, onSave }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className='space-y-3'>
+        <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-1 block text-[1.1rem] text-[#343434]' htmlFor='task-title'>
-              Task Title
+              Task Title (Section Name)
             </label>
             <input
               id='task-title'
               type='text'
-              value={taskForm.taskTitle}
-              onChange={onFieldChange('taskTitle')}
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
               className='h-10 w-full rounded-sm border border-[#d8d8d8] bg-[#f5f5f5] px-3 text-[0.95rem] text-[#535353] outline-none focus:border-[#a9b9a6]'
+              placeholder='e.g., 3-4 Months Before'
+              required
             />
           </div>
 
@@ -56,21 +102,57 @@ const AddTaskModal = ({ isOpen, taskForm, onFieldChange, onClose, onSave }) => {
             <label className='mb-1 block text-[1.1rem] text-[#343434]' htmlFor='task-name'>
               Task Name
             </label>
-            <input
-              id='task-name'
-              type='text'
-              value={taskForm.taskName}
-              onChange={onFieldChange('taskName')}
-              className='h-10 w-full rounded-sm border border-[#d8d8d8] bg-[#f5f5f5] px-3 text-[0.95rem] text-[#535353] outline-none focus:border-[#a9b9a6]'
-            />
+            <div className='flex gap-2'>
+              <input
+                id='task-name'
+                type='text'
+                value={currentTaskName}
+                onChange={(e) => setCurrentTaskName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddTaskToList();
+                  }
+                }}
+                className='h-10 flex-1 rounded-sm border border-[#d8d8d8] bg-[#f5f5f5] px-3 text-[0.95rem] text-[#535353] outline-none focus:border-[#a9b9a6]'
+                placeholder='e.g., Send save-the-dates'
+              />
+              <button
+                type='button'
+                onClick={handleAddTaskToList}
+                className='inline-flex h-10 items-center gap-1 rounded-md bg-[#a4b5a2] px-4 text-base text-[#2f3a2f] transition hover:bg-[#94a592]'
+              >
+                <Plus size={18} /> Add
+              </button>
+            </div>
           </div>
 
-          <button
-            type='submit'
-            className='rounded-md bg-[#a4b5a2] px-5 py-2 text-base text-[#2f3a2f] transition hover:bg-[#94a592]'
-          >
-            Save
-          </button>
+          {taskList.length > 0 && (
+            <div className='max-h-40 overflow-y-auto rounded-md border border-[#d8d8d8] bg-white p-2 space-y-1.5'>
+              {taskList.map((task, index) => (
+                <div key={index} className='flex items-center justify-between rounded bg-[#fdfcfc] p-2 border border-[#D4A57415]'>
+                  <span className='text-sm text-[#5a5a5a] font-raleway'>{task}</span>
+                  <button
+                    type='button'
+                    onClick={() => handleRemoveTaskFromList(index)}
+                    className='text-red-400 hover:text-red-600 transition'
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className='flex justify-end pt-2'>
+            <button
+              type='submit'
+              disabled={isSubmitting || !taskTitle.trim() || taskList.length === 0}
+              className='rounded-md bg-[#2f3a2f] px-6 py-2 text-base text-white transition hover:bg-[#202920] disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {isSubmitting ? 'Saving...' : editSection ? 'Update Section' : 'Save Section'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

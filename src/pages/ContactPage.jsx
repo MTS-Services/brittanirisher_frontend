@@ -1,5 +1,6 @@
 import React, { memo, useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   Mail,
   MessageCircle,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import { useSEO } from "../hooks/useSEO";
 import { ROUTES } from "../config";
+import { useSendMessageMutation } from "../store/features/public/publicApi";
 
 const HERO_IMAGE = "/Get_in_Touch.png";
 const CONTACT_DECOR_LEFT = "/Get_in_Touch2.png";
@@ -70,6 +72,14 @@ const FAQ_ITEMS = [
   },
 ];
 
+const INITIAL_FORM = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  subject: "",
+  message: "",
+};
+
 const ContactBlock = memo(({ icon: Icon, title, text, detail }) => (
   <article className="rounded-[14px] bg-[#f0e9e1] px-6 py-7 text-center shadow-sm">
     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#d8c3b4] text-[#464e46]">
@@ -91,6 +101,43 @@ ContactBlock.displayName = "ContactBlock";
 
 const ContactPage = memo(() => {
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [sendMessage, { isLoading: isSendingMessage }] = useSendMessageMutation();
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleSendMessage = async (event) => {
+    event.preventDefault();
+
+    const payload = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+    };
+
+    if (Object.values(payload).some((value) => !value)) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      await sendMessage(payload).unwrap();
+      toast.success("Message sent successfully.");
+      setFormData(INITIAL_FORM);
+    } catch (error) {
+      toast.error(
+        error?.data?.message || "Failed to send message. Please try again.",
+      );
+    }
+  };
 
   useSEO({
     title: "Contact Us",
@@ -147,41 +194,63 @@ const ContactPage = memo(() => {
                 Send us a Message
               </h2>
 
-              <form className="mt-6 space-y-4">
+              <form className="mt-6 space-y-4" onSubmit={handleSendMessage}>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <input
                     aria-label="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
                     placeholder="First Name"
+                    required
                     className="h-11 rounded-sm border-0 bg-white px-4 font-raleway text-[16px] outline-none placeholder:text-[#8c8c8c]"
                   />
                   <input
                     aria-label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
                     placeholder="Last Name"
+                    required
                     className="h-11 rounded-sm border-0 bg-white px-4 font-raleway text-[16px] outline-none placeholder:text-[#8c8c8c]"
                   />
                 </div>
                 <input
                   aria-label="Email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="Email"
+                  required
                   className="h-11 w-full rounded-sm border-0 bg-white px-4 font-raleway text-[16px] outline-none placeholder:text-[#8c8c8c]"
                 />
                 <input
                   aria-label="Subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleInputChange}
                   placeholder="Subject"
+                  required
                   className="h-11 w-full rounded-sm border-0 bg-white px-4 font-raleway text-[16px] outline-none placeholder:text-[#8c8c8c]"
                 />
                 <textarea
                   aria-label="Message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
                   rows={6}
                   placeholder="Tell us how we can help."
+                  required
                   className="w-full rounded-sm border-0 bg-white px-4 py-3 font-raleway text-[16px] outline-none placeholder:text-[#8c8c8c]"
                 />
 
                 <button
                   type="submit"
-                  className="inline-flex rounded-lg bg-[#a7b9a6] px-5 py-3 font-raleway text-[16px] leading-6 text-[#464e46]"
+                  disabled={isSendingMessage}
+                  className="inline-flex rounded-lg bg-[#a7b9a6] px-5 py-3 font-raleway text-[16px] leading-6 text-[#464e46] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Send Message
+                  {isSendingMessage ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </article>

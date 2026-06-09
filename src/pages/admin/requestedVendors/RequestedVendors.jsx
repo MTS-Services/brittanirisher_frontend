@@ -1,93 +1,86 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { ROUTES } from '../../../config';
 import VendorManagementHeader from '../../../components/adminDashboard/requestVendors/VendorManagementHeader';
 import RequestedVendorsTable from '../../../components/adminDashboard/requestVendors/RequestedVendorsTable';
 import RequestedVendorsMobileList from '../../../components/adminDashboard/requestVendors/RequestedVendorsMobileList';
 import RequestedVendorsActionMenu from '../../../components/adminDashboard/requestVendors/RequestedVendorsActionMenu';
 import RequestedVendorsPagination from '../../../components/adminDashboard/requestVendors/RequestedVendorsPagination';
-import { useGetAdminVendorQuery } from '../../../store/features/admin/adminVendor/adminVendorApi';
+import {
+  useDeleteVendorMutation,
+  useGetAdminVendorQuery,
+  useUpdateVendorStatusMutation,
+} from '../../../store/features/admin/adminVendor/adminVendorApi';
 
-const vendors = [
-  {
-    id: 1,
-    name: 'Elegant Frames',
-    category: 'Photography',
-    date: '2024-05-10',
-    status: 'Reject',
-  },
-  {
-    id: 2,
-    name: 'Grand Feast Catering',
-    category: 'Catering',
-    date: '2024-05-10',
-    status: 'Approved',
-  },
-  {
-    id: 3,
-    name: 'Midnight Melodies DJ',
-    category: 'Entertainment',
-    date: '2024-05-10',
-    status: 'Reject',
-  },
-  {
-    id: 4,
-    name: 'Elegant Frames',
-    category: 'Photography',
-    date: '2024-05-10',
-    status: 'Approved',
-  },
-  {
-    id: 5,
-    name: 'Elegant Frames',
-    category: 'Photography',
-    date: '2024-05-10',
-    status: 'Approved',
-  },
-  {
-    id: 6,
-    name: 'Elegant Frames',
-    category: 'Photography',
-    date: '2024-05-10',
-    status: 'Approved',
-  },
-  {
-    id: 7,
-    name: 'Elegant Frames',
-    category: 'Photography',
-    date: '2024-05-10',
-    status: 'Approved',
-  },
-  {
-    id: 8,
-    name: 'Elegant Frames',
-    category: 'Photography',
-    date: '2024-05-10',
-    status: 'Approved',
-  },
-];
+const FILTER_TO_STATUS = {
+  approved: 'APPROVED',
+  rejected: 'REJECTED',
+  pending: 'PENDING',
+};
+
+const formatDate = (value) => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
 
 export default function RequestedVendors() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [openId, setOpenId] = useState(null);
   const activeMenuRef = useRef(null);
   const [menuPos, setMenuPos] = useState(null);
+  const perPage = 10;
 
-  const filtered = vendors.filter((v) => {
-    if (!filter || filter === 'all') return true;
-    if (filter === 'approved') return v.status.toLowerCase() === 'approved';
-    if (filter === 'reject') return v.status.toLowerCase() === 'reject';
-    return true;
-  });
+  const [updateVendorStatus] = useUpdateVendorStatusMutation();
+  const [deleteVendor] = useDeleteVendorMutation();
 
-  const query = `status=PENDING&page=${page}&limit=${perPage}`;
+  const query = useMemo(() => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(perPage),
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+
+    const status = FILTER_TO_STATUS[filter];
+    if (status) {
+      params.set('status', status);
+    }
+
+    return params.toString();
+  }, [filter, page]);
+
   const { data, isLoading } = useGetAdminVendorQuery(query, {
     refetchOnMountOrArgChange: true,
     refetchOnWindowFocus: true,
   });
 
-  const perPage = 7;
-  const totalResults = filtered.length;
-  const paged = filtered.slice((page - 1) * perPage, page * perPage);
+  const paged = (data?.data || []).map((item) => ({
+    id: item.id,
+    name: item.name || 'Unknown Vendor',
+    category: item.category || '-',
+    date: formatDate(item.joinedAt),
+    status: item.status || 'PENDING',
+    raw: item,
+  }));
+
+  const meta = data?.meta || {};
+  const totalResults = meta.totalItems ?? 0;
+  const totalPages = meta.totalPages || 1;
+  const hasNextPage = !!meta.hasNextPage;
+  const hasPreviousPage = !!meta.hasPreviousPage;
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter]);
 
   useEffect(() => {
     function handleDocClick(e) {
@@ -101,12 +94,70 @@ export default function RequestedVendors() {
     return () => document.removeEventListener('mousedown', handleDocClick);
   }, []);
 
-  const handleAction = (action, vendor) => {
+  const handleAction = async (action, vendor) => {
     setOpenId(null);
     setMenuPos(null);
-    // placeholder for real handlers
-    // eslint-disable-next-line no-console
-    console.log('action', action, vendor);
+
+    if (!vendor?.id) {
+      toast.error('Vendor not found.');
+      return;
+    }
+
+    if (action === 'view') {
+      navigate(
+        ROUTES.ADMIN_VENDOR_DETAILS.replace(':vendorId', String(vendor.id)),
+        { state: { vendor } },
+      );
+      return;
+    }
+
+    if (action === 'status-approved') {
+      try {
+        await updateVendorStatus({
+          id: vendor.id,
+          status: 'APPROVED',
+        }).unwrap();
+        toast.success('Vendor status updated to APPROVED.');
+      } catch (error) {
+        toast.error(error?.data?.message || 'Failed to update vendor status.');
+      }
+      return;
+    }
+
+    if (action === 'status-pending') {
+      try {
+        await updateVendorStatus({
+          id: vendor.id,
+          status: 'PENDING',
+        }).unwrap();
+        toast.success('Vendor status updated to PENDING.');
+      } catch (error) {
+        toast.error(error?.data?.message || 'Failed to update vendor status.');
+      }
+      return;
+    }
+
+    if (action === 'status-rejected') {
+      try {
+        await updateVendorStatus({
+          id: vendor.id,
+          status: 'REJECTED',
+        }).unwrap();
+        toast.success('Vendor status updated to REJECTED.');
+      } catch (error) {
+        toast.error(error?.data?.message || 'Failed to update vendor status.');
+      }
+      return;
+    }
+
+    if (action === 'delete') {
+      try {
+        await deleteVendor({ id: vendor.id }).unwrap();
+        toast.success('Vendor deleted successfully.');
+      } catch (error) {
+        toast.error(error?.data?.message || 'Failed to delete vendor.');
+      }
+    }
   };
 
   const toggleMenu = (id, evt) => {
@@ -129,37 +180,50 @@ export default function RequestedVendors() {
     setMenuPos({ top, left });
   };
 
+  const emptyMessage =
+    filter === 'all'
+      ? 'No vendors found.'
+      : `No ${filter} vendors found.`;
+
   return (
     <div className='space-y-8'>
-      <div className=''>
+      <div>
         <VendorManagementHeader filter={filter} setFilter={setFilter} />
 
         <div className='bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden'>
+
           <RequestedVendorsTable
             paged={paged}
             openId={openId}
             toggleMenu={toggleMenu}
+            isLoading={isLoading}
+            emptyMessage={emptyMessage}
           />
 
           <RequestedVendorsMobileList
             paged={paged}
             openId={openId}
             toggleMenu={toggleMenu}
+            isLoading={isLoading}
+            emptyMessage={emptyMessage}
           />
 
           <RequestedVendorsActionMenu
             openId={openId}
             menuPos={menuPos}
             activeMenuRef={activeMenuRef}
-            vendors={vendors}
+            vendors={paged}
             onAction={handleAction}
           />
 
           <RequestedVendorsPagination
             page={page}
             setPage={setPage}
-            perPage={perPage}
+            perPage={meta.itemsPerPage || perPage}
             totalResults={totalResults}
+            totalPages={totalPages}
+            hasNextPage={hasNextPage}
+            hasPreviousPage={hasPreviousPage}
           />
         </div>
       </div>

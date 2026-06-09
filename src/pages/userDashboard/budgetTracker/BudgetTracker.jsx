@@ -1,21 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import BudgetSummaryCards from './components/BudgetSummaryCards';
 import BudgetItemsSection from './components/BudgetItemsSection';
 import BudgetBreakdownChart from './components/BudgetBreakdownChart';
 import AddExpenseModal from './components/AddExpenseModal';
+import toast from 'react-hot-toast';
+import {
+  useCreateCoupleExpenseMutation,
+  useGetCategoriesQuery,
+} from '../../../store/features/couple/coupleDashboard';
 
 const initialExpenseForm = {
-  category: 'Photography',
+  categoryId: '',
   vendorName: '',
   vendorPhone: '',
   vendorEmail: '',
-  expense: '$00.00',
+  amount: '',
   note: '',
 };
 
 const BudgetTracker = () => {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [expenseForm, setExpenseForm] = useState(initialExpenseForm);
+  const [createCoupleExpense, { isLoading }] = useCreateCoupleExpenseMutation();
+  const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+
+  const normalizedCategories = useMemo(
+    () => (Array.isArray(categories) ? categories : []),
+    [categories],
+  );
+
+  useEffect(() => {
+    if (!expenseForm.categoryId && normalizedCategories.length > 0) {
+      setExpenseForm((prev) => ({
+        ...prev,
+        categoryId: normalizedCategories[0].id || normalizedCategories[0]._id || '',
+      }));
+    }
+  }, [expenseForm.categoryId, normalizedCategories]);
 
   const openExpenseModal = () => {
     setIsExpenseModalOpen(true);
@@ -33,10 +54,31 @@ const BudgetTracker = () => {
     }));
   };
 
-  const handleExpenseSave = () => {
-    console.log('Expense saved:', expenseForm);
-    setIsExpenseModalOpen(false);
-    setExpenseForm(initialExpenseForm);
+  const submitExpense = async (event) => {
+    event.preventDefault();
+
+    const amount = Number.parseFloat(String(expenseForm.amount).replace(/[^0-9.]/g, ''));
+
+    if (!expenseForm.vendorName.trim() || !expenseForm.categoryId || !Number.isFinite(amount)) {
+      toast.error('Please fill in category, vendor name, and amount.');
+      return;
+    }
+
+    try {
+      await createCoupleExpense({
+        vendorName: expenseForm.vendorName.trim(),
+        categoryId: expenseForm.categoryId,
+        vendorPhone: expenseForm.vendorPhone.trim(),
+        vendorEmail: expenseForm.vendorEmail.trim(),
+        amount,
+        note: expenseForm.note.trim(),
+      }).unwrap();
+
+      toast.success('Expense added successfully');
+      closeExpenseModal();
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message || 'Failed to add expense');
+    }
   };
 
   return (
@@ -66,7 +108,10 @@ const BudgetTracker = () => {
         expenseForm={expenseForm}
         onFormChange={handleFormFieldChange}
         onClose={closeExpenseModal}
-        onSave={handleExpenseSave}
+        onSave={submitExpense}
+        categories={normalizedCategories}
+        categoriesLoading={isCategoriesLoading}
+        isSaving={isLoading}
       />
     </>
   );

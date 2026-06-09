@@ -10,8 +10,9 @@ import { useSelector } from 'react-redux';
 import Layout from '../components/Layout';
 import AdminLayout from '../components/layout/Layout';
 import DummyRoutePage from '../components/DummyRoutePage';
+import { RouteSkeleton } from '../components/skeletons/LoadingSkeletons';
 import { ROUTES } from '../config';
-import { selectIsAuthenticated } from '../store/slices/authSlice';
+import { selectIsAuthenticated, selectUser } from '../store/slices/authSlice';
 import NotFound from '../pages/NotFound';
 
 const Home = lazy(() => import('../components/home/HomeContent'));
@@ -34,6 +35,19 @@ const VendorBookings = lazy(
 );
 const VendorAvailability = lazy(
   () => import('../pages/VendorDashboard/VendorAvailability/VendorAvailability'),
+);
+const VendorPricing = lazy(() => import('../pages/VendorDashboard/pricing/VendorPricing'));
+const VendorPaymentSuccess = lazy(
+  () => import('../pages/VendorDashboard/pricing/VendorPaymentSuccess')
+);
+const VendorBillingRedirect = lazy(
+  () => import('../pages/VendorDashboard/pricing/VendorBillingRedirect')
+);
+const RegistrationSuccess = lazy(
+  () => import('../pages/VendorDashboard/pricing/RegistrationSuccess')
+);
+const RegistrationCancel = lazy(
+  () => import('../pages/VendorDashboard/pricing/RegistrationCancel')
 );
 const VendorProfile = lazy(() => import('../pages/VendorDashboard/profile/VendorProfile'));
 const UserDashboard = lazy(() => import('../pages/userDashboard/dashboard/UserDashboard'));
@@ -66,19 +80,20 @@ const Settings = lazy(
   () => import('../pages/admin/settings/Settings')
 );
 const Profile = lazy(
-  () => import('../pages/admin/profile/Profile')
+  () => import('../pages/admin/profile/components/Profile')
 );
+const Messages = lazy(() => import('../pages/admin/Messages'));
 
 const segFor = (baseRoute) => (route) => route.replace(`${baseRoute}/`, '');
 const adminSeg = segFor(ROUTES.ADMIN);
 const vendorSeg = segFor(ROUTES.VENDOR);
 const userSeg = segFor(ROUTES.USER);
 
-const PageLoader = () => (
-  <div className='flex items-center justify-center min-h-screen'>
-    <div className='w-8 h-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent' />
-  </div>
-);
+// const PageLoader = () => (
+//   <div className='flex items-center justify-center min-h-screen'>
+//     <div className='w-8 h-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent' />
+//   </div>
+// );
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -86,6 +101,17 @@ const ProtectedRoute = ({ children }) => {
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+const VendorOnlyRoute = ({ children }) => {
+  const user = useSelector(selectUser);
+  const role = (user?.role || '').toLowerCase();
+
+  if (role !== 'vendor') {
+    return <Navigate to={ROUTES.HOME} replace />;
   }
 
   return children;
@@ -106,7 +132,7 @@ const router = createBrowserRouter(
     <>
       <Route
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <Layout />
           </Suspense>
         }
@@ -123,7 +149,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.LOGIN}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <Login />
           </Suspense>
         }
@@ -132,8 +158,73 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.SIGNUP}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <Signup />
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.VENDOR_PRICING}
+        element={
+          <Suspense fallback={<RouteSkeleton />}>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <VendorPricing />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.VENDOR_BILLING_CALLBACK}
+        element={
+          <Suspense fallback={<RouteSkeleton />}>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <VendorBillingRedirect />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.VENDOR_PAYMENT_SUCCESS}
+        element={
+          <Suspense fallback={<RouteSkeleton />}>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <VendorPaymentSuccess />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.REGISTRATION_SUCCESS}
+        element={
+          <Suspense fallback={<RouteSkeleton />}>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <RegistrationSuccess />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
+          </Suspense>
+        }
+      />
+
+      <Route
+        path={ROUTES.REGISTRATION_CANCEL}
+        element={
+          <Suspense fallback={<RouteSkeleton />}>
+            <ProtectedRoute>
+              <VendorOnlyRoute>
+                <RegistrationCancel />
+              </VendorOnlyRoute>
+            </ProtectedRoute>
           </Suspense>
         }
       />
@@ -141,7 +232,7 @@ const router = createBrowserRouter(
       <Route
         path='/vendor-signup-flow'
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <VendorSignupFlow />
           </Suspense>
         }
@@ -150,7 +241,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.ADMIN}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -164,6 +255,7 @@ const router = createBrowserRouter(
         <Route path={adminSeg(ROUTES.ADMIN_PAYMENTS)} element={<Payments />} />
         <Route path={adminSeg(ROUTES.ADMIN_SETTINGS)} element={<Settings />} />
         <Route path={adminSeg(ROUTES.ADMIN_PROFILE)} element={<Profile />} />
+        <Route path={adminSeg(ROUTES.ADMIN_MESSAGES)} element={<Messages />} />
         <Route path={adminSeg(ROUTES.ADMIN_EMAILS)} element={<Emails />} />
         <Route path={adminSeg(ROUTES.ADMIN_LEADS)} element={<Leads />} />
         <Route path={adminSeg(ROUTES.ADMIN_ORDERS)} element={<Orders />} />
@@ -183,7 +275,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -212,7 +304,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.USER}
         element={
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>

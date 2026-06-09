@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { Eye, X, Trash2 } from "lucide-react";
+import { Eye, CheckCircle2, Clock3, X, Trash2 } from "lucide-react";
 
 export default function RequestedVendorsActionMenu({
   openId,
@@ -34,10 +34,28 @@ export default function RequestedVendorsActionMenu({
         </li>
         <li>
           <button
-            onClick={() => onAction("reject", currentVendor)}
+            onClick={() => onAction("status-approved", currentVendor)}
+            className="w-full text-left px-4 py-3 text-sm text-[#16A34A] hover:bg-gray-50 flex items-center gap-3"
+          >
+            <CheckCircle2 size={16} className="text-[#16A34A]" />
+            <span>Set Approved</span>
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => onAction("status-pending", currentVendor)}
+            className="w-full text-left px-4 py-3 text-sm text-[#D97706] hover:bg-gray-50 flex items-center gap-3"
+          >
+            <Clock3 size={16} className="text-[#D97706]" />
+            <span>Set Pending</span>
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => onAction("status-rejected", currentVendor)}
             className="w-full text-left px-4 py-3 text-sm text-[#F97316] hover:bg-gray-50 flex items-center gap-3"
           >
-            <X size={16} className="text-[#F97316]" /> <span>Reject</span>
+            <X size={16} className="text-[#F97316]" /> <span>Set Rejected</span>
           </button>
         </li>
         <li>

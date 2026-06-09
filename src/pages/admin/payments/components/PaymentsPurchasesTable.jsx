@@ -1,53 +1,6 @@
-const PURCHASES = [
-  {
-    vendorName: 'Sarah',
-    businessName: 'Sarah Photography',
-    plan: 'Starter',
-    price: '$29',
-    purchaseDate: '4/12/2026',
-    expiryDate: '5/12/2026',
-  },
-  {
-    vendorName: 'Juhan',
-    businessName: 'Elite Catering Co',
-    plan: 'Professional',
-    price: '$70',
-    purchaseDate: '4/10/2026',
-    expiryDate: '5/10/2026',
-  },
-  {
-    vendorName: 'Zepher',
-    businessName: 'Floral Dreams Studio',
-    plan: 'Premium',
-    price: '$149',
-    purchaseDate: '4/8/2026',
-    expiryDate: '5/8/2026',
-  },
-  {
-    vendorName: 'Liyana',
-    businessName: 'Premier DJ Services',
-    plan: 'Starter',
-    price: '$29',
-    purchaseDate: '4/10/2026',
-    expiryDate: '5/12/2026',
-  },
-  {
-    vendorName: 'Lisa',
-    businessName: 'Cake Artistry',
-    plan: 'Professional',
-    price: '$70',
-    purchaseDate: '4/10/2026',
-    expiryDate: '5/10/2026',
-  },
-  {
-    vendorName: 'Zarah',
-    businessName: 'Premier DJ Services',
-    plan: 'Premium',
-    price: '$149',
-    purchaseDate: '4/10/2026',
-    expiryDate: '4/10/2026',
-  },
-];
+import { useMemo, useState } from 'react';
+import { useGetAdminPaymentPurchasesQuery } from '../../../../store/features/admin/adminDashboard/adminDashboardApi';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
 const TableCell = ({ children, className = '' }) => (
   <td className={`px-4 py-4 text-sm text-gray-600 ${className}`}>{children}</td>
@@ -60,8 +13,53 @@ const InfoBlock = ({ label, value }) => (
   </div>
 );
 
+const formatCurrency = (value) => {
+  const numeric = Number(value ?? 0);
+  if (!Number.isFinite(numeric)) return '$0';
+  return `$${numeric.toLocaleString('en-US')}`;
+};
+
+const formatDate = (value) => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleDateString('en-GB');
+};
+
 export default function PaymentsPurchasesTable() {
-  const pagedPurchases = PURCHASES;
+  const [page, setPage] = useState(1);
+  const perPage = 10;
+
+  const query = useMemo(
+    () =>
+      new URLSearchParams({
+        page: String(page),
+        limit: String(perPage),
+      }).toString(),
+    [page],
+  );
+
+  const { data, isLoading } = useGetAdminPaymentPurchasesQuery(query, {
+    refetchOnMountOrArgChange: true,
+    refetchOnWindowFocus: true,
+  });
+
+  const pagedPurchases = (data?.data || []).map((item) => ({
+    id: item.id,
+    vendorName: item.vendorName || 'N/A',
+    businessName: item.businessName || 'N/A',
+    plan: item.plan || 'N/A',
+    price: formatCurrency(item.price),
+    purchaseDate: formatDate(item.purchaseDate),
+    expiryDate: formatDate(item.expiryDate),
+  }));
+
+  const meta = data?.meta || {};
+  const totalItems = meta.totalItems ?? pagedPurchases.length;
+  const hasNextPage = !!meta.hasNextPage;
+  const hasPreviousPage = !!meta.hasPreviousPage;
+  const startIndex = totalItems === 0 ? 0 : (page - 1) * perPage + 1;
+  const endIndex = Math.min(page * perPage, totalItems);
 
   return (
     <section className='space-y-4'>
@@ -88,24 +86,60 @@ export default function PaymentsPurchasesTable() {
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-100'>
-              {pagedPurchases.map((purchase) => (
-                <tr key={`${purchase.vendorName}-${purchase.businessName}`} className='hover:bg-gray-50/60 transition-colors'>
-                  <TableCell className='text-gray-800 font-medium'>{purchase.vendorName}</TableCell>
-                  <TableCell>{purchase.businessName}</TableCell>
-                  <TableCell>{purchase.plan}</TableCell>
-                  <TableCell>{purchase.price}</TableCell>
-                  <TableCell>{purchase.purchaseDate}</TableCell>
-                  <TableCell>{purchase.expiryDate}</TableCell>
+              {isLoading ? (
+                Array.from({ length: 6 }).map((_, index) => (
+                  <tr key={`purchase-skeleton-row-${index}`}>
+                    {Array.from({ length: 6 }).map((__, cellIndex) => (
+                      <td
+                        key={`purchase-skeleton-cell-${index}-${cellIndex}`}
+                        className='px-4 py-4'
+                      >
+                        <SkeletonBlock className='h-4 w-full rounded' />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : pagedPurchases.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className='px-4 py-10 text-center text-sm text-gray-500'>
+                    No purchases found.
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                pagedPurchases.map((purchase) => (
+                  <tr key={purchase.id} className='hover:bg-gray-50/60 transition-colors'>
+                    <TableCell className='text-gray-800 font-medium'>{purchase.vendorName}</TableCell>
+                    <TableCell>{purchase.businessName}</TableCell>
+                    <TableCell>{purchase.plan}</TableCell>
+                    <TableCell>{purchase.price}</TableCell>
+                    <TableCell>{purchase.purchaseDate}</TableCell>
+                    <TableCell>{purchase.expiryDate}</TableCell>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         <div className='lg:hidden divide-y divide-gray-100'>
-          {pagedPurchases.map((purchase) => (
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={`purchase-mobile-skeleton-${index}`} className='p-4 sm:p-5'>
+                <SkeletonBlock className='h-5 w-32 rounded' />
+                <SkeletonBlock className='mt-2 h-4 w-40 rounded' />
+                <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                  <SkeletonBlock className='h-14 w-full rounded-lg' />
+                  <SkeletonBlock className='h-14 w-full rounded-lg' />
+                  <SkeletonBlock className='h-14 w-full rounded-lg' />
+                </div>
+              </div>
+            ))
+          ) : pagedPurchases.length === 0 ? (
+            <div className='p-4 sm:p-5 text-sm text-gray-500'>No purchases found.</div>
+          ) : (
+            pagedPurchases.map((purchase) => (
             <div
-              key={`${purchase.vendorName}-${purchase.businessName}`}
+              key={purchase.id}
               className='p-4 sm:p-5'
             >
               <div className='flex items-start justify-between gap-3'>
@@ -129,25 +163,28 @@ export default function PaymentsPurchasesTable() {
                 <InfoBlock label='Expiry Date' value={purchase.expiryDate} />
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className='flex flex-col items-center justify-between gap-4 px-4 py-4 border-t border-gray-100 sm:flex-row'>
           <p className='text-base font-medium text-[#1FB356]'>
-            Showing 1 to {Math.min(7, pagedPurchases.length)} of {pagedPurchases.length} results
+            Showing {startIndex} to {endIndex} of {totalItems} results
           </p>
           <div className='flex items-center gap-2'>
             <button
               type='button'
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               className='rounded-lg border border-[#1FB356] px-4 py-1.5 text-sm text-[#1FB356] transition hover:bg-gray-50 disabled:opacity-40'
-              disabled
+              disabled={!hasPreviousPage}
             >
               Previous
             </button>
             <button
               type='button'
+              onClick={() => setPage((prev) => prev + 1)}
               className='rounded-lg border border-[#1FB356] px-4 py-1.5 text-sm text-[#1FB356] transition hover:bg-gray-50 disabled:opacity-40'
-              disabled
+              disabled={!hasNextPage}
             >
               Next
             </button>

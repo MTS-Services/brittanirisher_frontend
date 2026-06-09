@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const VendorSignupStep1 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = (field) => (e) => {
     onFormChange({ ...formData, [field]: e.target.value });
   };
 
   const handleNext = () => {
-    navigate('/vendor-signup-flow?step=2');
+    // Forward the vendorSignupInitialData through navigation state
+    navigate('/vendor-signup-flow?step=2', {
+      state: location.state,
+    });
   };
 
   const handlePrevious = () => {

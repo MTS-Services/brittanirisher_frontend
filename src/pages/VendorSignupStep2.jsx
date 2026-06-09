@@ -1,9 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, X, RefreshCw } from 'lucide-react';
 
 const VendorSignupStep2 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const fileInputRef = useRef(null);
   const [previews, setPreviews] = useState(() => {
     const imgs = formData.portfolioImages || [];
@@ -56,7 +58,9 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
   useEffect(() => {
     // If parent provides initial images (strings or Files), ensure previews reflect them
     if (formData.portfolioImages && formData.portfolioImages.length > 0) {
-      const imgs = formData.portfolioImages.map((item) => (typeof item === 'string' ? item : URL.createObjectURL(item)));
+      const imgs = formData.portfolioImages.map((item) =>
+        typeof item === 'string' ? item : URL.createObjectURL(item)
+      );
       // track only those we created in this effect so we can revoke later
       imgs.forEach((url, i) => {
         if (typeof formData.portfolioImages[i] !== 'string') createdURLsRef.current.push(url);
@@ -72,11 +76,17 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
   }, []);
 
   const handleNext = () => {
-    navigate('/vendor-signup-flow?step=3');
+    // Forward the vendorSignupInitialData through navigation state
+    onFormChange({ ...formData, portfolioImages: formData.portfolioImages || [] });
+    navigate('/vendor-signup-flow?step=3', {
+      state: location.state,
+    });
   };
 
   const handlePrevious = () => {
-    navigate('/vendor-signup-flow?step=1');
+    navigate('/vendor-signup-flow?step=1', {
+      state: location.state,
+    });
   };
 
   return (
@@ -92,7 +102,7 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
 
         <div className='relative z-10 flex w-full max-w-116.25 flex-col items-center gap-10 px-6 py-12 text-center text-white sm:px-8'>
           <div className='max-w-116.25 space-y-4'>
-            <h2 className='font-playfair text-3xl leading-none sm:text-5xl]'>
+            <h2 className='font-playfair text-3xl leading-none sm:text-5xl'>
               Begin Your Journey
             </h2>
             <p className='font-raleway text-[20px] leading-6 text-white/95'>

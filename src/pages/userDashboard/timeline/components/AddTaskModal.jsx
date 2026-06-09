@@ -1,18 +1,49 @@
-import React from 'react';
-import { Calendar, X } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
+import toast from 'react-hot-toast'; 
 
 const AddTaskModal = ({
   isOpen,
   onClose,
   taskForm,
   setTaskForm,
-  sections,
   onSubmit,
 }) => {
+  
+  const staticCategories = [
+    "1 Year Out",
+    "6 Months Out",
+    "3 Months Out",
+    "The Month of"
+  ];
+
+  useEffect(() => {
+    if (isOpen && !taskForm.category && staticCategories.length > 0) {
+      setTaskForm(prev => ({ ...prev, category: staticCategories[0] }));
+    }
+  }, [isOpen, taskForm.category, setTaskForm]);
+
   if (!isOpen) return null;
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!taskForm.taskName.trim()) {
+      toast.error("Task name is required");
+      return;
+    }
+
+    try {
+      await onSubmit(e);
+      
+      toast.success(`"${taskForm.taskName}" added successfully!`);
+    } catch (error) {
+      toast.error("Failed to save");
+    }
+  };
+
   return (
-    <div className="fixed font-raleway  inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
+    <div className="fixed font-raleway inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
       <div className="relative w-full max-w-lg rounded-xl bg-[#f7f7f7] p-5 shadow-2xl">
         <button
           type="button"
@@ -25,30 +56,32 @@ const AddTaskModal = ({
 
         <h3 className="font-raleway text-2xl font-semibold text-[#1f1f1f]">Add New Task</h3>
 
-        <form onSubmit={onSubmit} className="mt-3 space-y-3">
+        <form onSubmit={handleSubmit} className="mt-3 space-y-3">
+          {/* Task Name */}
           <div>
             <label className="mb-1 block font-raleway text-base text-[#2f2f2f]">Task Name</label>
             <input
               type="text"
               placeholder="e.g. Book wedding photographer"
-              value={taskForm.name}
-              onChange={(e) => setTaskForm({ ...taskForm, name: e.target.value })}
+              value={taskForm.taskName}
+              onChange={(e) => setTaskForm({ ...taskForm, taskName: e.target.value })}
               className="h-9 w-full rounded-lg border border-[#d7d7d7] bg-white px-3 font-raleway text-sm text-[#2f2f2f] placeholder:text-[#a2a2a2] focus:border-[#9bae99] focus:outline-none"
               required
             />
           </div>
 
+          {/* Phase & Due Date */}
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="mb-1 block font-raleway text-base text-[#2f2f2f]">Phase/Category</label>
               <select
-                value={taskForm.sectionId}
-                onChange={(e) => setTaskForm({ ...taskForm, sectionId: Number(e.target.value) })}
+                value={taskForm.category || staticCategories[0]}
+                onChange={(e) => setTaskForm({ ...taskForm, category: e.target.value })}
                 className="h-9 w-full rounded-lg border border-[#d7d7d7] bg-white px-3 font-raleway text-xs text-[#5a5a5a] focus:border-[#9bae99] focus:outline-none"
               >
-                {sections.map((section) => (
-                  <option key={section.id} value={section.id}>
-                    {section.title}
+                {staticCategories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
                   </option>
                 ))}
               </select>
@@ -59,15 +92,15 @@ const AddTaskModal = ({
               <div className="relative">
                 <input
                   type="date"
-                  value={taskForm.dueDate}
+                  value={taskForm.dueDate || ''}
                   onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
                   className="h-9 w-full rounded-lg border border-[#d7d7d7] bg-white px-3 pr-9 font-raleway text-xs text-[#5a5a5a] focus:border-[#9bae99] focus:outline-none"
                 />
-                <Calendar className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9a9a9a]" />
               </div>
             </div>
           </div>
 
+          {/* Priority */}
           <div>
             <label className="mb-1 block font-raleway text-base text-[#2f2f2f]">Priority</label>
             <div className="grid grid-cols-3 gap-2">
@@ -88,16 +121,18 @@ const AddTaskModal = ({
             </div>
           </div>
 
+          {/* Notes */}
           <div>
             <label className="mb-1 block font-raleway text-base text-[#2f2f2f]">Notes</label>
             <textarea
-              value={taskForm.notes}
-              onChange={(e) => setTaskForm({ ...taskForm, notes: e.target.value })}
+              value={taskForm.taskNotes || ''}
+              onChange={(e) => setTaskForm({ ...taskForm, taskNotes: e.target.value })}
               placeholder="Add vendor details or reminders..."
               className="min-h-20 w-full resize-none rounded-lg border border-[#d7d7d7] bg-white p-3 font-raleway text-xs text-[#5a5a5a] placeholder:text-[#a2a2a2] focus:border-[#9bae99] focus:outline-none"
             ></textarea>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex items-center justify-end gap-2 pt-1">
             <button
               type="button"

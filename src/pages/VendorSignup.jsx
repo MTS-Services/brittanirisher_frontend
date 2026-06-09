@@ -1,32 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { ROUTES } from '../config';
-
-const SERVICE_OPTIONS = [
-  'Photography',
-  'Videography',
-  'Floral Design',
-  'Catering',
-  'Bartending Specialist',
-  'Bakery',
-  'Venue',
-  'DJ & Music',
-  'Planning',
-  'Hair & Makeup',
-];
-const SPECIALTY_OPTIONS = ['None', 'Bar Service', 'Mixology', 'Signature Cocktails'];
+import { useGetCategoriesQuery, useGetStatesQuery } from '../../src/store/features/couple/coupleDashboard';
 
 const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false }) => {
   const navigate = useNavigate();
+
+  // API Calls
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const { data: statesData, isLoading: isStatesLoading } = useGetStatesQuery();
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
+    state: '',
+    city: '',
     location: '',
-    serviceCategory: SERVICE_OPTIONS[0],
-    bartendingSpecialties: SPECIALTY_OPTIONS[0],
+    serviceCategory: '',
+    bartendingSpecialties: '',
   });
+
+  const [availableCities, setAvailableCities] = useState([]);
+
+  const cleanCategories = Array.isArray(categoriesData)
+    ? categoriesData
+    : categoriesData?.data && Array.isArray(categoriesData.data)
+    ? categoriesData.data
+    : [];
+
+  useEffect(() => {
+    if (form.state && statesData?.data) {
+      const selectedStateObj = statesData.data.find((s) => s.id === form.state);
+      if (selectedStateObj && selectedStateObj.cities) {
+        setAvailableCities(selectedStateObj.cities);
+        setForm((current) => {
+          const hasCity = selectedStateObj.cities.some((city) => city.id === current.city);
+          return hasCity ? current : { ...current, city: '' };
+        });
+      }
+    } else {
+      setAvailableCities([]);
+      setForm((current) => ({ ...current, city: '' }));
+    }
+  }, [form.state, statesData]);
 
   const updateField = (field) => (event) => {
     const { value } = event.target;
@@ -35,8 +53,30 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    navigate('/vendor-signup-flow?step=1', { replace: true });
+    console.log('Form Submitted Data:', form);
+    // Pass the initial signup form data via navigation state
+    // so it is accessible in all subsequent steps
+    navigate('/vendor-signup-flow?step=1', {
+      replace: true,
+      state: { vendorSignupInitialData: form },
+    });
   };
+
+  const categoryOptions = cleanCategories.map((cat) => ({
+    label: cat.name,
+    value: cat.id || cat._id || cat.name,
+  }));
+
+  const stateOptions =
+    statesData?.data?.map((st) => ({
+      label: st.name,
+      value: st.id,
+    })) || [];
+
+  const cityOptions = availableCities.map((ct) => ({
+    label: ct.name,
+    value: ct.id,
+  }));
 
   const RightContent = (
     <div className='w-full max-w-162.5'>
@@ -49,7 +89,7 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
         </p>
       </header>
 
-      <div className='mt-10 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea] '>
+      <div className='mt-10 rounded-3xl border border-[#e9eaeb] bg-[#f4f0ea]'>
         <div className='grid grid-cols-2 gap-2'>
           <button
             type='button'
@@ -110,9 +150,28 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 value={form.email}
                 onChange={updateField('email')}
               />
+              <DropdownField
+                label='State'
+                value={form.state}
+                onChange={updateField('state')}
+                options={stateOptions}
+                disabled={isStatesLoading}
+                placeholder={isStatesLoading ? 'Loading States...' : 'Select State'}
+              />
+            </div>
+
+            <div className='grid gap-3 sm:grid-cols-2'>
+              <DropdownField
+                label='City'
+                value={form.city}
+                onChange={updateField('city')}
+                options={cityOptions}
+                disabled={isStatesLoading || availableCities.length === 0}
+                placeholder={form.state ? 'Select City' : 'Select a State first'}
+              />
               <FormField
-                label='Location'
-                placeholder='Enter your Location here'
+                label='Location / Address'
+                placeholder='Enter street address or area'
                 value={form.location}
                 onChange={updateField('location')}
               />
@@ -122,14 +181,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
               label='Service Category'
               value={form.serviceCategory}
               onChange={updateField('serviceCategory')}
-              options={SERVICE_OPTIONS}
-            />
-
-            <DropdownField
-              label='BARTENDING SPECIALTIES'
-              value={form.bartendingSpecialties}
-              onChange={updateField('bartendingSpecialties')}
-              options={SPECIALTY_OPTIONS}
+              options={categoryOptions}
+              disabled={isCategoriesLoading}
+              placeholder={isCategoriesLoading ? 'Loading Categories...' : 'Select Category'}
             />
           </div>
 
@@ -269,9 +323,28 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                     value={form.email}
                     onChange={updateField('email')}
                   />
+                  <DropdownField
+                    label='State'
+                    value={form.state}
+                    onChange={updateField('state')}
+                    options={stateOptions}
+                    disabled={isStatesLoading}
+                    placeholder={isStatesLoading ? 'Loading States...' : 'Select State'}
+                  />
+                </div>
+
+                <div className='grid gap-3 sm:grid-cols-2'>
+                  <DropdownField
+                    label='City'
+                    value={form.city}
+                    onChange={updateField('city')}
+                    options={cityOptions}
+                    disabled={isStatesLoading || availableCities.length === 0}
+                    placeholder={form.state ? 'Select City' : 'Select a State first'}
+                  />
                   <FormField
-                    label='Location'
-                    placeholder='Enter your Location here'
+                    label='Location / Address'
+                    placeholder='Enter street address or area'
                     value={form.location}
                     onChange={updateField('location')}
                   />
@@ -281,10 +354,10 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                   label='Service Category'
                   value={form.serviceCategory}
                   onChange={updateField('serviceCategory')}
-                  options={SERVICE_OPTIONS}
+                  options={categoryOptions}
+                  disabled={isCategoriesLoading}
+                  placeholder={isCategoriesLoading ? 'Loading Categories...' : 'Select Category'}
                 />
-
-           
               </div>
 
               <button
@@ -294,16 +367,16 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 Create Account
               </button>
 
-            <p className='pt-2 text-center font-raleway text-[14px] text-[#857f7a]'>
-                        Already have an account?{' '}
-                        <button
-                          type='button'
-                          onClick={() => navigate(ROUTES.LOGIN)}
-                          className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
-                        >
-                          Log In
-                        </button>
-                      </p>
+              <p className='pt-2 text-center font-raleway text-[14px] text-[#857f7a]'>
+                Already have an account?{' '}
+                <button
+                  type='button'
+                  onClick={() => navigate(ROUTES.LOGIN)}
+                  className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
+                >
+                  Log In
+                </button>
+              </p>
             </form>
           </div>
         </div>
@@ -325,18 +398,20 @@ const FormField = ({ label, placeholder, value, onChange }) => (
   </label>
 );
 
-const DropdownField = ({ label, value, onChange, options }) => (
+const DropdownField = ({ label, value, onChange, options, disabled, placeholder }) => (
   <label className='block'>
     <span className='mb-2 block font-raleway text-[16px] font-normal uppercase text-[#2d3036]'>{label}</span>
     <div className='relative'>
       <select
         value={value}
         onChange={onChange}
-        className='h-13.5 w-full appearance-none rounded-lg border border-[#2d3036] bg-white px-4 pr-11 font-raleway text-[16px] text-[#2d3036] outline-none focus:border-[#9ca1aa]'
+        disabled={disabled}
+        className='h-13.5 w-full appearance-none rounded-lg border border-[#2d3036] bg-white px-4 pr-11 font-raleway text-[16px] text-[#2d3036] outline-none focus:border-[#9ca1aa] disabled:opacity-60 disabled:bg-gray-50'
       >
+        {placeholder && <option value=''>{placeholder}</option>}
         {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>

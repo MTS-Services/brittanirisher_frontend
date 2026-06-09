@@ -5,14 +5,14 @@ import {
   LandPlot,
   Users,
 } from 'lucide-react';
+import { useGetAdminPaymentCardQuery } from '../../../../store/features/admin/adminDashboard/adminDashboardApi';
+import { SkeletonBlock } from '../../../../components/skeletons/LoadingSkeletons';
 
-const STATS = [
-  { label: 'Total Revenue', value: '$48,250', icon: CircleDollarSign,  },
-  { label: 'This Month', value: '$4,120', icon: CalendarDays, detail: 'May 2026' },
-  { label: 'Annual Revenue', value: '$49,440', icon: LandPlot, detail: 'Projected 2026' },
-  { label: 'Active Plans', value: '182', icon: Users, },
-  { label: 'Expired Plans', value: '23', icon: Clock3, detail: 'Requires attention' },
-];
+const formatCurrency = (value) => {
+  const numeric = Number(value ?? 0);
+  if (!Number.isFinite(numeric)) return '$0';
+  return `$${numeric.toLocaleString('en-US')}`;
+};
 
 const StatCard = ({ label, value, icon: Icon, detail }) => (
   <div className='rounded-xl border border-gray-100 bg-white shadow-sm p-4 h-full'>
@@ -30,11 +30,58 @@ const StatCard = ({ label, value, icon: Icon, detail }) => (
 );
 
 export default function PaymentsStats() {
+  const { data, isLoading } = useGetAdminPaymentCardQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnWindowFocus: true,
+  });
+
+  const paymentCard = data?.data || {};
+
+  const stats = [
+    {
+      label: 'Total Revenue',
+      value: formatCurrency(paymentCard.totalRevenue),
+      icon: CircleDollarSign,
+    },
+    {
+      label: 'This Month',
+      value: formatCurrency(paymentCard.thisMonthRevenue),
+      icon: CalendarDays,
+      detail: 'Current month',
+    },
+    {
+      label: 'Annual Revenue',
+      value: formatCurrency(paymentCard.thisYearRevenue),
+      icon: LandPlot,
+      detail: 'This year',
+    },
+    {
+      label: 'Active Plans',
+      value: String(paymentCard.activePlansCount ?? 0),
+      icon: Users,
+    },
+    {
+      label: 'Expired Plans',
+      value: String(paymentCard.expiredPlansCount ?? 0),
+      icon: Clock3,
+      detail: 'Requires attention',
+    },
+  ];
+
   return (
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5'>
-      {STATS.map((stat) => (
-        <StatCard key={stat.label} {...stat} />
-      ))}
+      {isLoading
+        ? Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={`payment-stat-skeleton-${index}`}
+              className='rounded-xl border border-gray-100 bg-white shadow-sm p-4 h-full'
+            >
+              <SkeletonBlock className='h-4 w-28 rounded' />
+              <SkeletonBlock className='mt-3 h-8 w-24 rounded' />
+              <SkeletonBlock className='mt-2 h-3 w-20 rounded' />
+            </div>
+          ))
+        : stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
     </div>
   );
 }

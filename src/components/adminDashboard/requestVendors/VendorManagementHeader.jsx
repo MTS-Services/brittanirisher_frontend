@@ -18,6 +18,14 @@ export default function VendorManagementHeader({ filter, setFilter }) {
           All
         </button>
         <button
+          onClick={() => setFilter("pending")}
+          className={`px-4 py-2 rounded-lg text-sm ${
+            filter === "pending" ? "bg-[#A7B9A6] text-white" : "text-gray-600"
+          }`}
+        >
+          Pending
+        </button>
+        <button
           onClick={() => setFilter("approved")}
           className={`px-4 py-2 rounded-lg text-sm ${
             filter === "approved" ? "bg-[#A7B9A6] text-white" : "text-gray-600"
@@ -26,12 +34,12 @@ export default function VendorManagementHeader({ filter, setFilter }) {
           Approved
         </button>
         <button
-          onClick={() => setFilter("reject")}
+          onClick={() => setFilter("rejected")}
           className={`px-4 py-2 rounded-lg text-sm ${
-            filter === "reject" ? "bg-[#A7B9A6] text-white" : "text-gray-600"
+            filter === "rejected" ? "bg-[#A7B9A6] text-white" : "text-gray-600"
           }`}
         >
-          Reject
+          Rejected
         </button>
       </div>
     </header>

@@ -159,30 +159,26 @@ const Login = ({ initialMode = 'login' }) => {
     <div className='min-h-dvh overflow-hidden bg-[#f4f0ea] lg:flex'>
       <section className='relative flex min-h-112 items-center justify-center overflow-hidden lg:min-h-dvh lg:flex-[0_0_52%]'>
         <img
-          src='/Elegant_Photography.jpg'
+          src='/Elegant_Photography2.jpg'
           alt='Wedding couple holding hands'
           className='absolute inset-0 h-full w-full object-cover object-center'
         />
         <div className='absolute inset-0 bg-[rgba(30,24,18,0.36)]' />
 
-        <div className='relative z-10 mx-auto flex w-full max-w-130 flex-col items-center px-6 py-12 text-center text-white lg:px-10'>
-          <div className='mb-8 flex items-center justify-center'>
-            <div className='rounded-full bg-white/15 px-4 py-2 text-[12px] uppercase tracking-[0.32em] text-white/85'>
-              Vow &amp; Vendor
-            </div>
-          </div>
+        <div className='relative z-10 mx-auto flex w-full max-w-130 flex-col items-center px-6 py-12 text-center text-white '>
+    
 
-          <div style={{ maxWidth: 420 }}>
-            <h2 className='font-playfair text-[48px] leading-none sm:text-[56px]'>
-              Welcome Back
+          <div className='max-w-5xl'>
+            <h2 className='font-playfair text-3xl md:text-4xl lg:text-5xl font-semibold leading-none '>
+              Begin Your Journey
             </h2>
-            <p className='mx-auto mt-5 font-raleway text-[20px] leading-8 text-white/90'>
-              Sign in to continue managing your account and planning tools.
+            <p className='mx-auto mt-5 font-raleway  text-base md:text-xl max-w-116.25 leading-8 text-white/90'>
+              Plan every detail of your dream wedding with our professional tools and curated vendor connections.
             </p>
           </div>
 
-          <div className='mt-14 flex flex-col items-center gap-4'>
-            <div className='flex items-center justify-center -space-x-3'>
+          <div className='mt-14 flex flex-row items-center gap-4'>
+            <div className='flex  items-center justify-center -space-x-3'>
               {AVATAR_STYLES.map((className, index) => (
                 <div
                   key={className}

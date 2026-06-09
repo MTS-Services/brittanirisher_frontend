@@ -12,7 +12,7 @@ export default function PaymentsHeader({ filter, setFilter }) {
         </p>
       </div>
 
-      <label className="inline-flex items-center gap-2 self-start rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 shadow-sm">
+      {/* <label className="inline-flex items-center gap-2 self-start rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 shadow-sm">
         <Filter size={14} />
         <span>Filter:</span>
         <select
@@ -25,7 +25,7 @@ export default function PaymentsHeader({ filter, setFilter }) {
           <option>Expired</option>
         </select>
         <ChevronDown size={14} className="text-gray-400" />
-      </label>
+      </label> */}
     </div>
   );
 }

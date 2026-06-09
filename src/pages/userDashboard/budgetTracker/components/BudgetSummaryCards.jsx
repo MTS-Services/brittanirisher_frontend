@@ -1,13 +1,39 @@
 import React from 'react';
 import { DollarSign } from 'lucide-react';
-
-const summaryCards = [
-  { title: 'Total Budget', value: '$128,430' },
-  { title: 'Expend Budget', value: '$28,430' },
-  { title: 'Remaining Budget', value: '$100,000' },
-];
+import { useGetCoupleDashboardQuery } from "../../../../store/features/couple/coupleDashboard";
 
 const BudgetSummaryCards = () => {
+  const {
+    data: statusResponse,
+    isLoading: isStatusLoading,
+    isError: isStatusError,
+    error: statusError,
+  } = useGetCoupleDashboardQuery();
+
+  const statusData = statusResponse?.data;
+    // console.log("================>",statusData);
+
+  const formatCurrency = (value) => {
+    if (value === undefined || value === null) return "$0";
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const summaryCards = [
+    { title: 'Total Budget', value: formatCurrency(statusData?.budget) },
+
+  
+    
+    { title: 'Expend Budget', value: formatCurrency(statusData?.expendBudget) },
+    { title: 'Remaining Budget', value: formatCurrency(statusData?.remainingBudget) },
+  ];
+
+  if (isStatusLoading) return <StatsSkeleton />;
+  if (isStatusError) return <p className="mt-5 text-red-500">Error loading data!</p>;
+
   return (
     <div className='mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3 font-raleway'>
       {summaryCards.map((card) => (
@@ -33,3 +59,15 @@ const BudgetSummaryCards = () => {
 };
 
 export default BudgetSummaryCards;
+
+const StatsSkeleton = () => (
+  <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3 animate-pulse">
+    {[1, 2, 3].map((n) => (
+      <div key={n} className="h-29 rounded-2xl border border-[#00000029] bg-[#ece9e2] p-4">
+        <div className="h-7 w-7 rounded-md bg-[#ece9e2] mb-3"></div>
+        <div className="h-4 w-24 rounded bg-[#ece9e2] mb-2"></div>
+        <div className="h-8 w-32 rounded bg-[#ece9e2]"></div>
+      </div>
+    ))}
+  </div>
+);

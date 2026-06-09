@@ -2,129 +2,92 @@ import React, { useState } from 'react';
 import SavedVendorHeader from './components/SavedVendorHeader';
 import SavedVendorsGrid from './components/SavedVendorsGrid';
 import SavedVendorPagination from './components/SavedVendorPagination';
+import { useGetSaveVendorsQuery } from '../../../store/features/couple/coupleDashboard'; 
 
-const savedVendorData = [
-  {
-    id: 1,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '5 - 128',
-    location: 'San Francisco, CA',
-    priceRange: '$5,500 - $6,000',
-    isFavorite: true,
-  },
-  {
-    id: 2,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '5 - 102',
-    location: 'San Francisco, CA',
-    priceRange: '$5,100 - $5,400',
-    isFavorite: true,
-  },
-  {
-    id: 3,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=600&auto=format&fit=crop&q=80',
-    rating: 4.5,
-    reviews: '4.5 - 95',
-    location: 'San Francisco, CA',
-    priceRange: '$5,200 - $5,600',
-    isFavorite: true,
-  },
-  {
-    id: 4,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '5 - 110',
-    location: 'San Francisco, CA',
-    priceRange: '$5,300 - $5,800',
-    isFavorite: true,
-  },
-  {
-    id: 5,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=600&auto=format&fit=crop&q=80',
-    rating: 4,
-    reviews: '4 - 78',
-    location: 'San Francisco, CA',
-    priceRange: '$5,100 - $5,500',
-    isFavorite: true,
-  },
-  {
-    id: 6,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '5 - 88',
-    location: 'San Francisco, CA',
-    priceRange: '$5,400 - $5,900',
-    isFavorite: true,
-  },
-  {
-    id: 7,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=600&auto=format&fit=crop&q=80',
-    rating: 4.5,
-    reviews: '4.5 - 92',
-    location: 'San Francisco, CA',
-    priceRange: '$5,200 - $5,700',
-    isFavorite: true,
-  },
-  {
-    id: 8,
-    name: 'Bella Flora Studio',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
-    rating: 5,
-    reviews: '5 - 115',
-    location: 'San Francisco, CA',
-    priceRange: '$5,300 - $5,700',
-    isFavorite: true,
-  },
-];
+const SavedVendorsSkeleton = () => (
+  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 animate-pulse">
+    {[...Array(8)].map((_, index) => (
+      <div key={index} className="overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm">
+        <div className="h-48 bg-[#ece9e2]" />
+        
+        <div className="px-3 py-2.5 space-y-3">
+          <div className="h-5 w-3/4 rounded bg-[#ece9e2]" />
+          <div className="h-4 w-1/2 rounded bg-[#ece9e2]" />
+          <div className="space-y-2 pt-1">
+            <div className="h-3.5 w-2/3 rounded bg-[#ece9e2]" />
+            <div className="h-3.5 w-1/2 rounded bg-[#ece9e2]" />
+          </div>
+          <div className="h-8 w-full rounded bg-[#ece9e2] mt-2" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const SavedVendor = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [favorites, setFavorites] = useState(
-    savedVendorData.reduce((acc, vendor) => {
-      acc[vendor.id] = vendor.isFavorite;
-      return acc;
-    }, {})
-  );
-
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(savedVendorData.length / itemsPerPage);
+
+  const { data: responseData, isLoading, isError, error } = useGetSaveVendorsQuery({
+    page: currentPage,
+    limit: itemsPerPage
+  });
+
+  const vendors = responseData?.data || [];
+  const meta = responseData?.meta || {};
+  const totalPages = meta.totalPages || 1;
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (meta.hasPreviousPage) setCurrentPage(currentPage - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (meta.hasNextPage) setCurrentPage(currentPage + 1);
   };
 
+  const [favorites, setFavorites] = useState({});
   const toggleFavorite = (vendorId) => {
-    setFavorites({ ...favorites, [vendorId]: !favorites[vendorId] });
+    setFavorites(prev => ({ ...prev, [vendorId]: !prev[vendorId] }));
   };
+
+  const handleRemoveVendor = (vendorId) => {
+    console.log("Remove vendor ID:", vendorId);
+  };
+
+  if (isError) {
+    return (
+      <div className="text-center py-10 text-red-500 font-raleway">
+        Error: {error?.message || 'Something went wrong'}
+      </div>
+    );
+  }
 
   return (
-    <section className='w-full text-[#171717] font-raleway '>
+    <section className='w-full text-[#171717] font-raleway'>
       <SavedVendorHeader />
-      <SavedVendorsGrid
-        vendors={savedVendorData}
-        favorites={favorites}
-        onToggleFavorite={toggleFavorite}
-      />
-      <SavedVendorPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPrevPage={handlePrevPage}
-        onNextPage={handleNextPage}
-        onPageChange={setCurrentPage}
-      />
+      
+      {isLoading ? (
+        <SavedVendorsSkeleton />
+      ) : vendors.length === 0 ? (
+        <div className="text-center py-10 text-gray-500">No saved vendors found.</div>
+      ) : (
+        <SavedVendorsGrid
+          vendors={vendors}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+          onRemove={handleRemoveVendor}
+        />
+      )}
+
+      {!isLoading && vendors.length > 0 && (
+        <SavedVendorPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrevPage={handlePrevPage}
+          onNextPage={handleNextPage}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </section>
   );
 };

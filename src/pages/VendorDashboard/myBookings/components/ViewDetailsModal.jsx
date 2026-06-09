@@ -1,5 +1,6 @@
-import { Check, Mail, Phone, SquareX, X } from "lucide-react";
+import { Check, Mail, Phone, X } from "lucide-react";
 import ModalShell from "./ModalShell";
+import { SkeletonBlock } from "../../../../components/skeletons/LoadingSkeletons";
 
 const formatModalDate = (dateString) => {
   if (!dateString) {
@@ -16,13 +17,36 @@ const DetailRow = ({ label, value }) => (
   </div>
 );
 
-const ViewDetailsModal = ({ booking, onClose }) => {
-  if (!booking) {
+const ViewDetailsModal = ({
+  booking,
+  onClose,
+  isLoading,
+}) => {
+  if (!booking && !isLoading) {
     return null;
   }
 
   return (
-    <ModalShell onClose={onClose} widthClass="max-w-[585px]">
+    <ModalShell onClose={onClose} widthClass="max-w-[800px]">
+      {isLoading ? (
+        <div className="space-y-5 px-6 py-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <SkeletonBlock className="h-20 w-20 rounded-full" />
+              <div className="space-y-3">
+                <SkeletonBlock className="h-6 w-48" />
+                <SkeletonBlock className="h-4 w-40" />
+                <SkeletonBlock className="h-4 w-44" />
+              </div>
+            </div>
+            <SkeletonBlock className="h-10 w-10 rounded-full" />
+          </div>
+
+          <SkeletonBlock className="h-40 w-full rounded-xl" />
+          <SkeletonBlock className="h-32 w-full rounded-xl" />
+        </div>
+      ) : (
+        <>
       <div className="flex items-start justify-between px-6 pb-4 pt-5">
         <div className="flex items-start gap-4">
           <div className="relative">
@@ -58,39 +82,43 @@ const ViewDetailsModal = ({ booking, onClose }) => {
         </button>
       </div>
 
-      <div className="mx-6 mb-6 rounded-xl border border-[#cfd6ea] p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-[22px] text-[#17305d]">
-            <Check size={18} className="text-[#6f7969]" />
-            <span className="font-playfair">Couple Details</span>
-          </div>
-          <div className="text-[15px] text-[#2b2b2b]">
-            {formatModalDate(booking.weddingDate)}
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-[10px] bg-[#f7f3ea] px-4 py-4">
-          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8f8575]">
-            Venue
-          </p>
-          <p className="mt-1 text-[20px] text-[#2f2f2f]">{booking.venue}</p>
-        </div>
-
-        <div className="mt-3 rounded-xl border border-[#e8edf4] px-4 py-4">
-          <div className="flex items-center gap-2 text-[14px] text-[#7d7d7d]">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-[#91a0b6] text-[12px] text-[#637085]">
-              i
-            </span>
-            <span>Detailed information</span>
+      <div className="mx-4 mb-6">
+        <div className="rounded-xl border border-[#cfd6ea] p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-[22px] text-[#17305d]">
+              <Check size={18} className="text-[#6f7969]" />
+              <span className="font-playfair">Couple Details</span>
+            </div>
+            <div className="text-[15px] text-[#2b2b2b]">
+              {formatModalDate(booking.weddingDate)}
+            </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-4">
-            <DetailRow label="Location" value={booking.location} />
-            <DetailRow label="Package" value={booking.packageName} />
-            <DetailRow label="Price" value={booking.price} />
+          <div className="mt-4 rounded-[10px] bg-[#f7f3ea] px-4 py-4">
+            <p className="text-[11px] uppercase tracking-[0.08em] text-[#8f8575]">
+              Venue
+            </p>
+            <p className="mt-1 text-[20px] text-[#2f2f2f]">{booking.venue}</p>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-[#e8edf4] px-4 py-4">
+            <div className="flex items-center gap-2 text-[14px] text-[#7d7d7d]">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-[#91a0b6] text-[12px] text-[#637085]">
+                i
+              </span>
+              <span>Detailed information</span>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-4">
+              <DetailRow label="Location" value={booking.location} />
+              <DetailRow label="Package" value={booking.packageName} />
+              <DetailRow label="Price" value={booking.price} />
+            </div>
           </div>
         </div>
       </div>
+        </>
+      )}
     </ModalShell>
   );
 };

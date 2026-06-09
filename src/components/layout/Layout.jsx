@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
+import useGlobalGsapAnimations from '../../hooks/useGlobalGsapAnimations';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
+  const contentRef = useRef(null);
+
+  useGlobalGsapAnimations(contentRef);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -88,7 +92,7 @@ const Layout = () => {
 
         {/* Scrollable page area — data-lenis-prevent stops Lenis hijacking this scroll container */}
         <div className='flex-1 min-h-0 overflow-y-auto' data-lenis-prevent>
-          <div className='w-full px-6 py-5 sm:px-8 sm:py-6  lg:py-8'>
+          <div ref={contentRef} className='w-full px-6 py-5 sm:px-8 sm:py-6  lg:py-8'>
             <Outlet />
           </div>
         </div>

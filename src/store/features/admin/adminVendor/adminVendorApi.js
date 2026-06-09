@@ -18,7 +18,7 @@ const adminVendorApi = apiSlice.injectEndpoints({
       invalidatesTags: ['vendor'],
     }),
     deleteVendor: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `/vendor-profiles/${id}`,
         method: 'DELETE',
       }),
