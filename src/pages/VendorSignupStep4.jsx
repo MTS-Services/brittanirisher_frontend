@@ -1,8 +1,10 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { ROUTES } from '../config';
 import { useCreateVendorProfileMutation } from '../store/features/vendor/vendorSignupApi';
+import { loginSuccess } from '../store/slices/authSlice';
 import VendorPricingPlansSection from './VendorDashboard/dashboard/components/VendorPricingPlansSection';
 
 const STORAGE_KEY = 'vendor-signup-flow-draft';
@@ -65,6 +67,7 @@ const resolvePackageIdFromPlan = (plan, fallbackPlanId) => {
 
 const VendorSignupStep4 = ({ formData }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
   const audience = location.state?.audience || 'vendor';
   const vendorSignupInitialData = location.state?.vendorSignupInitialData || {};
@@ -185,13 +188,16 @@ const VendorSignupStep4 = ({ formData }) => {
 
     try {
       const response = await createVendorProfile(body).unwrap();
+      const responseData = response?.data || {};
+      const requiresPayment = Boolean(responseData.requiresPayment);
+
       const redirectUrl =
         response?.url ||
-        response?.data?.url ||
+        responseData?.url ||
         response?.paymentUrl ||
-        response?.data?.paymentUrl ||
+        responseData?.paymentUrl ||
         response?.checkoutUrl ||
-        response?.data?.checkoutUrl;
+        responseData?.checkoutUrl;
 
       try {
         window.sessionStorage.removeItem(STORAGE_KEY);
@@ -199,13 +205,47 @@ const VendorSignupStep4 = ({ formData }) => {
         // Ignore storage cleanup failures.
       }
 
+      if (!requiresPayment) {
+        const createdUser = responseData?.user || response?.user || null;
+        const tokens = responseData?.tokens || response?.tokens || responseData || response || {};
+        const accessToken = tokens?.accessToken || tokens?.token || null;
+        const refreshToken = tokens?.refreshToken || null;
+        const tokenType = tokens?.tokenType || 'Bearer';
+        const expiresIn = tokens?.expiresIn || null;
+
+        if (createdUser && accessToken) {
+          dispatch(
+            loginSuccess({
+              user: createdUser,
+              token: accessToken,
+              accessToken,
+              refreshToken,
+              tokenType,
+              expiresIn,
+            }),
+          );
+        }
+
+        toast.success('Vendor profile created successfully.');
+        navigate(ROUTES.VENDOR_DASHBOARD, { replace: true });
+        return;
+      }
+
       if (redirectUrl) {
         window.location.assign(redirectUrl);
         return;
       }
 
-      toast.success('Profile completed successfully.');
-    //   navigate(`${ROUTES.LOGIN}?audience=${audience}`, { replace: true });
+      const successParams = new URLSearchParams({
+        email: vendorSignupInitialData.email || '',
+        planName: String(plan?.planName || ''),
+        planPrice: String(plan?.priceMonthly || ''),
+        userName: String(vendorSignupInitialData.name || ''),
+      });
+
+      navigate(`${ROUTES.REGISTRATION_SUCCESS}?${successParams.toString()}`, {
+        replace: true,
+      });
     } catch (error) {
       toast.error(
         error?.data?.message || error?.data?.error || 'Failed to complete vendor profile.',
@@ -285,7 +325,7 @@ const VendorSignupStep4 = ({ formData }) => {
           <VendorPricingPlansSection
             title='Select Package to Continue'
             subtitle=''
-            actionLabel='Select Plan '
+            actionLabel='Select Plan'
             submittingLabel={isLoading ? 'Submitting...' : 'Select Plan'}
             onChoosePlan={handleChoosePlan}
           />

@@ -23,12 +23,19 @@ export const authApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
-     createVendorProfile: builder.mutation({
+    createVendorProfile: builder.mutation({
       query: (body) => ({
         url: '/vendor-profiles',
         method: 'POST',
         body, // FormData — do NOT set Content-Type manually
         formData: true, // Custom flag to indicate FormData usage
+      }),
+    }),
+    getTokenByEmail: builder.mutation({
+      query: (body) => ({
+        url: '/auth/get-token',
+        method: 'POST',
+        body,
       }),
     }),
     changePassword: builder.mutation({
@@ -63,5 +70,6 @@ export const {
   useChangePasswordMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,
+  useGetTokenByEmailMutation,
 
 } = authApi;

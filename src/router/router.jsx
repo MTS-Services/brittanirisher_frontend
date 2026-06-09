@@ -207,11 +207,7 @@ const router = createBrowserRouter(
         path={ROUTES.REGISTRATION_SUCCESS}
         element={
           <Suspense fallback={<RouteSkeleton />}>
-            <ProtectedRoute>
-              <VendorOnlyRoute>
                 <RegistrationSuccess />
-              </VendorOnlyRoute>
-            </ProtectedRoute>
           </Suspense>
         }
       />
@@ -220,11 +216,7 @@ const router = createBrowserRouter(
         path={ROUTES.REGISTRATION_CANCEL}
         element={
           <Suspense fallback={<RouteSkeleton />}>
-            <ProtectedRoute>
-              <VendorOnlyRoute>
                 <RegistrationCancel />
-              </VendorOnlyRoute>
-            </ProtectedRoute>
           </Suspense>
         }
       />
