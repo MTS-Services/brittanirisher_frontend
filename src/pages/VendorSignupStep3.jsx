@@ -1,31 +1,26 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Eye, EyeOff } from 'lucide-react';
-import { ROUTES } from '../config';
-import { useCreateVendorProfileMutation } from '../store/features/vendor/vendorSignupApi';
 
 const VendorSignupStep3 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // vendorSignupInitialData contains: name, email, location, state, city, serviceCategory
-  // passed via router state from VendorSignup → Step1 → Step2 → Step3
-  const vendorSignupInitialData = location.state?.vendorSignupInitialData || {};
-
-  const [createVendorProfile, { isLoading }] = useCreateVendorProfileMutation();
+  const audience = location.state?.audience || 'vendor';
 
   const [packages, setPackages] = useState(
     Array.isArray(formData.packages) ? formData.packages : [],
   );
   const [currentPackage, setCurrentPackage] = useState({
-    packageName: '', // ✅ was: name
-    badge: '', // ✅ new field
-    features: [],
-    price: '',
+    packageName: formData.currentPackage?.packageName || '',
+    badge: formData.currentPackage?.badge || '',
+    features: Array.isArray(formData.currentPackage?.features)
+      ? formData.currentPackage.features
+      : [],
+    price: formData.currentPackage?.price || '',
   });
 
   const featuresRef = useRef([]);
-  const [newFeature, setNewFeature] = useState('');
+  const [newFeature, setNewFeature] = useState(formData.newFeature || '');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState(formData.password || '');
@@ -34,9 +29,32 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
   );
   const [error, setError] = useState('');
 
+  const syncDraft = (nextValues = {}) => {
+    onFormChange({
+      ...formData,
+      packages,
+      currentPackage,
+      newFeature,
+      password,
+      confirmPassword,
+      ...nextValues,
+    });
+  };
+
   const handleAddPackage = () => {
     if (currentPackage.packageName && currentPackage.price) {
-      setPackages([...packages, currentPackage]);
+      const nextPackages = [...packages, currentPackage];
+      setPackages(nextPackages);
+      syncDraft({
+        packages: nextPackages,
+        currentPackage: {
+          packageName: '',
+          badge: '',
+          features: [],
+          price: '',
+        },
+        newFeature: '',
+      });
       setCurrentPackage({
         packageName: '',
         badge: '',
@@ -50,10 +68,15 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
   const handleAddFeature = () => {
     const val = newFeature.trim();
     if (!val) return;
-    setCurrentPackage((prev) => ({
-      ...prev,
-      features: [...prev.features, val],
-    }));
+    const nextCurrentPackage = {
+      ...currentPackage,
+      features: [...currentPackage.features, val],
+    };
+    setCurrentPackage(nextCurrentPackage);
+    syncDraft({
+      currentPackage: nextCurrentPackage,
+      newFeature: '',
+    });
     setNewFeature('');
     setTimeout(() => {
       const idx = featuresRef.current.length - 1;
@@ -62,18 +85,22 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
   };
 
   const handleRemoveFeature = (index) => {
-    setCurrentPackage((prev) => ({
-      ...prev,
-      features: prev.features.filter((_, i) => i !== index),
-    }));
+    const nextCurrentPackage = {
+      ...currentPackage,
+      features: currentPackage.features.filter((_, i) => i !== index),
+    };
+    setCurrentPackage(nextCurrentPackage);
+    syncDraft({ currentPackage: nextCurrentPackage });
     featuresRef.current = featuresRef.current.filter((_, i) => i !== index);
   };
 
   const handleRemovePackage = (index) => {
-    setPackages((prev) => prev.filter((_, i) => i !== index));
+    const nextPackages = packages.filter((_, i) => i !== index);
+    setPackages(nextPackages);
+    syncDraft({ packages: nextPackages });
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     setError('');
 
     if (!password || password.length < 6) {
@@ -83,6 +110,34 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
+    }
+
+    const hasCurrentPackageDraft =
+      currentPackage.packageName?.trim() ||
+      currentPackage.badge?.trim() ||
+      currentPackage.price ||
+      (Array.isArray(currentPackage.features) && currentPackage.features.length > 0);
+
+    if (hasCurrentPackageDraft) {
+      if (!currentPackage.packageName?.trim()) {
+        setError('Package name is required.');
+        return;
+      }
+
+      if (!currentPackage.badge?.trim()) {
+        setError('Package badge is required.');
+        return;
+      }
+
+      if (!currentPackage.price || Number.isNaN(Number(currentPackage.price))) {
+        setError('A valid package price is required.');
+        return;
+      }
+
+      if (!Array.isArray(currentPackage.features) || currentPackage.features.length === 0) {
+        setError('Add at least one feature for the current package.');
+        return;
+      }
     }
 
     const stagedPackages = Array.isArray(packages) ? [...packages] : [];
@@ -100,6 +155,8 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
     const updatedFormData = {
       ...formData,
       packages: stagedPackages,
+      currentPackage,
+      newFeature,
       password,
       confirmPassword,
     };
@@ -128,77 +185,28 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
       return;
     }
 
-    const normalizeHighlightedServices = (value) => {
-      if (Array.isArray(value)) {
-        return value.map((item) => String(item || '').trim()).filter(Boolean);
-      }
-
-      if (typeof value === 'string') {
-        return value
-          .split(/\r?\n|,/)
-          .map((item) => item.trim())
-          .filter(Boolean);
-      }
-
-      return [];
-    };
-
-    const highlightedServices = normalizeHighlightedServices(
-      updatedFormData.highlightedServices,
-    );
-
-    const buildVendorFormData = () => {
-      const fd = new FormData();
-
-      // Fields from VendorSignup (step 0) — passed via router state
-      fd.append('name', vendorSignupInitialData.name || '');
-      fd.append('phone', vendorSignupInitialData.phone || '');
-      fd.append('email', vendorSignupInitialData.email || '');
-      fd.append('location', vendorSignupInitialData.location || '');
-      fd.append('stateId', vendorSignupInitialData.state || '');
-      fd.append('cityId', vendorSignupInitialData.city || '');
-      fd.append('categoryId', vendorSignupInitialData.serviceCategory || '');
-
-      // Fields from Step 1
-      fd.append('businessName', updatedFormData.businessName || '');
-      fd.append('highlightedServices', JSON.stringify(highlightedServices));
-      fd.append('experienceYears', updatedFormData.experience || '');
-      fd.append('speciality', updatedFormData.speciality || '');
-      fd.append('aboutMe', updatedFormData.aboutMe || '');
-
-      (updatedFormData.portfolioImages || []).forEach((img) => {
-        if (img instanceof File) {
-          fd.append('images', img);
-        }
-      });
-      fd.append('package', JSON.stringify(cleanPackages));
-      fd.append('password', password);
-      return fd;
-    };
-
-    try {
-      const body = buildVendorFormData();
-      await createVendorProfile(body).unwrap();
-      navigate(ROUTES.LOGIN, { replace: true });
-    } catch (lastError) {
-      console.error('Vendor profile creation failed:', lastError);
-      setError(
-        lastError?.data?.message ||
-          lastError?.data?.error ||
-          'Something went wrong. Please try again.',
-      );
-    }
+    navigate('/vendor-signup-flow?step=4', {
+      state: {
+        ...location.state,
+        audience,
+      },
+    });
   };
 
   const handlePrevious = () => {
     onFormChange({
       ...formData,
       packages,
+      currentPackage,
+      newFeature,
       password,
       confirmPassword,
     });
     navigate('/vendor-signup-flow?step=2', {
-      state: location.state,
+      state: {
+        ...location.state,
+        audience,
+      },
     });
   };
 
@@ -292,19 +300,20 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                 </label>
                 <input
                   type='text'
-                  value={currentPackage.packageName} // ✅ was: currentPackage.name
-                  onChange={(e) =>
-                    setCurrentPackage({
+                  value={currentPackage.packageName}
+                  onChange={(e) => {
+                    const nextCurrentPackage = {
                       ...currentPackage,
                       packageName: e.target.value,
-                    })
-                  }
+                    };
+                    setCurrentPackage(nextCurrentPackage);
+                    syncDraft({ currentPackage: nextCurrentPackage });
+                  }}
                   placeholder='Enter Package Name'
                   className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                 />
               </div>
 
-              {/* ✅ Package Badge — new field */}
               <div className='space-y-2'>
                 <label className='block font-raleway text-[16px] text-[#2d3036]'>
                   Package Badge
@@ -312,12 +321,14 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                 <input
                   type='text'
                   value={currentPackage.badge}
-                  onChange={(e) =>
-                    setCurrentPackage({
+                  onChange={(e) => {
+                    const nextCurrentPackage = {
                       ...currentPackage,
                       badge: e.target.value,
-                    })
-                  }
+                    };
+                    setCurrentPackage(nextCurrentPackage);
+                    syncDraft({ currentPackage: nextCurrentPackage });
+                  }}
                   placeholder='e.g. Best Seller, Popular, Premium'
                   className='h-12 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                 />
@@ -335,14 +346,16 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                         ref={(el) => (featuresRef.current[i] = el)}
                         type='text'
                         value={f}
-                        onChange={(e) =>
-                          setCurrentPackage((prev) => ({
-                            ...prev,
-                            features: prev.features.map((fv, idx) =>
+                        onChange={(e) => {
+                          const nextCurrentPackage = {
+                            ...currentPackage,
+                            features: currentPackage.features.map((fv, idx) =>
                               idx === i ? e.target.value : fv,
                             ),
-                          }))
-                        }
+                          };
+                          setCurrentPackage(nextCurrentPackage);
+                          syncDraft({ currentPackage: nextCurrentPackage });
+                        }}
                         placeholder={`Feature ${i + 1}`}
                         className='flex-1 rounded-lg border border-[#2d3036] bg-white px-4 py-2 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                       />
@@ -360,7 +373,10 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                     <input
                       type='text'
                       value={newFeature}
-                      onChange={(e) => setNewFeature(e.target.value)}
+                      onChange={(e) => {
+                        setNewFeature(e.target.value);
+                        syncDraft({ newFeature: e.target.value });
+                      }}
                       placeholder='Type a feature then click +'
                       className='flex-1 rounded-lg border border-[#2d3036] bg-white px-4 py-2 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                     />
@@ -385,12 +401,14 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
                   <input
                     type='number'
                     value={currentPackage.price}
-                    onChange={(e) =>
-                      setCurrentPackage({
+                    onChange={(e) => {
+                      const nextCurrentPackage = {
                         ...currentPackage,
                         price: e.target.value,
-                      })
-                    }
+                      };
+                      setCurrentPackage(nextCurrentPackage);
+                      syncDraft({ currentPackage: nextCurrentPackage });
+                    }}
                     placeholder='$0.00'
                     className='h-12 flex-1 rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#9ca1aa] focus:outline-none focus:border-[#9f8b79]'
                   />
@@ -518,17 +536,15 @@ const VendorSignupStep3 = ({ formData, onFormChange }) => {
           <div className='flex items-center justify-between gap-4 pt-6'>
             <button
               onClick={handlePrevious}
-              disabled={isLoading}
               className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-6 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed'
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              disabled={isLoading}
               className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#a7b9a6] px-6 font-raleway text-[16px] font-medium text-[#464e46] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed'
             >
-              {isLoading ? 'Submitting...' : 'NEXT'}
+              NEXT
             </button>
           </div>
         </div>

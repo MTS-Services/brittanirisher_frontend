@@ -5,11 +5,25 @@ import { Plus, X, RefreshCw } from 'lucide-react';
 const VendorSignupStep2 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const audience = location.state?.audience || 'vendor';
+  const [error, setError] = useState('');
+
+  const getPreviewSource = (item) => {
+    if (typeof item === 'string') {
+      return item;
+    }
+
+    if (item && typeof item === 'object' && item.dataUrl) {
+      return item.dataUrl;
+    }
+
+    return URL.createObjectURL(item);
+  };
 
   const fileInputRef = useRef(null);
   const [previews, setPreviews] = useState(() => {
     const imgs = formData.portfolioImages || [];
-    return imgs.map((item) => (typeof item === 'string' ? item : URL.createObjectURL(item)));
+    return imgs.map((item) => getPreviewSource(item));
   });
   const createdURLsRef = useRef([]);
   const replaceFileInputRef = useRef(null);
@@ -34,6 +48,7 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
   const handleReplaceFileChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
+    setError('');
     const idx = replaceIndexRef.current;
     const portfolioImages = [...(formData.portfolioImages || [])];
     // revoke old preview URL if we created it
@@ -59,11 +74,11 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
     // If parent provides initial images (strings or Files), ensure previews reflect them
     if (formData.portfolioImages && formData.portfolioImages.length > 0) {
       const imgs = formData.portfolioImages.map((item) =>
-        typeof item === 'string' ? item : URL.createObjectURL(item)
+        getPreviewSource(item)
       );
       // track only those we created in this effect so we can revoke later
       imgs.forEach((url, i) => {
-        if (typeof formData.portfolioImages[i] !== 'string') createdURLsRef.current.push(url);
+        if (formData.portfolioImages[i] instanceof File) createdURLsRef.current.push(url);
       });
       setPreviews(imgs);
     }
@@ -76,16 +91,28 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
   }, []);
 
   const handleNext = () => {
+    if (!formData.portfolioImages || formData.portfolioImages.length === 0) {
+      setError('Please upload at least one portfolio image to continue.');
+      return;
+    }
+
     // Forward the vendorSignupInitialData through navigation state
+    setError('');
     onFormChange({ ...formData, portfolioImages: formData.portfolioImages || [] });
     navigate('/vendor-signup-flow?step=3', {
-      state: location.state,
+      state: {
+        ...location.state,
+        audience,
+      },
     });
   };
 
   const handlePrevious = () => {
     navigate('/vendor-signup-flow?step=1', {
-      state: location.state,
+      state: {
+        ...location.state,
+        audience,
+      },
     });
   };
 
@@ -241,7 +268,13 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
           </div>
 
           {/* Navigation Buttons */}
-          <div className='flex items-center justify-between gap-4 pt-6'>
+          <div className='space-y-4 pt-6'>
+            {error && (
+              <p className='rounded-lg border border-red-200 bg-red-50 px-4 py-3 font-raleway text-[14px] text-red-600'>
+                {error}
+              </p>
+            )}
+            <div className='flex items-center justify-between gap-4'>
             <button
               onClick={handlePrevious}
               className='flex py-2.5 items-center justify-center rounded-[10px] bg-[#e8ded2] px-4 font-raleway text-[16px] font-medium text-[#615d58] transition-transform hover:-translate-y-0.5'
@@ -254,6 +287,7 @@ const VendorSignupStep2 = ({ formData, onFormChange }) => {
             >
               NEXT
             </button>
+            </div>
           </div>
         </div>
       </section>

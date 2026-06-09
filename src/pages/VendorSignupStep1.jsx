@@ -1,23 +1,55 @@
 import React from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const VendorSignupStep1 = ({ formData, onFormChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const audience = location.state?.audience || 'vendor';
+  const [error, setError] = useState('');
 
   const handleChange = (field) => (e) => {
     onFormChange({ ...formData, [field]: e.target.value });
   };
 
   const handleNext = () => {
+    if (!formData.businessName?.trim()) {
+      setError('Business name is required.');
+      return;
+    }
+
+    if (!formData.highlightedServices?.trim()) {
+      setError('Highlighted services are required.');
+      return;
+    }
+
+    if (!formData.experience?.trim()) {
+      setError('Experience is required.');
+      return;
+    }
+
+    if (!formData.speciality?.trim()) {
+      setError('Speciality is required.');
+      return;
+    }
+
+    if (!formData.aboutMe?.trim()) {
+      setError('About me is required.');
+      return;
+    }
+
+    setError('');
     // Forward the vendorSignupInitialData through navigation state
     navigate('/vendor-signup-flow?step=2', {
-      state: location.state,
+      state: {
+        ...location.state,
+        audience,
+      },
     });
   };
 
   const handlePrevious = () => {
-    navigate('/signup');
+    navigate(`/signup?audience=${audience}`);
   };
 
   return (
@@ -79,6 +111,12 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
           <div className='border-b border-black/10 pb-2'>
             <p className='font-raleway text-[16px] font-medium text-[#090909]'>Profile Completion</p>
           </div>
+
+          {error && (
+            <p className='rounded-lg border border-red-200 bg-red-50 px-4 py-3 font-raleway text-[14px] text-red-600'>
+              {error}
+            </p>
+          )}
 
           <form className='space-y-6'>
             {/* Business Name */}

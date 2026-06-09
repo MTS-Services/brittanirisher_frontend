@@ -68,7 +68,10 @@ const VendorSignup = ({
     // so it is accessible in all subsequent steps
     navigate('/vendor-signup-flow?step=1', {
       replace: true,
-      state: { vendorSignupInitialData: form },
+      state: {
+        vendorSignupInitialData: form,
+        audience,
+      },
     });
   };
 
@@ -130,7 +133,7 @@ const VendorSignup = ({
         <div className='flex items-center gap-8 border-b border-black/20 text-[16px] font-medium text-[#6b6b6b]'>
           <button
             type='button'
-            onClick={() => navigate(ROUTES.LOGIN)}
+            onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
             className='pb-4 font-raleway transition-colors hover:text-[#090909]'
           >
             Login
@@ -223,8 +226,8 @@ const VendorSignup = ({
             <span>Already have an account?</span>
             <button
               type='button'
-              onClick={() => navigate(ROUTES.LOGIN)}
-              className='text-[20px] text-[#090909] underline decoration-[#090909] underline-offset-4'
+              onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
+              className='text-[16px] text-[#090909] underline decoration-[#090909] underline-offset-4'
             >
               Log In
             </button>
@@ -330,7 +333,7 @@ const VendorSignup = ({
             <div className='flex items-center gap-8 border-b border-black/20 text-[16px] font-medium text-[#6b6b6b]'>
               <button
                 type='button'
-                onClick={() => navigate(ROUTES.LOGIN)}
+                onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
                 className='pb-4 font-raleway transition-colors hover:text-[#090909]'
               >
                 Login
@@ -423,7 +426,7 @@ const VendorSignup = ({
                 Already have an account?{' '}
                 <button
                   type='button'
-                  onClick={() => navigate(ROUTES.LOGIN)}
+                  onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
                   className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
                 >
                   Log In

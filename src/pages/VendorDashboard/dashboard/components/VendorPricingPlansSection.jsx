@@ -5,7 +5,13 @@ import { PricingSkeleton } from '../../../../components/skeletons/LoadingSkeleto
 import { useGetSubscriptionPlansQuery } from '../../../../store/features/public/publicApi';
 import { useUpdateSubscriptionMutation } from '../../../../store/features/vendor/vendorDashboardApi';
 
-const VendorPricingCard = memo(({ plan, onChoose, isSubmitting }) => (
+const VendorPricingCard = memo(({
+  plan,
+  onChoose,
+  isSubmitting,
+  actionLabel,
+  submittingLabel,
+}) => (
   <article
     data-gsap-card
     className={`relative flex h-full flex-col rounded-lg border p-4 shadow-sm md:p-6 ${
@@ -68,20 +74,26 @@ const VendorPricingCard = memo(({ plan, onChoose, isSubmitting }) => (
         plan.featured ? 'bg-[#c8d2c4] text-[#425044]' : 'bg-[#d6ddcf] text-[#4f5b4d]'
       }`}
     >
-      {isSubmitting ? 'Updating...' : 'Select Plan'}
+      {isSubmitting ? submittingLabel : actionLabel}
     </button>
   </article>
 ));
 
 VendorPricingCard.displayName = 'VendorPricingCard';
 
-const VendorPricingPlansSection = () => {
+const VendorPricingPlansSection = ({
+  title = 'Upgrade Your Plan',
+  subtitle = 'Choose a package and unlock more visibility, better lead quality, and faster growth.',
+  actionLabel = 'Select Plan',
+  submittingLabel = 'Updating...',
+  onChoosePlan,
+}) => {
   const [activePlanId, setActivePlanId] = useState(null);
   const { data, isLoading, error } = useGetSubscriptionPlansQuery();
   const [updateSubscription, { isLoading: isUpdatingSubscription }] = useUpdateSubscriptionMutation();
   const plans = data?.data || [];
 
-  const handleChoosePlan = async (planId) => {
+  const handleChoosePlan = async (planId, plan) => {
     if (!planId) {
       toast.error('Invalid plan id. Please refresh and try again.');
       return;
@@ -89,6 +101,12 @@ const VendorPricingPlansSection = () => {
 
     try {
       setActivePlanId(planId);
+
+      if (onChoosePlan) {
+        await onChoosePlan({ planId, plan });
+        return;
+      }
+
       const response = await updateSubscription({ planId }).unwrap();
       const redirectUrl =
         response?.url ||
@@ -116,9 +134,9 @@ const VendorPricingPlansSection = () => {
     <section data-gsap-reveal className='my-10'>
       <div className='flex flex-wrap items-end justify-between gap-3'>
         <div className='max-w-2xl py-10'>
-          <h2 className='font-playfair text-2xl text-[#171411] sm:text-3xl'>Upgrade Your Plan</h2>
+          <h2 className='font-playfair text-2xl text-[#171411] sm:text-3xl'>{title}</h2>
           <p className='mt-2 max-w-2xl font-raleway text-sm text-[#6c6155] sm:text-base'>
-            Choose a package and unlock more visibility, better lead quality, and faster growth.
+            {subtitle}
           </p>
         </div>
       </div>
@@ -141,8 +159,13 @@ const VendorPricingPlansSection = () => {
                 ...plan,
                 featured: String(plan.planName || '').toLowerCase() === 'professional',
               }}
-              isSubmitting={isUpdatingSubscription && activePlanId === (plan.id || plan._id)}
-              onChoose={() => handleChoosePlan(plan.id || plan._id)}
+              isSubmitting={
+                activePlanId === (plan.id || plan._id) &&
+                (onChoosePlan ? true : isUpdatingSubscription)
+              }
+              onChoose={() => handleChoosePlan(plan.id || plan._id, plan)}
+              actionLabel={actionLabel}
+              submittingLabel={submittingLabel}
             />
           ))}
         </div>

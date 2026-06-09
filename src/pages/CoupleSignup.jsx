@@ -116,7 +116,7 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
     event.preventDefault();
 
     if (audience !== 'couple') {
-      navigate(ROUTES.SIGNUP, { replace: true });
+      navigate(`${ROUTES.SIGNUP}?audience=${audience}`, { replace: true });
       return;
     }
 
@@ -216,7 +216,7 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
       <div className='mt-10 flex items-center gap-8 border-b border-[#cfc7bc]'>
         <button
           type='button'
-          onClick={() => navigate(ROUTES.LOGIN)}
+            onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
           className='pb-4 font-raleway text-[16px] font-medium text-[#857f7a] transition-colors'
         >
           Login
@@ -340,7 +340,7 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
           Already have an account?{' '}
           <button
             type='button'
-            onClick={() => navigate(ROUTES.LOGIN)}
+              onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
             className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
           >
             Log In
@@ -559,7 +559,7 @@ const CoupleSignup = ({ audience = 'couple', onAudienceChange, shellMode = false
               Already have an account?{' '}
               <button
                 type='button'
-                onClick={() => navigate(ROUTES.LOGIN)}
+                onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
                 className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
               >
                 Log In

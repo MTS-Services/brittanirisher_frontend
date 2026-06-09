@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../store/slices/authSlice';
 import { ROUTES } from '../config';
@@ -50,6 +50,7 @@ const roleDashboardMap = {
 
 const Login = ({ initialMode = 'login' }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const [authMode, setAuthMode] = useState(initialMode);
@@ -59,6 +60,13 @@ const Login = ({ initialMode = 'login' }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [login, { isLoading }] = useLoginMutation();
+
+  useEffect(() => {
+    const urlAudience = new URLSearchParams(location.search).get('audience');
+    if (urlAudience === 'vendor' || urlAudience === 'couple') {
+      setAudience(urlAudience);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     setAuthMode(initialMode);
@@ -219,7 +227,12 @@ const Login = ({ initialMode = 'login' }) => {
                   <button
                     key={option.id}
                     type='button'
-                    onClick={() => setAudience(option.id)}
+                    onClick={() => {
+                      setAudience(option.id);
+                      navigate(`${ROUTES.LOGIN}?audience=${option.id}`, {
+                        replace: true,
+                      });
+                    }}
                     className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
                       active
                         ? 'bg-[#e8ded2] text-[#2d3036]'
