@@ -5,9 +5,13 @@ import {
   useGetVendorCalendarQuery,
   useGetVendorPackagesQuery,
   useSaveBulkMonthAvailabilityMutation,
-} from '../../../store/features/vendor/vendorDashboardApi'; 
+} from '../../../store/features/vendor/vendorDashboardApi';
 
-const initialMonth = new Date(2026, 8, 1);
+const today = new Date();
+const currentRealYear = today.getFullYear();
+const currentRealMonth = today.getMonth();
+
+const initialMonth = new Date(currentRealYear, currentRealMonth, 1);
 
 const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -41,9 +45,10 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
   const startOffset = getMondayIndex(firstDay.getDay());
   const endOffset = 42 - (startOffset + lastDay.getDate());
 
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
   const cells = [];
 
-  // Previous Month Offset
   for (let index = startOffset; index > 0; index -= 1) {
     const previousDate = toLocalDate(year, month, 1 - index);
     cells.push({
@@ -55,13 +60,14 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
     });
   }
 
-  // Current Month Days
   for (let day = 1; day <= lastDay.getDate(); day += 1) {
     const currentDate = toLocalDate(year, month, day);
-    const key = dateKey(currentDate); 
+    const key = dateKey(currentDate);
+
+    const compareDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+    const isPastDay = compareDate < startOfToday;
 
     const defaultStatus = 'available';
-
     const apiDayData = apiBookedDays.find((dayData) => getApiDateKey(dayData) === key);
     const apiStatus = normalizeStatus(apiDayData?.status);
 
@@ -70,16 +76,15 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
       day,
       date: currentDate,
       inMonth: true,
-      status: overrides[key] || (apiStatus === 'booked' ? 'booked' : defaultStatus),
+      status: isPastDay ? 'unavailable' : (overrides[key] || (apiStatus === 'booked' ? 'booked' : defaultStatus)),
     });
   }
 
-  // Next Month Offset
   for (let day = 1; day <= endOffset; day += 1) {
     const nextDate = toLocalDate(year, month + 1, day);
     cells.push({
       key: dateKey(nextDate),
-      day,
+      day: nextDate.getDate(),
       date: nextDate,
       inMonth: false,
       status: 'unavailable',
@@ -109,10 +114,10 @@ const AvailabilityLegend = () => (
 const VendorAvailability = () => {
   const [monthDate, setMonthDate] = useState(initialMonth);
   const [overrides, setOverrides] = useState({});
-  const [selectedDate, setSelectedDate] = useState('2026-09-11');
+  const [selectedDate, setSelectedDate] = useState(dateKey(today));
 
   const currentYear = monthDate.getFullYear();
-  const currentMonthValue = monthDate.getMonth() + 1; 
+  const currentMonthValue = monthDate.getMonth() + 1;
 
   const { data: vendorPackagesResponse } = useGetVendorPackagesQuery();
 
@@ -157,7 +162,7 @@ const VendorAvailability = () => {
   const monthLabel = getMonthTitle(monthDate);
 
   const handleDayClick = (cell) => {
-    if (!cell.inMonth) return;
+    if (!cell.inMonth || cell.status === 'unavailable') return;
 
     const nextStatus = cell.status === 'booked' ? 'available' : 'booked';
 
@@ -171,11 +176,16 @@ const VendorAvailability = () => {
   const handleSave = async () => {
     try {
       const bulkPayload = cells
-        .filter(cell => cell.inMonth)
+        .filter(cell => cell.inMonth && cell.status !== 'unavailable')
         .map(cell => ({
           date: cell.key,
           status: cell.status === 'booked' ? 'BOOKED' : 'AVAILABLE'
         }));
+
+      if (bulkPayload.length === 0) {
+        toast.error("No valid future dates found to update.");
+        return;
+      }
 
       await saveBulkMonth(bulkPayload).unwrap();
       const selectedDisplayDate = formatDisplayDate(selectedDate);
@@ -184,7 +194,7 @@ const VendorAvailability = () => {
           ? `Availability published successfully for ${selectedDisplayDate}.`
           : `Availability published successfully for ${monthLabel}.`
       );
-      setOverrides({}); 
+      setOverrides({});
     } catch (error) {
       console.error("Failed to save calendar data: ", error);
       toast.error(error?.data?.message || 'Error updating calendar. Try again.');
@@ -247,11 +257,11 @@ const VendorAvailability = () => {
                       onClick={() => handleDayClick(cell)}
                       className={`relative aspect-square border-r border-b border-[#bfd0b8] text-center transition last:border-r-0 lg:aspect-auto lg:h-22 ${
                         isUnavailable
-                          ? 'bg-[#fafafa] text-[#d4d4d4]'
+                          ? 'bg-[#fafafa] text-[#d4d4d4] cursor-not-allowed'
                           : isBooked
-                            ? 'bg-[#a4b1a0] text-white hover:brightness-[0.98]' 
-                            : 'bg-white text-[#26211f] hover:bg-[#f4f7f2]'       
-                      } ${isSelected ? 'ring-2 ring-inset ring-[#62715f]' : ''}`}
+                            ? 'bg-[#a4b1a0] text-white hover:brightness-[0.98]'
+                            : 'bg-white text-[#26211f] hover:bg-[#f4f7f2]'
+                      } ${isSelected && !isUnavailable ? 'ring-2 ring-inset ring-[#62715f]' : ''}`}
                       disabled={isUnavailable}
                     >
                       <span className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[18px] font-normal leading-none sm:text-[20px] lg:text-[22px]'>

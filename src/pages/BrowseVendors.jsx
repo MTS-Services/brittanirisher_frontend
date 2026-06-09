@@ -17,7 +17,7 @@ const BUDGETS = [
   { label: '$6,000+', min: 6001, max: 999999 }, 
 ];
 
-const VENDORS_PER_PAGE = 12;
+const VENDORS_PER_PAGE = 6;
 
 const BrowseVendorsSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
@@ -107,7 +107,9 @@ const BrowseVendors = memo(() => {
   }, [currentPage, selectedCategory, currentBudgetObj, selectedStateId, selectedStateName, selectedCityName, availability]);
 
   // ── Fetch Server Data ──
-  const { data: vendorsApiResponse, isLoading } = useGetVendorProfilesQuery(queryParams);
+  const { data: vendorsApiResponse, isLoading } = useGetVendorProfilesQuery(queryParams, {
+    refetchOnMountOrArgChange: true,
+  });
 
   const paginatedVendors = vendorsApiResponse?.data || [];
   const metaData = vendorsApiResponse?.meta || {};
@@ -378,11 +380,12 @@ const BrowseVendors = memo(() => {
           </div>
         )}
 
+        
         {!isLoading && totalPages > 1 && (
           <div className="flex items-center justify-center gap-1.5 mt-10 flex-wrap">
             <button 
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} 
-              disabled={!metaData.hasPreviousPage} 
+              disabled={currentPage <= 1} 
               className="px-3 py-1.5 rounded-md border border-[#d4c8bc] bg-white text-[#7a6a5a] text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0e9e1] transition-colors"
             >
               Previous
@@ -392,7 +395,7 @@ const BrowseVendors = memo(() => {
             ) : (
               <button 
                 key={p} 
-                onClick={() => setCurrentPage(p)} 
+                onClick={() => setCurrentPage(Number(p))} 
                 className={`w-8 h-8 rounded-md text-xs font-semibold border transition-colors ${currentPage === p ? 'bg-[#3a3028] border-[#3a3028] text-white' : 'bg-white border-[#d4c8bc] text-[#7a6a5a] hover:bg-[#f0e9e1]'}`}
               >
                 {p}
@@ -400,7 +403,7 @@ const BrowseVendors = memo(() => {
             ))}
             <button 
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} 
-              disabled={!metaData.hasNextPage} 
+              disabled={currentPage >= totalPages} 
               className="px-3 py-1.5 rounded-md border border-[#d4c8bc] bg-white text-[#7a6a5a] text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0e9e1] transition-colors"
             >
               Next

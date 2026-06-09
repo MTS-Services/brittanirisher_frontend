@@ -7,127 +7,144 @@ import ServiceHighlights from "./components/ServiceHighlights";
 import Portfolio from "./components/Portfolio";
 import SubscriptionBanner from "./components/SubscriptionBanner";
 import { ChevronLeft } from "lucide-react";
+import { API_CONFIG } from "../../../config";
+import { useGetAdminVendorByIdQuery } from "../../../store/features/admin/adminVendor/adminVendorApi";
 
-const fallbackVendors = [
-  {
-    id: 1,
-    name: "Grace Photography",
-    category: "Photography",
-    date: "2024-05-10",
-    status: "Approved",
-  },
-];
+const toPublicAssetUrl = (path) => {
+  if (!path) return "";
+  if (String(path).startsWith("http")) return path;
+
+  const base = (API_CONFIG.BASE_URL || "").replace(/\/$/, "");
+  const normalizedPath = String(path).startsWith("/") ? path : `/${path}`;
+  return `${base}${normalizedPath}`;
+};
+
+const formatDate = (value) => {
+  if (!value) return "N/A";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "N/A";
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const splitIntoColumns = (items, columnCount = 3) => {
+  const safeItems = Array.isArray(items) ? items : [];
+  if (!safeItems.length) return [["No service highlights available"]];
+
+  const chunkSize = Math.ceil(safeItems.length / columnCount);
+  const columns = [];
+  for (let index = 0; index < safeItems.length; index += chunkSize) {
+    columns.push(safeItems.slice(index, index + chunkSize));
+  }
+  return columns;
+};
 
 export default function VendorDetails() {
+  const navigate = useNavigate();
   const { vendorId } = useParams();
   const location = useLocation();
 
   const vendorFromState = location.state?.vendor;
-  const parsedId = Number(vendorId);
-  const fallbackVendor =
-    fallbackVendors.find((vendor) => vendor.id === parsedId) ||
-    fallbackVendors[0];
-  const vendor = vendorFromState || fallbackVendor;
+  const selectedVendorId = vendorId || vendorFromState?.id;
 
-  const vendorData = {
-    name: vendor.name,
-    category: vendor.category,
-    location: "Bay Area, California",
-    email: "debra.holt@example.com",
-    phone: "(629) 555-0129",
-  };
+  const { data, isLoading, isError } = useGetAdminVendorByIdQuery(selectedVendorId, {
+    skip: !selectedVendorId,
+    refetchOnMountOrArgChange: true,
+  });
 
-  const packages = [
-    {
-      id: "essential",
-      title: "Essential Package",
-      price: "$1,200",
-      description: "Perfect for intimate weddings.",
-      recommended: false,
-      bullets: [
-        "Full wedding coverage",
-        "1 professional photographer",
-        "150 professionally edited photos",
-        "Private online gallery",
-        "Digital download",
-        "Delivery within 14 days",
-      ],
-    },
-    {
-      id: "premium",
-      title: "Premium Package",
-      price: "$2,500",
-      description: "Best for full-day wedding coverage.",
-      recommended: true,
-      bullets: [
-        "Full wedding coverage",
-        "2 professional photographers",
-        "400 professionally edited photos",
-        "Complimentary engagement session",
-        "Private online gallery",
-        "Sneak peek within 48 hours",
-        "Delivery within 10 days",
-      ],
-    },
-    {
-      id: "luxury",
-      title: "Luxury Package",
-      price: "$1,200",
-      description: "Complete luxury wedding experience.",
-      recommended: false,
-      bullets: [
-        "Full wedding coverage",
-        "2 photographers + 1 videographer",
-        "700+ edited photos",
-        "Engagement session",
-        "Bridal session",
-        "Luxury wedding album",
-        "Drone photography",
-        "Same day teaser",
-        "Delivery within 7 days",
-      ],
-    },
-  ];
+  const vendorProfile = data?.data || vendorFromState?.raw || null;
 
-  const bio = [
-    "At Timeless Moments Photography, we believe every wedding tells a unique love story—and our passion is capturing those unforgettable moments with authenticity and elegance.",
-    "With over 8 years of experience in wedding photography, we specialize in documenting genuine emotions, candid moments, and timeless portraits that couples can cherish forever. From intimate ceremonies to grand celebrations, our goal is to preserve every detail of your special day with creativity and care.",
-    "Our photography style blends modern editorial, candid storytelling, and romantic elegance, ensuring your memories are beautifully captured and delivered in a way that feels personal and timeless.",
-    "Your wedding day happens once—our mission is to make those memories last forever.",
-  ];
+  const vendorName =
+    vendorProfile?.businessName ||
+    vendorProfile?.user?.name ||
+    vendorFromState?.name ||
+    "Unknown Vendor";
+  const categoryName =
+    vendorProfile?.category?.name ||
+    vendorProfile?.category ||
+    vendorFromState?.category ||
+    "N/A";
+  const locationText = vendorProfile?.location || "N/A";
+  const email = vendorProfile?.user?.email || "N/A";
+  const phone = vendorProfile?.phone || "N/A";
 
-  const highlights = [
-    [
-      "Full-day coverage (10+ hours)",
-      "Online gallery with download rights",
-      "Same-day preview photos",
-    ],
-    [
-      "Second photographer included",
-      "Complimentary engagement session",
-      "Professional retouching",
-    ],
-    [
-      "Second photographer included",
-      "Complimentary engagement session",
-      "Professional retouching",
-    ],
-  ];
+  const packageItems = Array.isArray(vendorProfile?.packages)
+    ? vendorProfile.packages
+    : [];
 
-  const portfolio = [
-    "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
-    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=80",
-    "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80",
-    "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80",
-    "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=800&q=80",
-    "https://images.unsplash.com/photo-1621801306185-3079b7b92019?w=800&q=80",
-    "https://images.unsplash.com/photo-1544078751-58fee2e8baa1?w=800&q=80",
-    "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=80",
-    "https://images.unsplash.com/photo-1607583481239-1662cc7e644b?w=800&q=80",
-    "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80",
-    "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800&q=80",
-    "https://images.unsplash.com/photo-1610174092497-6a58eb23ce0d?w=800&q=80",
-  ];
+  const packages = packageItems.map((item, index) => ({
+    id: item.id || `${item.packageName}-${index}`,
+    title: item.packageName || "Package",
+    price: item.price ? `$${item.price}` : "$0",
+    description: item.shortDescription || item.badge || "Custom package",
+    recommended: index === 0,
+    bullets:
+      Array.isArray(item.features) && item.features.length > 0
+        ? item.features
+        : ["No feature listed"],
+  }));
+
+  const aboutText = vendorProfile?.aboutMe
+    ? [vendorProfile.aboutMe]
+    : ["No about information provided."];
+
+  const highlights = splitIntoColumns(vendorProfile?.highlightedServices || []);
+
+  const portfolio = (vendorProfile?.portfolioImages || [])
+    .map((image) => toPublicAssetUrl(image?.mediaUrl))
+    .filter(Boolean);
+
+  const heroImage = toPublicAssetUrl(vendorProfile?.coverImage) || portfolio[0] || "";
+  const heroImages = [toPublicAssetUrl(vendorProfile?.coverImage), ...portfolio].filter(Boolean);
+
+  const bannerPlanName = packageItems[0]?.packageName || "N/A";
+  const bannerPlanPrice = packageItems[0]?.price ? `$${packageItems[0].price}` : "$0";
+  const bannerExpiryDate = formatDate(vendorProfile?.updatedAt);
+
+  if (!selectedVendorId) {
+    return (
+      <div className="min-h-screen space-y-6 font-playfair">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+        >
+          <ChevronLeft size={16} className="mr-1" /> Back
+        </button>
+        <p className="text-sm text-red-600">Vendor id not found.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen space-y-6 font-playfair">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+        >
+          <ChevronLeft size={16} className="mr-1" /> Back
+        </button>
+        <p className="text-sm text-gray-600">Loading vendor details...</p>
+      </div>
+    );
+  }
+
+  if (isError || !vendorProfile) {
+    return (
+      <div className="min-h-screen space-y-6 font-playfair">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+        >
+          <ChevronLeft size={16} className="mr-1" /> Back
+        </button>
+        <p className="text-sm text-red-600">Failed to load vendor details.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen space-y-8 font-playfair">
@@ -140,20 +157,28 @@ export default function VendorDetails() {
       </button>
 
       <SubscriptionBanner
-        vendorName={vendor.name}
-        planName="Starter"
-        planPrice="$79"
-        expiryDate="5/12/2026"
+        vendorName={vendorName}
+        planName={bannerPlanName}
+        planPrice={bannerPlanPrice}
+        expiryDate={bannerExpiryDate}
         description="Manage your subscription, keep your profile active, and continue receiving quality leads from couples searching for vendors like you."
       />
 
-      <HeroSection imageUrl="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80" />
+      <HeroSection
+        imageUrl={heroImage}
+        imageUrls={heroImages}
+        name={vendorName}
+        category={categoryName}
+        location={locationText}
+        email={email}
+        phone={phone}
+      />
       <PackagesGrid packages={packages} />
-      <AboutSection bio={bio} />
+      <AboutSection bio={aboutText} />
       <ServiceHighlights
         highlights={highlights}
-        experience="8 years"
-        specialty="Romantic & Editorial"
+        experience={vendorProfile?.experienceYears || "N/A"}
+        specialty={vendorProfile?.speciality || "N/A"}
       />
       <Portfolio images={portfolio} />
     </div>

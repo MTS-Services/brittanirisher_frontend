@@ -376,12 +376,12 @@ const Login = ({ initialMode = 'login' }) => {
               )}
               {isLoading ? 'Signing in…' : 'Login'}
             </button>
-
+{/* 
             {errors.form && (
               <p className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 font-raleway text-[14px] text-red-700'>
                 {errors.form}
               </p>
-            )}
+            )} */}
 
             {/* <div className='mt-6 space-y-3 border-t border-[#e9eaeb] pt-6'>
               <p className='text-center font-raleway text-[14px] text-[#615d58]'>Or try demo login:</p>

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast"; 
 import { useGetVendorDetailQuery, useSendEnquiryMutation, useGetVendorCalendarQuery } from "../../src/store/features/public/publicApi"; 
-import { useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard"; 
+import { useGetSaveVendorsQuery, useSaveVendorMutation } from "../../src/store/features/couple/coupleDashboard"; 
 import { useSEO } from "../hooks/useSEO";
 import { API_CONFIG } from "../config";
 
@@ -176,6 +176,14 @@ const VendorDetails = () => {
   const enquiryRef = useRef(null);
 
   const { data: response, isLoading, isError } = useGetVendorDetailQuery(id);
+  const { data: savedVendorsResponse } = useGetSaveVendorsQuery(
+    { page: 1, limit: 200 },
+    {
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    },
+  );
   const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
   const [sendEnquiry, { isLoading: isInquiring }] = useSendEnquiryMutation();
   
@@ -209,11 +217,33 @@ const VendorDetails = () => {
     { skip: !id } 
   );
 
+  const savedVendorList = useMemo(() => {
+    const candidates =
+      savedVendorsResponse?.data?.vendors ||
+      savedVendorsResponse?.vendors ||
+      savedVendorsResponse?.data ||
+      [];
+
+    return Array.isArray(candidates) ? candidates : [];
+  }, [savedVendorsResponse]);
+
+  const isVendorSavedFromQuery = useMemo(() => {
+    if (!id) return false;
+
+    return savedVendorList.some((item) => {
+      const savedId =
+        item?.vendorId ||
+        item?.vendor?.id ||
+        item?.vendorProfileId ||
+        item?.id;
+
+      return String(savedId || "") === String(id);
+    });
+  }, [id, savedVendorList]);
+
   useEffect(() => {
-    if (vendor && typeof vendor.isFavorite !== "undefined") {
-      setIsFavorite(vendor.isFavorite);
-    }
-  }, [vendor]);
+    setIsFavorite(isVendorSavedFromQuery);
+  }, [isVendorSavedFromQuery]);
 
   const heroImages = useMemo(() => {
     const arr = [];

@@ -45,7 +45,7 @@ export default function SubscriptionBanner({
             <div className="text-sm text-black">
               Active Package
             </div>
-            <div className="mt-2 text-2xl font-medium text-[#111111]">
+            <div className="mt-2 text-base font-medium text-[#111111]">
               {planName}
             </div>
           </div>
@@ -54,7 +54,7 @@ export default function SubscriptionBanner({
             <div className="text-sm text-black">
               Price
             </div>
-            <div className="mt-2 text-2xl font-medium text-[#111111]">
+            <div className="mt-2 text-base font-medium text-[#111111]">
               {planPrice}
               <span className="ml-1 text-[13px] text-[#7a756f] font-normal">/month</span>
             </div>
@@ -64,19 +64,13 @@ export default function SubscriptionBanner({
             <div className="text-sm text-black">
               Expiry Date
             </div>
-            <div className="mt-2 text-2xl font-medium text-[#111111]">
+            <div className="mt-2 text-base font-medium text-[#111111]">
               {expiryDate}
             </div>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onUpgrade}
-          className="mt-8 inline-flex items-center rounded-xl bg-[#A3B79C] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#8d9f87]"
-        >
-          Upgrade Plan
-        </button>
+  
       </div>
     </section>
   );

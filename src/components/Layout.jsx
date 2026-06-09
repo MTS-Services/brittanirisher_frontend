@@ -145,14 +145,24 @@ const Layout = memo(() => {
                 );
               })}
             </div>
+
+
+
+  {/* <Link
+              to={isAuthenticated ? dashboardRoute : ROUTES.SIGNUP}
+              className='inline-flex items-center gap-2 rounded-sm bg-[#a8baa8] px-4 py-2 text-sm font-medium text-[#4a453d] shadow-md shadow-[#4f5b4d]/20 transition-transform duration-200 hover:-translate-y-0.5'
+            >
+              {isAuthenticated ? 'Dashboard' : 'Sign Up'}
+            </Link> */}
+
             <div className='mt-4 flex gap-3'>
            
               <Link
-                to={ROUTES.SIGNUP}
+              to={isAuthenticated ? dashboardRoute : ROUTES.SIGNUP}
                 onClick={closeMenu}
                 className='inline-flex flex-1 items-center justify-center gap-2 rounded-sm bg-[#4f5b4d] px-4 py-3 text-sm font-medium text-white'
               >
-                Sign Up
+                {isAuthenticated ? 'Dashboard' : 'Sign Up'}
               </Link>
             </div>
           </div>

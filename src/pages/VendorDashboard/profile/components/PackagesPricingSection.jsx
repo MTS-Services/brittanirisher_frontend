@@ -148,7 +148,7 @@ const PackageModal = ({ editPackageId, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-3"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3"
       onClick={onClose}
       role="presentation"
     >

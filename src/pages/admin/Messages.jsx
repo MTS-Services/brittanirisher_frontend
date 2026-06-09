@@ -88,7 +88,7 @@ export default function Messages() {
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900'>Messages</h1>
-          <p className='text-sm text-gray-500 mt-1'>
+          <p className='text-base text-gray-500 mt-1'>
             View and manage all contact messages from users.
           </p>
         </div>
@@ -110,7 +110,6 @@ export default function Messages() {
           <span>Email</span>
           <span>Subject</span>
           <span>Message</span>
-          <span>Status</span>
           <span className='text-right'>Action</span>
         </div>
 
@@ -167,15 +166,6 @@ export default function Messages() {
                     {item.message || '-'}
                   </p>
 
-                  <span
-                    className={`inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-medium ${
-                      item.isRead
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-amber-100 text-amber-700'
-                    }`}
-                  >
-                    {item.isRead ? 'Read' : 'Unread'}
-                  </span>
 
                   <div className='flex justify-end'>
                     <button
@@ -198,7 +188,7 @@ export default function Messages() {
                       </p>
                       <p className='text-xs text-gray-500'>{item.email || '-'}</p>
                     </div>
-                    <span
+                    {/* <span
                       className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[11px] font-medium ${
                         item.isRead
                           ? 'bg-emerald-100 text-emerald-700'
@@ -206,12 +196,12 @@ export default function Messages() {
                       }`}
                     >
                       {item.isRead ? 'Read' : 'Unread'}
-                    </span>
+                    </span> */}
                   </div>
 
-                  <p className='text-xs font-medium text-gray-700'>
+                  {/* <p className='text-xs font-medium text-gray-700'>
                     {item.subject || '-'}
-                  </p>
+                  </p> */}
                   <p className='text-sm text-gray-600 leading-6'>{item.message || '-'}</p>
 
                   <div className='flex items-center justify-between gap-2 pt-1'>

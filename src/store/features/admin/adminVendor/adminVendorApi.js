@@ -9,6 +9,13 @@ const adminVendorApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['vendor'],
     }),
+    getAdminVendorById: builder.query({
+      query: (id) => ({
+        url: `/vendor-profiles/${id}`,
+        method: 'GET',
+      }),
+      providesTags: (_result, _error, id) => [{ type: 'vendor', id }],
+    }),
     updateVendorStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/vendor-profiles/status/${id}`,
@@ -29,6 +36,7 @@ const adminVendorApi = apiSlice.injectEndpoints({
 
 export const {
   useGetAdminVendorQuery,
+  useGetAdminVendorByIdQuery,
   useUpdateVendorStatusMutation,
   useDeleteVendorMutation,
 } = adminVendorApi;
