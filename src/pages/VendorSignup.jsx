@@ -2,13 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { ROUTES } from '../config';
-import { useGetCategoriesQuery, useGetStatesQuery } from '../../src/store/features/couple/coupleDashboard';
+import {
+  useGetCategoriesQuery,
+  useGetStatesQuery,
+} from '../../src/store/features/couple/coupleDashboard';
 
-const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false }) => {
+const VendorSignup = ({
+  audience = 'vendor',
+  onAudienceChange,
+  shellMode = false,
+}) => {
   const navigate = useNavigate();
 
   // API Calls
-  const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const { data: categoriesData, isLoading: isCategoriesLoading } =
+    useGetCategoriesQuery();
   const { data: statesData, isLoading: isStatesLoading } = useGetStatesQuery();
 
   const [form, setForm] = useState({
@@ -27,8 +35,8 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
   const cleanCategories = Array.isArray(categoriesData)
     ? categoriesData
     : categoriesData?.data && Array.isArray(categoriesData.data)
-    ? categoriesData.data
-    : [];
+      ? categoriesData.data
+      : [];
 
   useEffect(() => {
     if (form.state && statesData?.data) {
@@ -36,7 +44,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
       if (selectedStateObj && selectedStateObj.cities) {
         setAvailableCities(selectedStateObj.cities);
         setForm((current) => {
-          const hasCity = selectedStateObj.cities.some((city) => city.id === current.city);
+          const hasCity = selectedStateObj.cities.some(
+            (city) => city.id === current.city,
+          );
           return hasCity ? current : { ...current, city: '' };
         });
       }
@@ -95,7 +105,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
             type='button'
             onClick={() => onAudienceChange('couple')}
             className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-              audience === 'couple' ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+              audience === 'couple'
+                ? 'bg-[#e8ded2] text-[#2d3036]'
+                : 'bg-transparent text-[#090909]'
             }`}
           >
             Couple
@@ -104,7 +116,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
             type='button'
             onClick={() => onAudienceChange('vendor')}
             className={`rounded-[47px] px-4 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-              audience === 'vendor' ? 'bg-[#e8ded2] text-[#2d3036]' : 'bg-transparent text-[#090909]'
+              audience === 'vendor'
+                ? 'bg-[#e8ded2] text-[#2d3036]'
+                : 'bg-transparent text-[#090909]'
             }`}
           >
             Vendor
@@ -121,7 +135,10 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
           >
             Login
           </button>
-          <button type='button' className='border-b-2 border-[#090909] pb-4 font-raleway text-[#090909]'>
+          <button
+            type='button'
+            className='border-b-2 border-[#090909] pb-4 font-raleway text-[#090909]'
+          >
             Sign Up
           </button>
         </div>
@@ -156,7 +173,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 onChange={updateField('state')}
                 options={stateOptions}
                 disabled={isStatesLoading}
-                placeholder={isStatesLoading ? 'Loading States...' : 'Select State'}
+                placeholder={
+                  isStatesLoading ? 'Loading States...' : 'Select State'
+                }
               />
             </div>
 
@@ -167,7 +186,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 onChange={updateField('city')}
                 options={cityOptions}
                 disabled={isStatesLoading || availableCities.length === 0}
-                placeholder={form.state ? 'Select City' : 'Select a State first'}
+                placeholder={
+                  form.state ? 'Select City' : 'Select a State first'
+                }
               />
               <FormField
                 label='Location / Address'
@@ -183,7 +204,11 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
               onChange={updateField('serviceCategory')}
               options={categoryOptions}
               disabled={isCategoriesLoading}
-              placeholder={isCategoriesLoading ? 'Loading Categories...' : 'Select Category'}
+              placeholder={
+                isCategoriesLoading
+                  ? 'Loading Categories...'
+                  : 'Select Category'
+              }
             />
           </div>
 
@@ -227,7 +252,8 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
               Begin Your Journey
             </h2>
             <p className='font-raleway text-[20px] leading-6 text-white/95'>
-              Plan every detail of your dream wedding with our professional tools and curated vendor connections.
+              Plan every detail of your dream wedding with our professional
+              tools and curated vendor connections.
             </p>
           </div>
 
@@ -237,15 +263,26 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 <div
                   key={label}
                   className='-ml-3 flex h-10.25 w-10.25 items-center justify-center rounded-full border-2 border-white text-[12px] font-semibold text-white shadow-md first:ml-0'
-                  style={{ backgroundColor: ['#b7c3b3', '#d8c3b4', '#cbb7a1', '#9f8b79'][index] }}
+                  style={{
+                    backgroundColor: [
+                      '#b7c3b3',
+                      '#d8c3b4',
+                      '#cbb7a1',
+                      '#9f8b79',
+                    ][index],
+                  }}
                 >
                   {label}
                 </div>
               ))}
             </div>
             <div className='text-left text-white'>
-              <p className='font-raleway text-[24px] font-medium leading-none'>Joined by 10,000+</p>
-              <p className='font-raleway text-[16px] leading-6 text-white/90'>Brides & Vendors</p>
+              <p className='font-raleway text-[24px] font-medium leading-none'>
+                Joined by 10,000+
+              </p>
+              <p className='font-raleway text-[16px] leading-6 text-white/90'>
+                Brides & Vendors
+              </p>
             </div>
           </div>
         </div>
@@ -268,7 +305,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 type='button'
                 onClick={() => onAudienceChange('couple')}
                 className={`rounded-full px-5 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-                  audience === 'couple' ? 'bg-[#e7dccb] text-[#2d2d2d]' : 'bg-transparent text-[#857f7a]'
+                  audience === 'couple'
+                    ? 'bg-[#e7dccb] text-[#2d2d2d]'
+                    : 'bg-transparent text-[#857f7a]'
                 }`}
               >
                 Couple
@@ -277,7 +316,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                 type='button'
                 onClick={() => onAudienceChange('vendor')}
                 className={`rounded-full px-5 py-2.5 text-center font-raleway text-[16px] font-medium transition-colors ${
-                  audience === 'vendor' ? 'bg-[#e7dccb] text-[#2d2d2d]' : 'bg-transparent text-[#857f7a]'
+                  audience === 'vendor'
+                    ? 'bg-[#e7dccb] text-[#2d2d2d]'
+                    : 'bg-transparent text-[#857f7a]'
                 }`}
               >
                 Vendor
@@ -294,7 +335,10 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
               >
                 Login
               </button>
-              <button type='button' className='border-b-2 border-[#090909] pb-4 font-raleway text-[#090909]'>
+              <button
+                type='button'
+                className='border-b-2 border-[#090909] pb-4 font-raleway text-[#090909]'
+              >
                 Sign Up
               </button>
             </div>
@@ -329,7 +373,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                     onChange={updateField('state')}
                     options={stateOptions}
                     disabled={isStatesLoading}
-                    placeholder={isStatesLoading ? 'Loading States...' : 'Select State'}
+                    placeholder={
+                      isStatesLoading ? 'Loading States...' : 'Select State'
+                    }
                   />
                 </div>
 
@@ -340,7 +386,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                     onChange={updateField('city')}
                     options={cityOptions}
                     disabled={isStatesLoading || availableCities.length === 0}
-                    placeholder={form.state ? 'Select City' : 'Select a State first'}
+                    placeholder={
+                      form.state ? 'Select City' : 'Select a State first'
+                    }
                   />
                   <FormField
                     label='Location / Address'
@@ -356,7 +404,11 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
                   onChange={updateField('serviceCategory')}
                   options={categoryOptions}
                   disabled={isCategoriesLoading}
-                  placeholder={isCategoriesLoading ? 'Loading Categories...' : 'Select Category'}
+                  placeholder={
+                    isCategoriesLoading
+                      ? 'Loading Categories...'
+                      : 'Select Category'
+                  }
                 />
               </div>
 
@@ -387,7 +439,9 @@ const VendorSignup = ({ audience = 'vendor', onAudienceChange, shellMode = false
 
 const FormField = ({ label, placeholder, value, onChange }) => (
   <label className='block'>
-    <span className='mb-2 block font-raleway text-[16px] font-normal text-[#2d3036]'>{label}</span>
+    <span className='mb-2 block font-raleway text-[16px] font-normal text-[#2d3036]'>
+      {label}
+    </span>
     <input
       type='text'
       value={value}
@@ -398,9 +452,18 @@ const FormField = ({ label, placeholder, value, onChange }) => (
   </label>
 );
 
-const DropdownField = ({ label, value, onChange, options, disabled, placeholder }) => (
+const DropdownField = ({
+  label,
+  value,
+  onChange,
+  options,
+  disabled,
+  placeholder,
+}) => (
   <label className='block'>
-    <span className='mb-2 block font-raleway text-[16px] font-normal uppercase text-[#2d3036]'>{label}</span>
+    <span className='mb-2 block font-raleway text-[16px] font-normal uppercase text-[#2d3036]'>
+      {label}
+    </span>
     <div className='relative'>
       <select
         value={value}
