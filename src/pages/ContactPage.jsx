@@ -25,7 +25,7 @@ const CONTACT_METHODS = [
     icon: Mail,
     title: "Email Us",
     text: "Send us an email anytime",
-    detail: "hello@vowandvendor.com",
+    detail: "Team@vowandvendor.com",
   },
   {
     icon: MessageCircle,

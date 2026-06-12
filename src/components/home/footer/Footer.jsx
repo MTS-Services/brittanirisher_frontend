@@ -76,7 +76,7 @@ const Footer = memo(() => {
             </h3>
             <ul className="mt-3 md:mt-5 space-y-1.5 md:space-y-2.5 text-sm text-white">
               <li>123 Wedding Lane, Suite 200</li>
-              <li>hello@vowandvendor.com</li>
+              <li>Team@vowandvendor.com</li>
               <li>(555) 012-3456</li>
               <li>Mon - Fri, 9am - 6pm</li>
             </ul>

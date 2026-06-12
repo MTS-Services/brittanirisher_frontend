@@ -14,10 +14,10 @@ const HERO_IMAGE = '/Our_Story.png';
 // decorative flower assets moved into section components when needed
 const TEAM_IMAGE = '/Sarah_Mitchell.png';
 const STORY_IMAGES = [
-  '/Elegant_Photography.jpg',
-  '/Love_Stories.png',
-  '/Sweet_Dreams_Cakes.png',
-  '/dummy-image-square.jpg',
+  '/Wedding celebration.png',
+  '/Happy-couple.png',
+  '/Wedding details.png',
+  '/Wedding-venue.png',
 ];
 
 const STATS = [
