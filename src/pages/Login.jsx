@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../store/slices/authSlice';
 import { ROUTES } from '../config';
@@ -356,12 +356,13 @@ const Login = ({ initialMode = 'login' }) => {
                 />
                 Remember me
               </label>
-              <button
+              <Link
+                to={ROUTES.FORGOT_PASSWORD}
                 type='button'
                 className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
               >
                 Forgot password?
-              </button>
+              </Link>
             </div>
 
             <button
