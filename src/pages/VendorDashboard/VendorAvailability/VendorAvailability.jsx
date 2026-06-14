@@ -43,18 +43,15 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
   const firstDay = toLocalDate(year, month, 1);
   const lastDay = toLocalDate(year, month + 1, 0);
   const startOffset = getMondayIndex(firstDay.getDay());
-  const endOffset = 42 - (startOffset + lastDay.getDate());
 
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   const cells = [];
 
-  for (let index = startOffset; index > 0; index -= 1) {
-    const previousDate = toLocalDate(year, month, 1 - index);
+  for (let index = 0; index < startOffset; index += 1) {
     cells.push({
-      key: dateKey(previousDate),
-      day: previousDate.getDate(),
-      date: previousDate,
+      key: `empty-${index}`,
+      day: null,
       inMonth: false,
       status: 'unavailable',
     });
@@ -67,7 +64,6 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
     const compareDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
     const isPastDay = compareDate < startOfToday;
 
-    const defaultStatus = 'available';
     const apiDayData = apiBookedDays.find((dayData) => getApiDateKey(dayData) === key);
     const apiStatus = normalizeStatus(apiDayData?.status);
 
@@ -76,18 +72,9 @@ const getGridCells = (monthDate, apiBookedDays, overrides) => {
       day,
       date: currentDate,
       inMonth: true,
-      status: isPastDay ? 'unavailable' : (overrides[key] || (apiStatus === 'booked' ? 'booked' : defaultStatus)),
-    });
-  }
-
-  for (let day = 1; day <= endOffset; day += 1) {
-    const nextDate = toLocalDate(year, month + 1, day);
-    cells.push({
-      key: dateKey(nextDate),
-      day: nextDate.getDate(),
-      date: nextDate,
-      inMonth: false,
-      status: 'unavailable',
+      status: isPastDay
+        ? 'unavailable'
+        : (overrides[key] || (apiStatus === 'booked' ? 'booked' : 'available')),
     });
   }
 
@@ -139,13 +126,10 @@ const VendorAvailability = () => {
     );
   }, [vendorPackagesResponse]);
 
-  const { data: apiResponse, isLoading } = useGetVendorCalendarQuery({
-    vendorId: resolvedVendorId,
-    year: currentYear,
-    month: currentMonthValue
-  }, {
-    skip: !resolvedVendorId,
-  });
+  const { data: apiResponse, isLoading } = useGetVendorCalendarQuery(
+    { vendorId: resolvedVendorId, year: currentYear, month: currentMonthValue },
+    { skip: !resolvedVendorId }
+  );
 
   const [saveBulkMonth] = useSaveBulkMonthAvailabilityMutation();
 
@@ -176,14 +160,14 @@ const VendorAvailability = () => {
   const handleSave = async () => {
     try {
       const bulkPayload = cells
-        .filter(cell => cell.inMonth && cell.status !== 'unavailable')
-        .map(cell => ({
+        .filter((cell) => cell.inMonth && cell.status !== 'unavailable')
+        .map((cell) => ({
           date: cell.key,
-          status: cell.status === 'booked' ? 'BOOKED' : 'AVAILABLE'
+          status: cell.status === 'booked' ? 'BOOKED' : 'AVAILABLE',
         }));
 
       if (bulkPayload.length === 0) {
-        toast.error("No valid future dates found to update.");
+        toast.error('No valid future dates found to update.');
         return;
       }
 
@@ -196,7 +180,7 @@ const VendorAvailability = () => {
       );
       setOverrides({});
     } catch (error) {
-      console.error("Failed to save calendar data: ", error);
+      console.error('Failed to save calendar data: ', error);
       toast.error(error?.data?.message || 'Error updating calendar. Try again.');
     }
   };
@@ -205,7 +189,9 @@ const VendorAvailability = () => {
     <div className='w-full text-[#2c241f]'>
       <main className='flex w-full flex-col'>
         <header>
-          <h1 className='mb-3 text-2xl font-playfair text-[#1a1a1a] md:text-4xl'>Set Your Availability</h1>
+          <h1 className='mb-3 font-playfair text-2xl text-[#1a1a1a] md:text-4xl'>
+            Set Your Availability
+          </h1>
           <p className='mt-2.5 font-raleway text-base font-light text-[#606060]'>
             Brides will see your available dates when they browse your profile.
           </p>
@@ -213,18 +199,28 @@ const VendorAvailability = () => {
 
         <section className='mt-8 w-full flex-1'>
           <div className='flex items-center justify-between gap-4'>
-            <h2 className='font-playfair text-2xl leading-none text-[#2b221d] lg:text-3xl'>{monthLabel}</h2>
+            <h2 className='font-playfair text-2xl leading-none text-[#2b221d] lg:text-3xl'>
+              {monthLabel}
+            </h2>
             <div className='flex items-center gap-3'>
               <button
                 type='button'
-                onClick={() => setMonthDate((current) => toLocalDate(current.getFullYear(), current.getMonth() - 1, 1))}
+                onClick={() =>
+                  setMonthDate((current) =>
+                    toLocalDate(current.getFullYear(), current.getMonth() - 1, 1)
+                  )
+                }
                 className='flex h-10 w-10 items-center justify-center rounded-full border border-[#b9c7b1] text-[#2c241f] transition hover:bg-[#f3f6f1]'
               >
                 <ChevronLeft size={22} />
               </button>
               <button
                 type='button'
-                onClick={() => setMonthDate((current) => toLocalDate(current.getFullYear(), current.getMonth() + 1, 1))}
+                onClick={() =>
+                  setMonthDate((current) =>
+                    toLocalDate(current.getFullYear(), current.getMonth() + 1, 1)
+                  )
+                }
                 className='flex h-10 w-10 items-center justify-center rounded-full border border-[#b9c7b1] text-[#2c241f] transition hover:bg-[#f3f6f1]'
               >
                 <ChevronRight size={22} />
@@ -233,12 +229,17 @@ const VendorAvailability = () => {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center h-96 text-gray-400">Loading calendar availability...</div>
+            <div className='flex h-96 items-center justify-center text-gray-400'>
+              Loading calendar availability...
+            </div>
           ) : (
             <div className='mt-5 overflow-hidden rounded-sm border border-[#bfd0b8]'>
               <div className='grid grid-cols-7 border-b border-[#bfd0b8] bg-white'>
                 {weekdayLabels.map((label) => (
-                  <div key={label} className='border-r border-[#bfd0b8] py-3 text-center text-[16px] font-medium tracking-wide text-[#2b221d] sm:py-4 lg:py-5 last:border-r-0'>
+                  <div
+                    key={label}
+                    className='border-r border-[#bfd0b8] py-3 text-center text-[16px] font-medium tracking-wide text-[#2b221d] last:border-r-0 sm:py-4 lg:py-5'
+                  >
                     {label}
                   </div>
                 ))}
@@ -246,6 +247,15 @@ const VendorAvailability = () => {
 
               <div className='grid grid-cols-7'>
                 {cells.map((cell) => {
+                  if (!cell.inMonth) {
+                    return (
+                      <div
+                        key={cell.key}
+                        className='aspect-square border-r border-b border-[#bfd0b8] bg-[#fafafa] last:border-r-0 lg:aspect-auto lg:h-22'
+                      />
+                    );
+                  }
+
                   const isSelected = selectedDate === cell.key;
                   const isBooked = cell.status === 'booked';
                   const isUnavailable = cell.status === 'unavailable';
@@ -257,7 +267,7 @@ const VendorAvailability = () => {
                       onClick={() => handleDayClick(cell)}
                       className={`relative aspect-square border-r border-b border-[#bfd0b8] text-center transition last:border-r-0 lg:aspect-auto lg:h-22 ${
                         isUnavailable
-                          ? 'bg-[#fafafa] text-[#d4d4d4] cursor-not-allowed'
+                          ? 'cursor-not-allowed bg-[#fafafa] text-[#d4d4d4]'
                           : isBooked
                             ? 'bg-[#a4b1a0] text-white hover:brightness-[0.98]'
                             : 'bg-white text-[#26211f] hover:bg-[#f4f7f2]'
@@ -287,7 +297,9 @@ const VendorAvailability = () => {
               className='inline-flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-[#556151] px-4 text-base text-white shadow-[0_6px_16px_rgba(85,97,81,0.25)] transition hover:bg-[#465146] sm:h-16 sm:w-auto sm:min-w-55 sm:px-6'
             >
               <span>Save &amp; Publish</span>
-              <span className='text-base leading-none'><MoveRight size={18} /></span>
+              <span className='text-base leading-none'>
+                <MoveRight size={18} />
+              </span>
             </button>
           </div>
         </section>

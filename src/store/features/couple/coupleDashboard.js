@@ -12,7 +12,7 @@ const CoupledashboardApi = apiSlice.injectEndpoints({
       query: (params = {}) => {
         const resolvedParams = typeof params === "number" ? { page: params } : params;
         const {
-          page = 1, limit = 10, sortBy, sortOrder, search,
+          page = 1, limit = 12, sortBy, sortOrder, search,
           availableDate, minPrice, maxPrice, category, state, city,
         } = resolvedParams;
 
