@@ -7,8 +7,6 @@ import { useCreateVendorProfileMutation } from '../store/features/vendor/vendorS
 import { loginSuccess } from '../store/slices/authSlice';
 import VendorPricingPlansSection from './VendorDashboard/dashboard/components/VendorPricingPlansSection';
 
-const STORAGE_KEY = 'vendor-signup-flow-draft';
-
 const imageItemToFile = (item, fallbackName = 'portfolio-image.jpg') => {
   if (item instanceof File) {
     return item;
@@ -75,21 +73,36 @@ const VendorSignupStep4 = ({ formData }) => {
   const [createVendorProfile, { isLoading }] = useCreateVendorProfileMutation();
 
   const validateFormData = () => {
-    if (!vendorSignupInitialData.name?.trim()) return 'Please complete your name in the first signup page.';
-    if (!vendorSignupInitialData.phone?.trim()) return 'Please complete your phone in the first signup page.';
-    if (!vendorSignupInitialData.email?.trim()) return 'Please complete your email in the first signup page.';
-    if (!vendorSignupInitialData.state) return 'Please select a state in the first signup page.';
-    if (!vendorSignupInitialData.city) return 'Please select a city in the first signup page.';
-    if (!vendorSignupInitialData.location?.trim()) return 'Please complete your location in the first signup page.';
-    if (!vendorSignupInitialData.serviceCategory) return 'Please choose a service category in the first signup page.';
+    if (!vendorSignupInitialData.name?.trim())
+      return 'Please complete your name in the first signup page.';
+    if (!vendorSignupInitialData.phone?.trim())
+      return 'Please complete your phone in the first signup page.';
+    if (!vendorSignupInitialData.email?.trim())
+      return 'Please complete your email in the first signup page.';
+    if (!vendorSignupInitialData.state)
+      return 'Please select a state in the first signup page.';
+    if (!vendorSignupInitialData.city)
+      return 'Please select a city in the first signup page.';
+    if (!vendorSignupInitialData.location?.trim())
+      return 'Please complete your location in the first signup page.';
+    if (!vendorSignupInitialData.serviceCategory)
+      return 'Please choose a service category in the first signup page.';
 
-    if (!formData.businessName?.trim()) return 'Please complete step 1 business name.';
-    if (!formData.highlightedServices?.trim()) return 'Please complete step 1 highlighted services.';
-    if (!formData.experience?.trim()) return 'Please complete step 1 experience.';
-    if (!formData.speciality?.trim()) return 'Please complete step 1 speciality.';
-    if (!formData.aboutMe?.trim()) return 'Please complete step 1 about me section.';
+    if (!formData.businessName?.trim())
+      return 'Please complete step 1 business name.';
+    if (!formData.highlightedServices?.trim())
+      return 'Please complete step 1 highlighted services.';
+    if (!formData.experience?.trim())
+      return 'Please complete step 1 experience.';
+    if (!formData.speciality?.trim())
+      return 'Please complete step 1 speciality.';
+    if (!formData.aboutMe?.trim())
+      return 'Please complete step 1 about me section.';
 
-    if (!Array.isArray(formData.portfolioImages) || formData.portfolioImages.length === 0) {
+    if (
+      !Array.isArray(formData.portfolioImages) ||
+      formData.portfolioImages.length === 0
+    ) {
       return 'Please upload at least one portfolio image in step 2.';
     }
 
@@ -139,7 +152,9 @@ const VendorSignupStep4 = ({ formData }) => {
       badge: String(pkg.badge || '').trim(),
       isActive: true,
       features: Array.isArray(pkg.features)
-        ? pkg.features.map((feature) => String(feature || '').trim()).filter(Boolean)
+        ? pkg.features
+            .map((feature) => String(feature || '').trim())
+            .filter(Boolean)
         : [],
     }));
 
@@ -148,7 +163,9 @@ const VendorSignupStep4 = ({ formData }) => {
         (pkg) => !pkg.packageName || !pkg.badge || !Number.isFinite(pkg.price),
       )
     ) {
-      toast.error('Please fix package information in step 3 before continuing.');
+      toast.error(
+        'Please fix package information in step 3 before continuing.',
+      );
       navigate('/vendor-signup-flow?step=3', {
         state: {
           ...location.state,
@@ -158,7 +175,9 @@ const VendorSignupStep4 = ({ formData }) => {
       return;
     }
 
-    const highlightedServices = normalizeHighlightedServices(formData.highlightedServices);
+    const highlightedServices = normalizeHighlightedServices(
+      formData.highlightedServices,
+    );
 
     const body = new FormData();
     body.append('name', vendorSignupInitialData.name || '');
@@ -199,15 +218,14 @@ const VendorSignupStep4 = ({ formData }) => {
         response?.checkoutUrl ||
         responseData?.checkoutUrl;
 
-      try {
-        window.sessionStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // Ignore storage cleanup failures.
-      }
-
       if (!requiresPayment) {
         const createdUser = responseData?.user || response?.user || null;
-        const tokens = responseData?.tokens || response?.tokens || responseData || response || {};
+        const tokens =
+          responseData?.tokens ||
+          response?.tokens ||
+          responseData ||
+          response ||
+          {};
         const accessToken = tokens?.accessToken || tokens?.token || null;
         const refreshToken = tokens?.refreshToken || null;
         const tokenType = tokens?.tokenType || 'Bearer';
@@ -248,7 +266,9 @@ const VendorSignupStep4 = ({ formData }) => {
       });
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.data?.error || 'Failed to complete vendor profile.',
+        error?.data?.message ||
+          error?.data?.error ||
+          'Failed to complete vendor profile.',
       );
     }
   };
@@ -319,7 +339,9 @@ const VendorSignupStep4 = ({ formData }) => {
             >
               Previous
             </button>
-            <p className='font-raleway text-[14px] text-[#2d3036]'>Step 4 of 4</p>
+            <p className='font-raleway text-[14px] text-[#2d3036]'>
+              Step 4 of 4
+            </p>
           </div>
 
           <VendorPricingPlansSection

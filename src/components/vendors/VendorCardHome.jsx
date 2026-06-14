@@ -8,10 +8,9 @@ const VARIANT_STYLES = {
     article:
       'overflow-hidden rounded-sm bg-white shadow-sm p-4 md:p-5 group cursor-pointer transition-all duration-300 hover:shadow-md border border-neutral-100/50',
     title:
-      'text-base md:text-lg font-serif font-medium text-[#201c18] leading-snug truncate group-hover:text-[#7a6050] transition-colors',
+      'text-base md:text-3xl font-serif font-medium text-[#201c18] leading-snug truncate group-hover:text-[#7a6050] transition-colors',
     category: 'mt-0.5 text-xs font-raleway text-[#606060] tracking-wide',
-    metaRow:
-      'flex items-center justify-between text-sm text-[#6d6357] mt-3 pt-3 border-t border-dashed border-[#e8e0d8]',
+    metaRow: 'flex items-center justify-between text-sm text-[#6d6357] ',
     location:
       'inline-flex items-center gap-1 text-[#5a4a3a] font-raleway font-medium truncate max-w-[60%]',
     price: 'font-serif font-bold text-[#3a2a1a] text-base md:text-lg shrink-0',
@@ -61,20 +60,20 @@ const VendorBadge = ({ badge }) => {
   return null;
 };
 
-const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
+const VendorCardHome = memo(({ vendor, variant = 'grid', onClick }) => {
   const navigate = useNavigate();
   const styles = VARIANT_STYLES[variant] || VARIANT_STYLES.grid;
-
-  console.log('Rendering VendorCard:', vendor);
 
   const imageSrc =
     vendor?.thumbnailImage || vendor?.image || '/dummy-image-square.jpg';
 
   const displayLocation = useMemo(() => {
-    if (vendor?.city && vendor?.state) {
-      return `${vendor.city}, ${vendor.state}`;
-    }
-    return vendor?.location || 'Location N/A';
+    // if (vendor?.city && vendor?.state) {
+    //   return `${vendor.city}, ${vendor.state}`;
+    // }
+    return (
+      `${vendor?.location}, ${vendor.city}, ${vendor.state}` || 'Location N/A'
+    );
   }, [vendor]);
 
   const displayPrice = useMemo(() => {
@@ -131,16 +130,19 @@ const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
         )}
       </div>
 
-      <div className='pt-4'>
-        <div className='flex items-start justify-between gap-2 mb-1'>
+      <div className='pt-4 flex flex-col justify-between gap-3'>
+        <div className='flex items-start justify-between gap-2'>
           <div className='min-w-0 flex-1'>
             <h3 className={styles.title}>
               {vendor?.businessName || vendor?.name}
             </h3>
-            <p className={styles.category}>
-              {vendor?.category || 'Wedding Professional'}
-            </p>
           </div>
+        </div>
+
+        <div className={' flex items-center justify-between gap-1.5'}>
+          <p className={`${styles.category} text-lg`}>
+            {vendor?.category || 'Wedding Professional'}
+          </p>
 
           <div className={styles.rating}>
             <Star size={14} className='fill-[#FFBF10] text-[#FFBF10]' />
@@ -162,6 +164,4 @@ const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
   );
 });
 
-VendorCard.displayName = 'VendorCard';
-
-export default VendorCard;
+export default VendorCardHome;

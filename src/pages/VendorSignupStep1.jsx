@@ -49,7 +49,22 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
   };
 
   const handlePrevious = () => {
-    navigate(`/signup?audience=${audience}`);
+    navigate(`/signup?audience=${audience}`, {
+      state: {
+        audience,
+        vendorSignupFlowDraft: formData,
+        vendorSignupInitialData: {
+          name: formData.name || '',
+          phone: formData.phone || '',
+          email: formData.email || '',
+          state: formData.state || '',
+          city: formData.city || '',
+          location: formData.location || '',
+          serviceCategory: formData.serviceCategory || '',
+          bartendingSpecialties: formData.bartendingSpecialties || '',
+        },
+      },
+    });
   };
 
   return (
@@ -69,7 +84,8 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
               Begin Your Journey
             </h2>
             <p className='font-raleway text-[20px] leading-6 text-white/95'>
-              Plan every detail of your dream wedding with our professional tools and curated vendor connections.
+              Plan every detail of your dream wedding with our professional
+              tools and curated vendor connections.
             </p>
           </div>
 
@@ -79,15 +95,26 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
                 <div
                   key={label}
                   className='-ml-3 flex h-10.25 w-10.25 items-center justify-center rounded-full border-2 border-white text-[12px] font-semibold text-white shadow-md first:ml-0'
-                  style={{ backgroundColor: ['#b7c3b3', '#d8c3b4', '#cbb7a1', '#9f8b79'][index] }}
+                  style={{
+                    backgroundColor: [
+                      '#b7c3b3',
+                      '#d8c3b4',
+                      '#cbb7a1',
+                      '#9f8b79',
+                    ][index],
+                  }}
                 >
                   {label}
                 </div>
               ))}
             </div>
             <div className='text-left text-white'>
-              <p className='font-raleway text-[24px] font-medium leading-none'>Joined by 10,000+</p>
-              <p className='font-raleway text-[16px] leading-6 text-white/90'>Brides & Vendors</p>
+              <p className='font-raleway text-[24px] font-medium leading-none'>
+                Joined by 10,000+
+              </p>
+              <p className='font-raleway text-[16px] leading-6 text-white/90'>
+                Brides & Vendors
+              </p>
             </div>
           </div>
         </div>
@@ -101,7 +128,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
               <h1 className='font-playfair text-2xl leading-none text-[#070707] sm:text-3xl'>
                 Complete your Profile
               </h1>
-              <p className='font-raleway text-[14px] text-[#2d3036]'>Step 1 of 3</p>
+              <p className='font-raleway text-[14px] text-[#2d3036]'>
+                Step 1 of 3
+              </p>
             </div>
             <p className='font-raleway text-base md:text-xl leading-6 text-[#615d58]'>
               Please enter your details to continue.
@@ -109,7 +138,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
           </header>
 
           <div className='border-b border-black/10 pb-2'>
-            <p className='font-raleway text-[16px] font-medium text-[#090909]'>Profile Completion</p>
+            <p className='font-raleway text-[16px] font-medium text-[#090909]'>
+              Profile Completion
+            </p>
           </div>
 
           {error && (
@@ -121,7 +152,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
           <form className='space-y-6'>
             {/* Business Name */}
             <div className='space-y-1'>
-              <label className='block font-raleway text-[16px] text-[#2d3036]'>Business Name</label>
+              <label className='block font-raleway text-[16px] text-[#2d3036]'>
+                Business Name
+              </label>
               <input
                 type='text'
                 value={formData.businessName || ''}
@@ -133,7 +166,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
 
             {/* Highlighted Services */}
             <div className='space-y-1'>
-              <label className='block font-raleway text-[16px] text-[#2d3036]'>Highlighted Services</label>
+              <label className='block font-raleway text-[16px] text-[#2d3036]'>
+                Highlighted Services
+              </label>
               <textarea
                 value={formData.highlightedServices || ''}
                 onChange={handleChange('highlightedServices')}
@@ -145,7 +180,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
 
             {/* Experience */}
             <div className='space-y-1'>
-              <label className='block font-raleway text-[16px] text-[#2d3036]'>Experience</label>
+              <label className='block font-raleway text-[16px] text-[#2d3036]'>
+                Experience
+              </label>
               <input
                 type='text'
                 value={formData.experience || ''}
@@ -157,7 +194,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
 
             {/* Speciality */}
             <div className='space-y-1'>
-              <label className='block font-raleway text-[16px] text-[#2d3036]'>Speciality</label>
+              <label className='block font-raleway text-[16px] text-[#2d3036]'>
+                Speciality
+              </label>
               <input
                 type='text'
                 value={formData.speciality || ''}
@@ -169,7 +208,9 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
 
             {/* About Me */}
             <div className='space-y-1'>
-              <label className='block font-raleway text-[16px] text-[#2d3036]'>About Me</label>
+              <label className='block font-raleway text-[16px] text-[#2d3036]'>
+                About Me
+              </label>
               <textarea
                 value={formData.aboutMe || ''}
                 onChange={handleChange('aboutMe')}

@@ -1,112 +1,113 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense } from 'react';
 import {
   createBrowserRouter,
   createRoutesFromElements,
   Navigate,
   Route,
   useLocation,
-} from "react-router-dom";
-import { useSelector } from "react-redux";
-import Layout from "../components/Layout";
-import AdminLayout from "../components/layout/Layout";
-import DummyRoutePage from "../components/DummyRoutePage";
-import { RouteSkeleton } from "../components/skeletons/LoadingSkeletons";
-import { ROUTES } from "../config";
-import { selectIsAuthenticated, selectUser } from "../store/slices/authSlice";
-import NotFound from "../pages/NotFound";
-import ForgotPassword from "../pages/ForgotPassword";
-import OtpVerify from "../pages/OtpVerify";
-import ResetPassword from "../pages/ResetPassword";
+} from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Layout from '../components/Layout';
+import AdminLayout from '../components/layout/Layout';
+import DummyRoutePage from '../components/DummyRoutePage';
+import { RouteSkeleton } from '../components/skeletons/LoadingSkeletons';
+import { ROUTES } from '../config';
+import { selectIsAuthenticated, selectUser } from '../store/slices/authSlice';
+import NotFound from '../pages/NotFound';
+import ForgotPassword from '../pages/ForgotPassword';
+import OtpVerify from '../pages/OtpVerify';
+import ResetPassword from '../pages/ResetPassword';
+import PaymentSuccess from '../pages/VendorDashboard/profile/PaymentSuccess';
 
-const Home = lazy(() => import("../components/home/HomeContent"));
-const BrowseVendors = lazy(() => import("../pages/BrowseVendors"));
-const VendorDetails = lazy(() => import("../pages/VendorDetails"));
-const HowItWorks = lazy(() => import("../pages/HowItWorks"));
-const PricingPage = lazy(() => import("../pages/PricingPage"));
-const AboutUsPage = lazy(() => import("../pages/AboutUsPage"));
-const ContactPage = lazy(() => import("../pages/ContactPage"));
-const Login = lazy(() => import("../pages/Login"));
-const Signup = lazy(() => import("../pages/Signup"));
-const VendorSignupFlow = lazy(() => import("../pages/VendorSignupFlow"));
+const Home = lazy(() => import('../components/home/HomeContent'));
+const BrowseVendors = lazy(() => import('../pages/BrowseVendors'));
+const VendorDetails = lazy(() => import('../pages/VendorDetails'));
+const HowItWorks = lazy(() => import('../pages/HowItWorks'));
+const PricingPage = lazy(() => import('../pages/PricingPage'));
+const AboutUsPage = lazy(() => import('../pages/AboutUsPage'));
+const ContactPage = lazy(() => import('../pages/ContactPage'));
+const Login = lazy(() => import('../pages/Login'));
+const Signup = lazy(() => import('../pages/Signup'));
+const VendorSignupFlow = lazy(() => import('../pages/VendorSignupFlow'));
 
-const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
+const Dashboard = lazy(() => import('../pages/admin/dashboard/Dashboard'));
 const VendorDetailsAdmin = lazy(
-  () => import("../pages/admin/dashboard/VendorDetails"),
+  () => import('../pages/admin/dashboard/VendorDetails'),
 );
 const VendorDashboard = lazy(
-  () => import("../pages/VendorDashboard/dashboard/VendorDashboard"),
+  () => import('../pages/VendorDashboard/dashboard/VendorDashboard'),
 );
 const VendorLeads = lazy(
-  () => import("../pages/VendorDashboard/VendorLeads/VendorLeads"),
+  () => import('../pages/VendorDashboard/VendorLeads/VendorLeads'),
 );
 const VendorBookings = lazy(
-  () => import("../pages/VendorDashboard/myBookings/VendorBookings"),
+  () => import('../pages/VendorDashboard/myBookings/VendorBookings'),
 );
 const VendorAvailability = lazy(
   () =>
-    import("../pages/VendorDashboard/VendorAvailability/VendorAvailability"),
+    import('../pages/VendorDashboard/VendorAvailability/VendorAvailability'),
 );
 const VendorPricing = lazy(
-  () => import("../pages/VendorDashboard/pricing/VendorPricing"),
+  () => import('../pages/VendorDashboard/pricing/VendorPricing'),
 );
 const VendorPaymentSuccess = lazy(
-  () => import("../pages/VendorDashboard/pricing/VendorPaymentSuccess"),
+  () => import('../pages/VendorDashboard/pricing/VendorPaymentSuccess'),
 );
 const VendorBillingRedirect = lazy(
-  () => import("../pages/VendorDashboard/pricing/VendorBillingRedirect"),
+  () => import('../pages/VendorDashboard/pricing/VendorBillingRedirect'),
 );
 const RegistrationSuccess = lazy(
-  () => import("../pages/VendorDashboard/pricing/RegistrationSuccess"),
+  () => import('../pages/VendorDashboard/pricing/RegistrationSuccess'),
 );
 const RegistrationCancel = lazy(
-  () => import("../pages/VendorDashboard/pricing/RegistrationCancel"),
+  () => import('../pages/VendorDashboard/pricing/RegistrationCancel'),
 );
 const VendorProfile = lazy(
-  () => import("../pages/VendorDashboard/profile/VendorProfile"),
+  () => import('../pages/VendorDashboard/profile/VendorProfile'),
 );
 const UserDashboard = lazy(
-  () => import("../pages/userDashboard/dashboard/UserDashboard"),
+  () => import('../pages/userDashboard/dashboard/UserDashboard'),
 );
 const UserBudgetTracker = lazy(
-  () => import("../pages/userDashboard/budgetTracker/BudgetTracker"),
+  () => import('../pages/userDashboard/budgetTracker/BudgetTracker'),
 );
 const UserChecklist = lazy(
-  () => import("../pages/userDashboard/checklist/Checklist"),
+  () => import('../pages/userDashboard/checklist/Checklist'),
 );
 const UserTimeline = lazy(
-  () => import("../pages/userDashboard/timeline/Timeline"),
+  () => import('../pages/userDashboard/timeline/Timeline'),
 );
 const UserMatchVendor = lazy(
-  () => import("../pages/userDashboard/matchVendor/MatchVendor"),
+  () => import('../pages/userDashboard/matchVendor/MatchVendor'),
 );
 const UserSavedVendor = lazy(
-  () => import("../pages/userDashboard/savedVendor/SavedVendor"),
+  () => import('../pages/userDashboard/savedVendor/SavedVendor'),
 );
 const UserProfile = lazy(
-  () => import("../pages/userDashboard/profile/Profile"),
+  () => import('../pages/userDashboard/profile/Profile'),
 );
-const Emails = lazy(() => import("../pages/admin/Emails"));
-const Leads = lazy(() => import("../pages/admin/Leads"));
-const Orders = lazy(() => import("../pages/admin/Orders"));
+const Emails = lazy(() => import('../pages/admin/Emails'));
+const Leads = lazy(() => import('../pages/admin/Leads'));
+const Orders = lazy(() => import('../pages/admin/Orders'));
 const MarketplaceOrders = lazy(
-  () => import("../pages/admin/MarketplaceOrders"),
+  () => import('../pages/admin/MarketplaceOrders'),
 );
-const CaseStudies = lazy(() => import("../pages/admin/CaseStudies"));
-const Blog = lazy(() => import("../pages/admin/Blog"));
-const Jobs = lazy(() => import("../pages/admin/Jobs"));
-const Pricing = lazy(() => import("../pages/admin/Pricing"));
+const CaseStudies = lazy(() => import('../pages/admin/CaseStudies'));
+const Blog = lazy(() => import('../pages/admin/Blog'));
+const Jobs = lazy(() => import('../pages/admin/Jobs'));
+const Pricing = lazy(() => import('../pages/admin/Pricing'));
 const RequestedVendors = lazy(
-  () => import("../pages/admin/requestedVendors/RequestedVendors"),
+  () => import('../pages/admin/requestedVendors/RequestedVendors'),
 );
 const UserManagement = lazy(
-  () => import("../pages/admin/userManagement/UserManagement"),
+  () => import('../pages/admin/userManagement/UserManagement'),
 );
-const Payments = lazy(() => import("../pages/admin/payments/Payments"));
-const Settings = lazy(() => import("../pages/admin/settings/Settings"));
-const Profile = lazy(() => import("../pages/admin/profile/components/Profile"));
-const Messages = lazy(() => import("../pages/admin/Messages"));
+const Payments = lazy(() => import('../pages/admin/payments/Payments'));
+const Settings = lazy(() => import('../pages/admin/settings/Settings'));
+const Profile = lazy(() => import('../pages/admin/profile/components/Profile'));
+const Messages = lazy(() => import('../pages/admin/Messages'));
 
-const segFor = (baseRoute) => (route) => route.replace(`${baseRoute}/`, "");
+const segFor = (baseRoute) => (route) => route.replace(`${baseRoute}/`, '');
 const adminSeg = segFor(ROUTES.ADMIN);
 const vendorSeg = segFor(ROUTES.VENDOR);
 const userSeg = segFor(ROUTES.USER);
@@ -124,9 +125,9 @@ const ProtectedRoute = ({ children }) => {
 
 const VendorOnlyRoute = ({ children }) => {
   const user = useSelector(selectUser);
-  const role = (user?.role || "").toLowerCase();
+  const role = (user?.role || '').toLowerCase();
 
-  if (role !== "vendor") {
+  if (role !== 'vendor') {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 
@@ -135,7 +136,7 @@ const VendorOnlyRoute = ({ children }) => {
 
 const DashboardSection = ({ title, description, bullets }) => (
   <DummyRoutePage
-    eyebrow="Dashboard Section"
+    eyebrow='Dashboard Section'
     title={title}
     description={description}
     bullets={bullets}
@@ -263,7 +264,7 @@ const router = createBrowserRouter(
       />
 
       <Route
-        path="/vendor-signup-flow"
+        path='/vendor-signup-flow'
         element={
           <Suspense fallback={<RouteSkeleton />}>
             <VendorSignupFlow />
@@ -347,6 +348,10 @@ const router = createBrowserRouter(
           path={vendorSeg(ROUTES.VENDOR_PROFILE)}
           element={<VendorProfile />}
         />
+        <Route
+          path={'/vendor/dashboard/payment-success'}
+          element={<PaymentSuccess />}
+        />
       </Route>
 
       <Route
@@ -386,7 +391,7 @@ const router = createBrowserRouter(
         <Route path={userSeg(ROUTES.USER_PROFILE)} element={<UserProfile />} />
       </Route>
 
-      <Route path="*" element={<NotFound />} />
+      <Route path='*' element={<NotFound />} />
     </>,
   ),
 );
