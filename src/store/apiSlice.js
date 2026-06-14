@@ -3,8 +3,7 @@ import { API_CONFIG } from '../config';
 import { logout } from './slices/authSlice';
 
 const baseQuery = fetchBaseQuery({
-  // baseUrl: `${API_CONFIG.BASE_URL}/api/v1`,
-    baseUrl: `http://localhost:3000/api/v1`,
+  baseUrl: `${API_CONFIG.BASE_URL}/api/v1`,
   // credentials: 'omit',
   prepareHeaders: async (headers) => {
     const token =
@@ -33,7 +32,7 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithAuthGuard,
   tagTypes: [
-       'User',
+    'User',
     'vendor',
     'product',
     'order',
@@ -42,8 +41,9 @@ export const apiSlice = createApi({
     'Checklist',
     'Timeline',
     'Schedule',
-    'SaveVendor',      
-    'VendorProfile',,
+    'SaveVendor',
+    'VendorProfile',
+    ,
     'VendorPackages',
     'Enquiries',
     'EnquiryDetails',

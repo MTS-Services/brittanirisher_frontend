@@ -72,9 +72,7 @@ const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
     if (vendor?.city && vendor?.state) {
       return `${vendor.city}, ${vendor.state}`;
     }
-    return (
-      `${vendor?.location}` || 'Location N/A'
-    );
+    return `${vendor?.location}` || 'Location N/A';
   }, [vendor]);
 
   const displayPrice = useMemo(() => {
@@ -149,8 +147,7 @@ const VendorCard = memo(({ vendor, variant = 'grid', onClick }) => {
         </div>
 
         <p className=' text-sm font-raleway text-[#606060] tracking-wide line-clamp-2'>
-          Elegant ballroom venue with stunning chandeliers and classic
-          architecture
+          {vendor?.aboutMe || 'No description available.'}
         </p>
 
         <div className={styles.metaRow}>

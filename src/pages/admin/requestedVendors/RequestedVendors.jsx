@@ -40,7 +40,8 @@ export default function RequestedVendors() {
   const perPage = 10;
 
   const [updateVendorStatus] = useUpdateVendorStatusMutation();
-  const [deleteVendor] = useDeleteVendorMutation();
+  const [deleteVendor, { isLoading: isDeletingVendor }] =
+    useDeleteVendorMutation();
 
   const query = useMemo(() => {
     const params = new URLSearchParams({
@@ -154,10 +155,14 @@ export default function RequestedVendors() {
       try {
         await deleteVendor({ id: vendor.id }).unwrap();
         toast.success('Vendor deleted successfully.');
+        return true;
       } catch (error) {
         toast.error(error?.data?.message || 'Failed to delete vendor.');
+        return false;
       }
     }
+
+    return true;
   };
 
   const toggleMenu = (id, evt) => {
@@ -181,9 +186,7 @@ export default function RequestedVendors() {
   };
 
   const emptyMessage =
-    filter === 'all'
-      ? 'No vendors found.'
-      : `No ${filter} vendors found.`;
+    filter === 'all' ? 'No vendors found.' : `No ${filter} vendors found.`;
 
   return (
     <div className='space-y-8'>
@@ -191,7 +194,6 @@ export default function RequestedVendors() {
         <VendorManagementHeader filter={filter} setFilter={setFilter} />
 
         <div className='bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden'>
-
           <RequestedVendorsTable
             paged={paged}
             openId={openId}
@@ -214,6 +216,7 @@ export default function RequestedVendors() {
             activeMenuRef={activeMenuRef}
             vendors={paged}
             onAction={handleAction}
+            isDeleting={isDeletingVendor}
           />
 
           <RequestedVendorsPagination
