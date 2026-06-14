@@ -52,8 +52,6 @@ const FeaturedVendorsSection = memo(() => {
     );
   }
 
-  console.log('=====================', vendorsData);
-
   return (
     <section id='vendors' className='relative z-0 bg-[#f5f1eb] py-14 sm:py-20'>
       <div className='mx-auto container px-4 sm:px-6 lg:px-8'>
