@@ -8,7 +8,7 @@ const VARIANT_STYLES = {
     article:
       'overflow-hidden rounded-sm bg-white shadow-sm p-4 md:p-5 group cursor-pointer transition-all duration-300 hover:shadow-md border border-neutral-100/50',
     title:
-      'text-base md:text-3xl font-serif font-medium text-[#201c18] leading-snug truncate group-hover:text-[#7a6050] transition-colors',
+      'text-base md:text-xl font-serif font-medium text-[#201c18] leading-snug truncate group-hover:text-[#7a6050] transition-colors',
     category: 'mt-0.5 text-xs font-raleway text-[#606060] tracking-wide',
     metaRow: 'flex items-center justify-between text-sm text-[#6d6357] ',
     location:
