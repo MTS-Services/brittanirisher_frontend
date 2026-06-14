@@ -29,7 +29,7 @@ const MatchVendor = () => {
   // Build query params from APPLIED preferences only
   const queryParams = {
     page: currentPage,
-    limit: 10,
+    limit: 12,
     ...(appliedPreferences.search && { search: appliedPreferences.search }),
     ...(appliedPreferences.state && { state: appliedPreferences.state }),
     ...(appliedPreferences.city && { city: appliedPreferences.city }),
@@ -40,7 +40,6 @@ const MatchVendor = () => {
   };
  
   const { data, isLoading, isFetching, isError } = useGetVendorSuggestedQuery(queryParams);
-  console.log("==================",data);
   
   const vendors = data?.data || [];
   const meta = data?.meta || {};

@@ -17,7 +17,7 @@ const BUDGETS = [
   { label: '$6,000+', min: 6001, max: 999999 }, 
 ];
 
-const VENDORS_PER_PAGE = 6;
+const VENDORS_PER_PAGE = 9;
 
 const BrowseVendorsSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
@@ -277,7 +277,7 @@ const BrowseVendors = memo(() => {
   );
 
   return (
-    <div className="container mx-auto min-h-screen flex items-start relative font-serif">
+    <div className=" max-w-[1400px] mx-auto min-h-screen flex items-start md:gap-10 relative font-serif">
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
@@ -365,7 +365,7 @@ const BrowseVendors = memo(() => {
         {isLoading ? (
           <BrowseVendorsSkeleton />
         ) : paginatedVendors.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {paginatedVendors.map((vendor) => (
               <VendorCard key={vendor.id} vendor={vendor} onClick={() => navigate(`/vendors/${vendor.id}`)} />
             ))}

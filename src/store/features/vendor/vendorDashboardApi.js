@@ -1,39 +1,39 @@
-import { apiSlice } from "../../apiSlice";
+import { apiSlice } from '../../apiSlice';
 
 const vendordashboardApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getVendorStatus: builder.query({
       query: () => ({
         url: `/vendor-profiles/my/profile`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["VendorProfile"],
+      providesTags: ['VendorProfile'],
     }),
 
     getVendodasrhboarStatus: builder.query({
       query: () => ({
         url: `/dashboard/vendor-data`,
-        method: "GET",
+        method: 'GET',
       }),
     }),
 
     getVendorChartData: builder.query({
       query: () => ({
         url: `/dashboard/vendor-chart`,
-        method: "GET",
+        method: 'GET',
       }),
     }),
     getVendorPackages: builder.query({
       query: () => ({
         url: `/vendor-package`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["VendorPackages"],
+      providesTags: ['VendorPackages'],
     }),
     getBookings: builder.query({
       query: ({ page = 1, limit = 10, status } = {}) => ({
         url: `/bookings`,
-        method: "GET",
+        method: 'GET',
         params: {
           page,
           limit,
@@ -43,102 +43,105 @@ const vendordashboardApi = apiSlice.injectEndpoints({
       providesTags: (result) => {
         const bookings = result?.data || [];
         return [
-          "Bookings",
-          ...bookings.map((booking) => ({ type: "BookingDetails", id: booking.id })),
+          'Bookings',
+          ...bookings.map((booking) => ({
+            type: 'BookingDetails',
+            id: booking.id,
+          })),
         ];
       },
     }),
     createBooking: builder.mutation({
       query: (body) => ({
         url: `/bookings`,
-        method: "POST",
+        method: 'POST',
         body,
       }),
-      invalidatesTags: ["Bookings"],
+      invalidatesTags: ['Bookings'],
     }),
     getBookingById: builder.query({
       query: (id) => ({
         url: `/bookings/${id}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: "BookingDetails", id }],
+      providesTags: (result, error, id) => [{ type: 'BookingDetails', id }],
     }),
     updateBooking: builder.mutation({
       query: ({ id, body }) => ({
         url: `/bookings/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body,
       }),
       invalidatesTags: (result, error, { id }) => [
-        "Bookings",
-        { type: "BookingDetails", id },
+        'Bookings',
+        { type: 'BookingDetails', id },
       ],
     }),
     deleteBooking: builder.mutation({
       query: (id) => ({
         url: `/bookings/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
       invalidatesTags: (result, error, id) => [
-        "Bookings",
-        { type: "BookingDetails", id },
+        'Bookings',
+        { type: 'BookingDetails', id },
       ],
     }),
 
     getEnquiries: builder.query({
       query: (page = 1) => ({
         url: `/enquiries?page=${page}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["Enquiries"],
+      providesTags: ['Enquiries'],
     }),
     getEnquiryById: builder.query({
       query: (id) => ({
         url: `/enquiries/${id}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: "EnquiryDetails", id }],
+      providesTags: (result, error, id) => [{ type: 'EnquiryDetails', id }],
     }),
     updateEnquiryStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/enquiries/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: { status },
       }),
-      invalidatesTags: ["Enquiries", "EnquiryDetails"],
+      invalidatesTags: ['Enquiries', 'EnquiryDetails'],
     }),
 
     deleteEnquiry: builder.mutation({
       query: (id) => ({
         url: `/enquiries/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["Enquiries"],
+      invalidatesTags: ['Enquiries'],
     }),
     getVendorCalendar: builder.query({
       query: ({ vendorId, year, month }) => ({
         url: `/vendor-availabilities/calendar`,
-        method: "GET",
+        method: 'GET',
         params: { vendorId, year, month },
       }),
-      providesTags: ["Calendar"],
+      providesTags: ['Calendar'],
     }),
 
     saveBulkMonthAvailability: builder.mutation({
       query: (body) => ({
         url: `/vendor-availabilities/bulk/month`,
-        method: "POST",
+        method: 'POST',
         body,
       }),
-      invalidatesTags: ["Calendar"],
+      invalidatesTags: ['Calendar'],
     }),
     updateVendorProfile: builder.mutation({
       query: (formData) => ({
         url: `/vendor-profiles/update`,
-        method: "PATCH",
+        method: 'PATCH',
         body: formData,
       }),
-      invalidatesTags: ["VendorProfile"],
+      invalidatesTags: ['VendorProfile'],
     }),
     updateSubscription: builder.mutation({
       query: ({ planId }) => ({
@@ -149,50 +152,50 @@ const vendordashboardApi = apiSlice.injectEndpoints({
       invalidatesTags: ['VendorProfile'],
     }),
     deletePortfolioImage: builder.mutation({
-  query: (imageId) => ({
-    url: `/vendor-profiles/portfolio/${imageId}`,
-    method: 'DELETE',
-  }),
-  invalidatesTags: ['VendorProfile'],
-}),
-getVendorPackageById: builder.query({
-  query: (id) => ({
-    url: `/vendor-package/${id}`,
-    method: 'GET',
-  }),
-  providesTags: (result, error, id) => [{ type: 'VendorPackages', id }],
-}),
+      query: (imageId) => ({
+        url: `/vendor-profiles/portfolio/${imageId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['VendorProfile'],
+    }),
+    getVendorPackageById: builder.query({
+      query: (id) => ({
+        url: `/vendor-package/${id}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, id) => [{ type: 'VendorPackages', id }],
+    }),
 
-createVendorPackage: builder.mutation({
-  query: (body) => ({
-    url: `/vendor-package`,
-    method: 'POST',
-    body,
-  }),
-  invalidatesTags: ['VendorPackages'],
-}),
+    createVendorPackage: builder.mutation({
+      query: (body) => ({
+        url: `/vendor-package`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['VendorPackages'],
+    }),
 
-updateVendorPackage: builder.mutation({
-  query: ({ id, body }) => ({
-    url: `/vendor-package/${id}`,
-    method: 'PATCH',
-    body,
-  }),
-  invalidatesTags: (result, error, { id }) => [
-    { type: 'VendorPackages', id },
-    'VendorPackages',
-  ],
-}),
-deleteVendorPackage: builder.mutation({
-  query: (id) => ({
-    url: `/vendor-package/${id}`,
-    method: 'DELETE',
-  }),
-  invalidatesTags: (result, error, id) => [
-    { type: 'VendorPackages', id },
-    'VendorPackages',
-  ],
-}),
+    updateVendorPackage: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/vendor-package/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'VendorPackages', id },
+        'VendorPackages',
+      ],
+    }),
+    deleteVendorPackage: builder.mutation({
+      query: (id) => ({
+        url: `/vendor-package/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'VendorPackages', id },
+        'VendorPackages',
+      ],
+    }),
   }),
 });
 const {
@@ -217,7 +220,7 @@ const {
   useCreateVendorPackageMutation,
   useGetVendorPackageByIdQuery,
   useUpdateVendorPackageMutation,
-  useDeleteVendorPackageMutation 
+  useDeleteVendorPackageMutation,
 } = vendordashboardApi;
 
 export {
@@ -242,5 +245,5 @@ export {
   useCreateVendorPackageMutation,
   useGetVendorPackageByIdQuery,
   useUpdateVendorPackageMutation,
-  useDeleteVendorPackageMutation 
+  useDeleteVendorPackageMutation,
 };

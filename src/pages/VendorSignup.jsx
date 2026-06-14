@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { ROUTES } from '../config';
 import {
@@ -13,24 +13,41 @@ const VendorSignup = ({
   shellMode = false,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const initialSignupData = {
+    ...(location.state?.vendorSignupFlowDraft || {}),
+    ...(location.state?.vendorSignupInitialData || {}),
+  };
 
   // API Calls
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useGetCategoriesQuery();
   const { data: statesData, isLoading: isStatesLoading } = useGetStatesQuery();
 
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    state: '',
-    city: '',
-    location: '',
-    serviceCategory: '',
-    bartendingSpecialties: '',
-  });
+  const [form, setForm] = useState(() => ({
+    name: initialSignupData.name || '',
+    phone: initialSignupData.phone || '',
+    email: initialSignupData.email || '',
+    state: initialSignupData.state || '',
+    city: initialSignupData.city || '',
+    location: initialSignupData.location || '',
+    serviceCategory: initialSignupData.serviceCategory || '',
+    bartendingSpecialties: initialSignupData.bartendingSpecialties || '',
+  }));
+  const [error, setError] = useState('');
 
   const [availableCities, setAvailableCities] = useState([]);
+
+  useEffect(() => {
+    const incomingData = location.state?.vendorSignupInitialData;
+    if (!incomingData) return;
+
+    setForm((current) => ({
+      ...current,
+      ...incomingData,
+    }));
+  }, [location.state]);
 
   const cleanCategories = Array.isArray(categoriesData)
     ? categoriesData
@@ -58,17 +75,37 @@ const VendorSignup = ({
 
   const updateField = (field) => (event) => {
     const { value } = event.target;
+    setError('');
     setForm((current) => ({ ...current, [field]: value }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (
+      !form.name.trim() ||
+      !form.phone.trim() ||
+      !form.email.trim() ||
+      !form.state ||
+      !form.city ||
+      !form.location.trim() ||
+      !form.serviceCategory
+    ) {
+      setError('Please fill all required fields before continuing.');
+      return;
+    }
+
+    setError('');
     console.log('Form Submitted Data:', form);
     // Pass the initial signup form data via navigation state
     // so it is accessible in all subsequent steps
     navigate('/vendor-signup-flow?step=1', {
       replace: true,
       state: {
+        vendorSignupFlowDraft: {
+          ...(location.state?.vendorSignupFlowDraft || {}),
+          ...form,
+        },
         vendorSignupInitialData: form,
         audience,
       },
@@ -146,6 +183,12 @@ const VendorSignup = ({
           </button>
         </div>
 
+        {error && (
+          <p className='rounded-lg border border-red-200 bg-red-50 px-4 py-3 font-raleway text-[14px] text-red-600'>
+            {error}
+          </p>
+        )}
+
         <form onSubmit={handleSubmit} className='mt-6 space-y-10'>
           <div className='space-y-5'>
             <div className='grid gap-3 sm:grid-cols-2'>
@@ -154,12 +197,14 @@ const VendorSignup = ({
                 placeholder='Enter your Full Name here'
                 value={form.name}
                 onChange={updateField('name')}
+                required
               />
               <FormField
                 label='Phone'
                 placeholder='Enter your phone number'
                 value={form.phone}
                 onChange={updateField('phone')}
+                required
               />
             </div>
 
@@ -169,6 +214,8 @@ const VendorSignup = ({
                 placeholder='Enter your E-mail here'
                 value={form.email}
                 onChange={updateField('email')}
+                type='email'
+                required
               />
               <DropdownField
                 label='State'
@@ -176,6 +223,7 @@ const VendorSignup = ({
                 onChange={updateField('state')}
                 options={stateOptions}
                 disabled={isStatesLoading}
+                required
                 placeholder={
                   isStatesLoading ? 'Loading States...' : 'Select State'
                 }
@@ -189,6 +237,7 @@ const VendorSignup = ({
                 onChange={updateField('city')}
                 options={cityOptions}
                 disabled={isStatesLoading || availableCities.length === 0}
+                required
                 placeholder={
                   form.state ? 'Select City' : 'Select a State first'
                 }
@@ -198,6 +247,7 @@ const VendorSignup = ({
                 placeholder='Enter street address or area'
                 value={form.location}
                 onChange={updateField('location')}
+                required
               />
             </div>
 
@@ -207,6 +257,7 @@ const VendorSignup = ({
               onChange={updateField('serviceCategory')}
               options={categoryOptions}
               disabled={isCategoriesLoading}
+              required
               placeholder={
                 isCategoriesLoading
                   ? 'Loading Categories...'
@@ -346,6 +397,12 @@ const VendorSignup = ({
               </button>
             </div>
 
+            {error && (
+              <p className='rounded-lg border border-red-200 bg-red-50 px-4 py-3 font-raleway text-[14px] text-red-600'>
+                {error}
+              </p>
+            )}
+
             <form onSubmit={handleSubmit} className='mt-6 space-y-10'>
               <div className='space-y-5'>
                 <div className='grid gap-3 sm:grid-cols-2'>
@@ -354,12 +411,14 @@ const VendorSignup = ({
                     placeholder='Enter your Full Name here'
                     value={form.name}
                     onChange={updateField('name')}
+                    required
                   />
                   <FormField
                     label='Phone'
                     placeholder='Enter your phone number'
                     value={form.phone}
                     onChange={updateField('phone')}
+                    required
                   />
                 </div>
 
@@ -369,6 +428,8 @@ const VendorSignup = ({
                     placeholder='Enter your E-mail here'
                     value={form.email}
                     onChange={updateField('email')}
+                    type='email'
+                    required
                   />
                   <DropdownField
                     label='State'
@@ -376,6 +437,7 @@ const VendorSignup = ({
                     onChange={updateField('state')}
                     options={stateOptions}
                     disabled={isStatesLoading}
+                    required
                     placeholder={
                       isStatesLoading ? 'Loading States...' : 'Select State'
                     }
@@ -389,6 +451,7 @@ const VendorSignup = ({
                     onChange={updateField('city')}
                     options={cityOptions}
                     disabled={isStatesLoading || availableCities.length === 0}
+                    required
                     placeholder={
                       form.state ? 'Select City' : 'Select a State first'
                     }
@@ -398,6 +461,7 @@ const VendorSignup = ({
                     placeholder='Enter street address or area'
                     value={form.location}
                     onChange={updateField('location')}
+                    required
                   />
                 </div>
 
@@ -407,6 +471,7 @@ const VendorSignup = ({
                   onChange={updateField('serviceCategory')}
                   options={categoryOptions}
                   disabled={isCategoriesLoading}
+                  required
                   placeholder={
                     isCategoriesLoading
                       ? 'Loading Categories...'
@@ -426,7 +491,9 @@ const VendorSignup = ({
                 Already have an account?{' '}
                 <button
                   type='button'
-                  onClick={() => navigate(`${ROUTES.LOGIN}?audience=${audience}`)}
+                  onClick={() =>
+                    navigate(`${ROUTES.LOGIN}?audience=${audience}`)
+                  }
                   className='font-medium text-[#2d2d2d] underline decoration-[#2d2d2d] underline-offset-4'
                 >
                   Log In
@@ -440,16 +507,24 @@ const VendorSignup = ({
   );
 };
 
-const FormField = ({ label, placeholder, value, onChange }) => (
+const FormField = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+  required = false,
+  type = 'text',
+}) => (
   <label className='block'>
     <span className='mb-2 block font-raleway text-[16px] font-normal text-[#2d3036]'>
       {label}
     </span>
     <input
-      type='text'
+      type={type}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
+      required={required}
       className='h-13.5 w-full rounded-lg border border-[#2d3036] bg-white px-4 font-raleway text-[16px] text-[#2d3036] outline-none placeholder:text-[#9ca1aa] focus:border-[#9ca1aa]'
     />
   </label>
@@ -462,6 +537,7 @@ const DropdownField = ({
   options,
   disabled,
   placeholder,
+  required = false,
 }) => (
   <label className='block'>
     <span className='mb-2 block font-raleway text-[16px] font-normal uppercase text-[#2d3036]'>
@@ -472,6 +548,7 @@ const DropdownField = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
+        required={required}
         className='h-13.5 w-full appearance-none rounded-lg border border-[#2d3036] bg-white px-4 pr-11 font-raleway text-[16px] text-[#2d3036] outline-none focus:border-[#9ca1aa] disabled:opacity-60 disabled:bg-gray-50'
       >
         {placeholder && <option value=''>{placeholder}</option>}

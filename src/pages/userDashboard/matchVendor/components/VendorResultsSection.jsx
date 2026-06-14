@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; 
-import { DollarSign, Heart, MapPin, Sparkles } from 'lucide-react';
-import toast from 'react-hot-toast'; 
-import { useSaveVendorMutation } from '../../../../store/features/couple/coupleDashboard'; 
-import { API_CONFIG, ROUTES } from "../../../../../src/config/index"; 
+import { Link } from 'react-router-dom';
+import { Award, DollarSign, Gem, Heart, MapPin, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useSaveVendorMutation } from '../../../../store/features/couple/coupleDashboard';
+import { API_CONFIG, ROUTES } from '../../../../../src/config/index';
 
 const VendorCardSkeleton = () => (
   <div className='overflow-hidden rounded-xl border border-[#dfddd8] bg-[#f8f8f7] shadow-sm animate-pulse'>
@@ -20,16 +20,42 @@ const VendorCardSkeleton = () => (
   </div>
 );
 
+const VendorBadge = ({ badge }) => {
+  if (!badge) return null;
+
+  const normalized = String(badge).toLowerCase().trim();
+
+  if (normalized === 'premium') {
+    return (
+      <span className='inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#fdf6e8] border border-[#e2c97e]'>
+        <Gem size={15} className='text-[#b8922a]' />
+      </span>
+    );
+  }
+
+  if (normalized === 'pro') {
+    return (
+      <span className='inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f0f4ef] border border-[#b8ccb5]'>
+        <Award size={15} className='text-[#3d5c3a]' />
+      </span>
+    );
+  }
+
+  return null;
+};
+
 const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
   const [saveVendor, { isLoading: isSaving }] = useSaveVendorMutation();
 
   const handleSaveToggle = async (vendorId, isCurrentlySaved) => {
     try {
       await saveVendor({ vendorId }).unwrap();
-      toast.success(isCurrentlySaved ? "Removed from favorites" : "Added to favorites");
+      toast.success(
+        isCurrentlySaved ? 'Removed from favorites' : 'Added to favorites',
+      );
     } catch (error) {
-      console.error("Failed to save vendor:", error);
-      toast.error("Failed to update favorite status. Please try again.");
+      console.error('Failed to save vendor:', error);
+      toast.error('Failed to update favorite status. Please try again.');
     }
   };
 
@@ -49,7 +75,9 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
   if (isError) {
     return (
       <section className='mb-6 rounded-2xl border border-red-100 bg-red-50 px-5 py-10 text-center'>
-        <p className='font-raleway text-sm text-red-500'>Failed to load vendors. Please try again.</p>
+        <p className='font-raleway text-sm text-red-500'>
+          Failed to load vendors. Please try again.
+        </p>
       </section>
     );
   }
@@ -57,7 +85,9 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
   if (!vendors || vendors.length === 0) {
     return (
       <section className='mb-6 rounded-2xl border border-[#D4A57426] bg-white px-5 py-12 text-center'>
-        <p className='font-raleway text-sm text-[#9a9a9a]'>No vendors found matching your preferences.</p>
+        <p className='font-raleway text-sm text-[#9a9a9a]'>
+          No vendors found matching your preferences.
+        </p>
       </section>
     );
   }
@@ -71,10 +101,11 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
         {vendors.map((vendor) => {
           const rawImage = vendor.thumbnailImage;
-          const isFullUrl = rawImage?.startsWith('http://') || rawImage?.startsWith('https://');
-          
-          const finalImageUrl = isFullUrl 
-            ? rawImage 
+          const isFullUrl =
+            rawImage?.startsWith('http://') || rawImage?.startsWith('https://');
+
+          const finalImageUrl = isFullUrl
+            ? rawImage
             : `${API_CONFIG.BASE_URL}${rawImage || '/dummy-image-square.jpg'}`;
 
           const priceRange =
@@ -96,7 +127,7 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
                   alt={vendor.businessName || vendor.name}
                   className='h-full w-full object-cover'
                   onError={(e) => {
-                    e.currentTarget.src = "/dummy-image-square.jpg";
+                    e.currentTarget.src = '/dummy-image-square.jpg';
                   }}
                 />
 
@@ -110,21 +141,35 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
                 <button
                   type='button'
                   onClick={() => handleSaveToggle(vendorId, vendor.isSaved)}
-                  disabled={isSaving} 
+                  disabled={isSaving}
                   className={`absolute right-2 top-2 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d9d7d2] bg-white/95 transition hover:bg-white disabled:opacity-70 ${
-                    vendor.isSaved ? 'text-[#d6b28d]' : 'text-[#a8a8a8] hover:text-[#d6b28d]'
+                    vendor.isSaved
+                      ? 'text-[#d6b28d]'
+                      : 'text-[#a8a8a8] hover:text-[#d6b28d]'
                   }`}
-                  aria-label={vendor.isSaved ? 'Remove from favorites' : 'Add to favorites'}
+                  aria-label={
+                    vendor.isSaved
+                      ? 'Remove from favorites'
+                      : 'Add to favorites'
+                  }
                 >
-                  <Heart size={22} fill={vendor.isSaved ? 'currentColor' : 'none'} />
+                  <Heart
+                    size={22}
+                    fill={vendor.isSaved ? 'currentColor' : 'none'}
+                  />
                 </button>
               </div>
 
               <div className='px-3 py-2.5'>
-                <h3 className='mb-0.5 text-xl font-medium leading-tight text-[#2a2a2a]'>
-                  {vendor.businessName || vendor.name}
-                </h3>
-                <p className='mb-2 text-base text-[#8a8a8a]'>{vendor.category || '—'}</p>
+                <div className='mb-0.5 flex items-center gap-2 justify-between'>
+                  <h3 className='mb-0.5 text-xl font-medium leading-tight text-[#2a2a2a]'>
+                    {vendor.businessName || vendor.name}
+                  </h3>
+                  <VendorBadge badge={vendor.vendorBadge} />
+                </div>
+                <p className='mb-2 text-base text-[#8a8a8a]'>
+                  {vendor.category || '—'}
+                </p>
 
                 <div className='mb-1.5 flex items-center gap-1 text-sm text-[#595959]'>
                   <DollarSign size={11} className='text-[#767676]' />
@@ -133,7 +178,11 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
 
                 <div className='mb-2.5 flex items-center gap-1 text-sm text-[#595959]'>
                   <MapPin size={11} />
-                  <span>{vendor.location || `${vendor.city || ''}${vendor.city && vendor.state ? ', ' : ''}${vendor.state || ''}` || '—'}</span>
+                  <span>
+                    {vendor.location ||
+                      `${vendor.city || ''}${vendor.city && vendor.state ? ', ' : ''}${vendor.state || ''}` ||
+                      '—'}
+                  </span>
                 </div>
 
                 <Link

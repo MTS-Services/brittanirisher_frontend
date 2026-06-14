@@ -1,38 +1,46 @@
-import { apiSlice } from "../../apiSlice";
+import { apiSlice } from '../../apiSlice';
 export const coupleDashboardApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getVendorProfiles: builder.query({
       query: (params) => ({
-        url: "/vendor-profiles",
-        method: "GET",
+        url: '/vendor-profiles',
+        method: 'GET',
         params: params,
       }),
-      providesTags: ["VendorProfile"],
+      providesTags: ['VendorProfile'],
+    }),
+    getVendorProfilesHome: builder.query({
+      query: (params) => ({
+        url: '/vendor-profiles/home',
+        method: 'GET',
+        params: params,
+      }),
+      providesTags: ['VendorProfile'],
     }),
     getVendorDetail: builder.query({
       query: (id) => ({
         url: `/vendor-profiles/${id}`,
-        method: "GET",
+        method: 'GET',
       }),
     }),
     sendEnquiry: builder.mutation({
       query: (enquiryData) => ({
-        url: "/enquiries",
-        method: "POST",
+        url: '/enquiries',
+        method: 'POST',
         body: enquiryData,
       }),
     }),
     sendMessage: builder.mutation({
       query: (messageData) => ({
-        url: "/message",
-        method: "POST",
+        url: '/message',
+        method: 'POST',
         body: messageData,
       }),
     }),
     getVendorCalendar: builder.query({
       query: ({ vendorId, month, year }) => ({
-        url: "/vendor-availabilities/calendar",
-        method: "GET",
+        url: '/vendor-availabilities/calendar',
+        method: 'GET',
         params: {
           vendorId: vendorId,
           month: month,
@@ -42,10 +50,10 @@ export const coupleDashboardApi = apiSlice.injectEndpoints({
     }),
     getSubscriptionPlans: builder.query({
       query: () => ({
-        url: "/subscription-plans",
-        method: "GET",
+        url: '/subscription-plans',
+        method: 'GET',
       }),
-      providesTags: ["SubscriptionPlan"],
+      providesTags: ['SubscriptionPlan'],
     }),
   }),
 });
@@ -57,6 +65,7 @@ const {
   useSendMessageMutation,
   useGetVendorCalendarQuery,
   useGetSubscriptionPlansQuery,
+  useGetVendorProfilesHomeQuery,
 } = coupleDashboardApi;
 
 export {
@@ -66,4 +75,5 @@ export {
   useSendMessageMutation,
   useGetVendorCalendarQuery,
   useGetSubscriptionPlansQuery,
+  useGetVendorProfilesHomeQuery,
 };

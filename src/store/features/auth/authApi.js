@@ -46,10 +46,7 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
 
-
-
-
-forgotPassword: builder.mutation({
+    forgotPassword: builder.mutation({
       query: (body) => ({
         url: '/auth/forgot-password',
         method: 'POST',
@@ -70,7 +67,6 @@ forgotPassword: builder.mutation({
         body, // { "email": "...", "token": "...", "password": "...", "confirmPassword": "..." }
       }),
     }),
-
 
     getProfile: builder.query({
       query: () => ({
@@ -101,5 +97,4 @@ export const {
   useForgotPasswordMutation,
   useOtpVerifyMutation,
   useResetPasswordMutation,
-
 } = authApi;
