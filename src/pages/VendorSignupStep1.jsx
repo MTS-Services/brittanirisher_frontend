@@ -176,6 +176,10 @@ const VendorSignupStep1 = ({ formData, onFormChange }) => {
                 rows='4'
                 className='w-full rounded-lg border border-[#2d3036] bg-white px-4 py-3 font-raleway text-[16px] text-[#2d3036] placeholder:text-[#686765] focus:outline-none focus:border-[#9f8b79]'
               />
+              <p className='font-raleway text-sm text-[#686765]'>
+                Separate multiple services with a comma (e.g. Haircut, Facial,
+                Massage)
+              </p>
             </div>
 
             {/* Experience */}
