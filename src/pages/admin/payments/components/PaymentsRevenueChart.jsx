@@ -46,7 +46,7 @@ export default function PaymentsRevenueChart() {
 
   return (
     <div className='bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6'>
-      <div className='flex items-start justify-between gap-3 mb-5'>
+      <div className='flex items-start justify-between flex-col md:flex-row gap-3 mb-5'>
         <div>
           <h2 className='text-xl sm:text-2xl font-playfair font-semibold text-gray-900'>
             Platform Revenue
@@ -90,54 +90,58 @@ export default function PaymentsRevenueChart() {
             <SkeletonBlock className='h-3 w-full rounded' />
           </div>
         ) : (
-        <ResponsiveContainer width='100%' height='100%'>
-          <AreaChart
-            data={revenueData}
-            margin={{ top: 10, right: 4, left: -30, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id='revenueGrad' x1='0' y1='0' x2='0' y2='1'>
-                <stop offset='0%' stopColor='#4A4A4A' stopOpacity={0.45} />
-                <stop offset='100%' stopColor='#794E0500' stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray='0'
-              stroke='#f0f0ec'
-              vertical={false}
-            />
-            <XAxis
-              dataKey='month'
-              tick={{ fontSize: 14, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 14, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-            />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ stroke: '#794E0500', strokeWidth: 1 }}
-            />
-            <Area
-              type='monotone'
-              dataKey='value'
-              stroke='#4A4A4A'
-              strokeWidth={2}
-              fill='url(#revenueGrad)'
-              dot={false}
-              activeDot={{
-                r: 4,
-                fill: '#4A4A4A',
-                stroke: '#fff',
-                strokeWidth: 2,
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+          <ResponsiveContainer width='100%' height='100%'>
+            <AreaChart
+              data={revenueData}
+              margin={{ top: 10, right: 4, left: -30, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id='revenueGrad' x1='0' y1='0' x2='0' y2='1'>
+                  <stop offset='0%' stopColor='#4A4A4A' stopOpacity={0.45} />
+                  <stop
+                    offset='100%'
+                    stopColor='#794E0500'
+                    stopOpacity={0.02}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray='0'
+                stroke='#f0f0ec'
+                vertical={false}
+              />
+              <XAxis
+                dataKey='month'
+                tick={{ fontSize: 14, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 14, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: '#794E0500', strokeWidth: 1 }}
+              />
+              <Area
+                type='monotone'
+                dataKey='value'
+                stroke='#4A4A4A'
+                strokeWidth={2}
+                fill='url(#revenueGrad)'
+                dot={false}
+                activeDot={{
+                  r: 4,
+                  fill: '#4A4A4A',
+                  stroke: '#fff',
+                  strokeWidth: 2,
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         )}
       </div>
     </div>

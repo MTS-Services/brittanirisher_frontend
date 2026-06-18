@@ -274,6 +274,7 @@ const VendorDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [activePortfolioIndex, setActivePortfolioIndex] = useState(null);
   const contactMenuRef = useRef(null);
 
   const calendarParams = useMemo(() => {
@@ -335,6 +336,7 @@ const VendorDetails = () => {
     setSelectedDate('');
     setBookingStatus('idle');
     setIsContactOpen(false);
+    setActivePortfolioIndex(null);
   }, [id]);
 
   useEffect(() => {
@@ -363,6 +365,44 @@ const VendorDetails = () => {
     });
     return set;
   }, [calendarResponse]);
+
+  const portfolioItems = vendor?.portfolioImages || [];
+  const hasPortfolio = portfolioItems.length > 0;
+
+  const closePortfolioModal = () => setActivePortfolioIndex(null);
+
+  const showPrevPortfolio = () => {
+    if (!hasPortfolio) return;
+    setActivePortfolioIndex((current) => {
+      if (typeof current !== 'number') return 0;
+      return (current - 1 + portfolioItems.length) % portfolioItems.length;
+    });
+  };
+
+  const showNextPortfolio = () => {
+    if (!hasPortfolio) return;
+    setActivePortfolioIndex((current) => {
+      if (typeof current !== 'number') return 0;
+      return (current + 1) % portfolioItems.length;
+    });
+  };
+
+  useEffect(() => {
+    if (typeof activePortfolioIndex !== 'number' || !hasPortfolio) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        closePortfolioModal();
+      } else if (event.key === 'ArrowLeft') {
+        showPrevPortfolio();
+      } else if (event.key === 'ArrowRight') {
+        showNextPortfolio();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [activePortfolioIndex, hasPortfolio, portfolioItems.length]);
 
   if (isLoading) {
     return <VendorDetailsSkeleton />;
@@ -984,26 +1024,83 @@ const VendorDetails = () => {
       </section>
 
       {/* Portfolio Section */}
-      {vendor.portfolioImages && vendor.portfolioImages.length > 0 && (
+      {hasPortfolio && (
         <section className='mb-14'>
           <h4 className='font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-4'>
             Portfolio
           </h4>
           <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'>
-            {vendor.portfolioImages.map((item) => (
-              <div
+            {portfolioItems.map((item, index) => (
+              <button
                 key={item.id}
-                className='group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-[#eadfcd]'
+                type='button'
+                onClick={() => setActivePortfolioIndex(index)}
+                className='group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-[#eadfcd] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a574]'
               >
                 <img
                   src={`${API_CONFIG.BASE_URL}${item.mediaUrl}`}
                   alt='Portfolio media'
                   className='h-32 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:h-36'
                 />
-              </div>
+              </button>
             ))}
           </div>
         </section>
+      )}
+
+      {typeof activePortfolioIndex === 'number' && hasPortfolio && (
+        <div
+          className='fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4'
+          onClick={closePortfolioModal}
+          role='dialog'
+          aria-modal='true'
+          aria-label='Portfolio image preview'
+        >
+          <div
+            className='relative w-full max-w-5xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type='button'
+              onClick={closePortfolioModal}
+              className='absolute -top-12 right-0 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#2a241e] shadow-md hover:bg-[#f5f1eb]'
+              aria-label='Close portfolio preview'
+            >
+              <X size={18} />
+            </button>
+
+            <img
+              src={`${API_CONFIG.BASE_URL}${portfolioItems[activePortfolioIndex].mediaUrl}`}
+              alt='Portfolio preview'
+              className='max-h-[80vh] w-full rounded-md object-contain bg-[#1f1f1f]'
+            />
+
+            {portfolioItems.length > 1 && (
+              <>
+                <button
+                  type='button'
+                  onClick={showPrevPortfolio}
+                  className='absolute left-3 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#2a241e] shadow-md hover:bg-white'
+                  aria-label='Previous portfolio image'
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type='button'
+                  onClick={showNextPortfolio}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#2a241e] shadow-md hover:bg-white'
+                  aria-label='Next portfolio image'
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </>
+            )}
+
+            <div className='mt-3 text-center font-raleway text-sm text-white/90'>
+              {activePortfolioIndex + 1} / {portfolioItems.length}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
