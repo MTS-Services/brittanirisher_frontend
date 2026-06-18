@@ -121,7 +121,7 @@ export default function RevenueChart() {
 
   return (
     <div className='bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6'>
-      <div className='flex items-start justify-between gap-3 mb-5'>
+      <div className='flex items-start justify-between flex-col md:flex-row gap-3 mb-5'>
         <div>
           <h2 className='text-xl sm:text-2xl font-playfair font-semibold text-gray-900'>
             Platform Revenue
