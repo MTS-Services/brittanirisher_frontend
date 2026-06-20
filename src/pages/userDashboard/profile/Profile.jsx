@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+import { Camera, Eye, EyeOff } from 'lucide-react';
 import {
   useGetCoupleProfileQuery,
   useUpdateCoupleProfileMutation,
   useGetStatesQuery,
 } from '../../../store/features/couple/coupleDashboard';
 import { useChangePasswordMutation } from '../../../store/features/auth/authApi';
+import { API_CONFIG } from '../../../config';
 
 const ProfileSkeleton = () => (
   <div className='w-full animate-pulse'>
@@ -65,6 +67,28 @@ const formatDateForDisplay = (value) => {
   });
 };
 
+const getProfileImageUrl = (url) => {
+  if (!url) return '';
+  if (
+    url.startsWith('blob:') ||
+    url.startsWith('http://') ||
+    url.startsWith('https://')
+  ) {
+    return url;
+  }
+  return `${API_CONFIG.BASE_URL}${url}`;
+};
+
+const resolveProfileImage = (serverData) => {
+  if (!serverData) return '';
+  if (serverData.profileImage) return serverData.profileImage;
+  if (Array.isArray(serverData.images) && serverData.images.length > 0) {
+    const first = serverData.images[0];
+    return typeof first === 'string' ? first : first?.mediaUrl || first?.url || '';
+  }
+  return '';
+};
+
 const Profile = () => {
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetCoupleProfileQuery();
@@ -91,6 +115,14 @@ const Profile = () => {
   });
 
   const [availableCities, setAvailableCities] = useState([]);
+  const [profileImage, setProfileImage] = useState('');
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const profileImageInputRef = useRef(null);
+  const createdProfileImageRef = useRef(null);
 
   useEffect(() => {
     if (profileResponse?.data) {
@@ -114,8 +146,20 @@ const Profile = () => {
         selectedState: serverData.stateId,
         selectedCity: serverData.cityId,
       }));
+
+      if (!profileImageFile) {
+        setProfileImage(resolveProfileImage(serverData));
+      }
     }
-  }, [profileResponse]);
+  }, [profileResponse, profileImageFile]);
+
+  useEffect(() => {
+    return () => {
+      if (createdProfileImageRef.current) {
+        URL.revokeObjectURL(createdProfileImageRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (profileForm.selectedState && statesResponse?.data) {
@@ -149,36 +193,53 @@ const Profile = () => {
     setPasswordForm({ ...passwordForm, [name]: value });
   };
 
+  const handleProfileImageUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (createdProfileImageRef.current) {
+      URL.revokeObjectURL(createdProfileImageRef.current);
+    }
+
+    const blobUrl = URL.createObjectURL(file);
+    createdProfileImageRef.current = blobUrl;
+    setProfileImage(blobUrl);
+    setProfileImageFile(file);
+    event.target.value = '';
+  };
+
   const handleSaveProfile = async () => {
     try {
       const numericBudget = Number(
         profileForm.weddingBudget.replace(/[^0-9.-]+/g, ''),
       );
 
-      const fullLocationString = [profileForm.streetAddress]
-        .filter(Boolean)
-        .join(', ');
+      const formData = new FormData();
+      formData.append('name', profileForm.fullName);
+      formData.append('phone', profileForm.phoneNumber);
+      formData.append('location', profileForm.streetAddress);
+      formData.append('budget', isNaN(numericBudget) ? 0 : numericBudget);
 
-      const payload = {
-        name: profileForm.fullName,
-        phone: profileForm.phoneNumber,
-        location: profileForm.streetAddress,
-        budget: isNaN(numericBudget) ? 0 : numericBudget,
-        cityId: profileForm.selectedCity,
-        stateId: profileForm.selectedState,
-      };
-
-      if (profileForm.weddingDate) {
-        payload.weddingDate = `${profileForm.weddingDate}T12:00:00.000Z`;
-        payload.weldingDate = payload.weddingDate;
+      if (profileForm.selectedState) {
+        formData.append('stateId', profileForm.selectedState);
+      }
+      if (profileForm.selectedCity) {
+        formData.append('cityId', profileForm.selectedCity);
       }
 
-      const formData = new FormData();
-      Object.entries(payload).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+      if (profileForm.weddingDate) {
+        formData.append(
+          'weldingDate',
+          `${profileForm.weddingDate}T12:00:00.000Z`,
+        );
+      }
+
+      if (profileImageFile) {
+        formData.append('images', profileImageFile);
+      }
 
       await updateProfile(formData).unwrap();
+      setProfileImageFile(null);
       toast.success('Profile details updated successfully!');
     } catch (error) {
       console.error('Failed to save profile:', error);
@@ -248,26 +309,33 @@ const Profile = () => {
         </h2>
 
         <div className='mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center'>
-          {/* <div className='inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#d2a674] text-center text-lg font-bold text-white overflow-hidden'>
-            {profileResponse?.data?.profileImage ? (
-              <img 
-                src={`https://api-brittanirisher.maktechgroup.tech${profileResponse.data.profileImage}`} 
-                alt="Profile" 
-                className="h-full w-full object-cover"
+          <div className='relative shrink-0'>
+            {profileImage ? (
+              <img
+                src={getProfileImageUrl(profileImage)}
+                alt='Profile'
+                className='h-16 w-16 rounded-full object-cover'
               />
             ) : (
-              'E&M'
+              <div className='inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#ece9e2] text-[#9a9a9a]'>
+                <Camera size={22} />
+              </div>
             )}
-          </div> */}
-
-          <div className='inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#d2a674] text-center text-lg font-bold text-white overflow-hidden'>
-            {profileForm.fullName
-              ? profileForm.fullName
-                  .split(' ')
-                  .slice(0, 2)
-                  .map((word) => word[0]?.toUpperCase())
-                  .join('')
-              : 'U'}
+            <button
+              type='button'
+              onClick={() => profileImageInputRef.current?.click()}
+              className='absolute -bottom-1 -right-1 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#d5d1cb] bg-white text-[#5f6661] shadow-sm transition hover:bg-[#f7f7f7]'
+              aria-label='Upload profile image'
+            >
+              <Camera size={13} />
+            </button>
+            <input
+              ref={profileImageInputRef}
+              type='file'
+              accept='image/*'
+              onChange={handleProfileImageUpload}
+              className='hidden'
+            />
           </div>
           <div>
             <h3 className='m-0 text-base font-semibold text-[#2a2a2a]'>
@@ -409,39 +477,77 @@ const Profile = () => {
             <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>
               Old Password
             </label>
-            <input
-              type='password'
-              name='currentPassword'
-              value={passwordForm.currentPassword}
-              onChange={handlePasswordChange}
-              className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
-            />
+            <div className='relative'>
+              <input
+                type={showCurrentPassword ? 'text' : 'password'}
+                name='currentPassword'
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 pr-10 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
+              />
+              <button
+                type='button'
+                onClick={() => setShowCurrentPassword((prev) => !prev)}
+                className='absolute right-2 top-1/2 -translate-y-1/2 text-[#7a7a7a]'
+                aria-label={
+                  showCurrentPassword ? 'Hide old password' : 'Show old password'
+                }
+              >
+                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>
               New Password
             </label>
-            <input
-              type='password'
-              name='newPassword'
-              value={passwordForm.newPassword}
-              onChange={handlePasswordChange}
-              className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
-            />
+            <div className='relative'>
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                name='newPassword'
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 pr-10 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
+              />
+              <button
+                type='button'
+                onClick={() => setShowNewPassword((prev) => !prev)}
+                className='absolute right-2 top-1/2 -translate-y-1/2 text-[#7a7a7a]'
+                aria-label={
+                  showNewPassword ? 'Hide new password' : 'Show new password'
+                }
+              >
+                {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className='mb-2 block text-sm font-medium text-[#2a2a2a]'>
               Confirm New Password
             </label>
-            <input
-              type='password'
-              name='confirmPassword'
-              value={passwordForm.confirmPassword}
-              onChange={handlePasswordChange}
-              className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
-            />
+            <div className='relative'>
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                name='confirmPassword'
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                className='w-full rounded-md border border-[#d5d1cb] bg-white px-3 py-2 pr-10 text-sm text-[#3a3a3a] outline-none focus:border-[#b4c4b1]'
+              />
+              <button
+                type='button'
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className='absolute right-2 top-1/2 -translate-y-1/2 text-[#7a7a7a]'
+                aria-label={
+                  showConfirmPassword
+                    ? 'Hide confirm password'
+                    : 'Show confirm password'
+                }
+              >
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
         </div>
 

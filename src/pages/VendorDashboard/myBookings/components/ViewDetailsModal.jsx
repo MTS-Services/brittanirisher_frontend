@@ -57,7 +57,7 @@ const ViewDetailsModal = ({ booking, onClose, isLoading }) => {
                   {booking.name}
                 </h2>
                 <div className='mt-2 space-y-1 text-[14px] text-[#7d7d7d]'>
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-center flex-wrap gap-2'>
                     <Mail size={14} />
                     <span>{booking.email}</span>
                   </div>
