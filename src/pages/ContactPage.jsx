@@ -266,10 +266,32 @@ const ContactPage = memo(() => {
                   </h3>
                 </div>
                 <div className="mt-4 space-y-1 font-raleway text-[16px] leading-6 text-[#615d58]">
-                  <p>123 Wedding Lane</p>
+                  {/* <p>123 Wedding Lane</p>
                   <p>Suite 100</p>
                   <p>San Francisco, CA 94102</p>
-                  <p>United States</p>
+                  <p>United States</p> */}
+                    <ul className="mt-3 md:mt-5 space-y-1.5 md:space-y-2.5 ">
+              <li>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Charleston,+SC"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  Charleston, SC
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:team@vowandvendor.com"
+                  className="hover:underline"
+                >
+                  team@vowandvendor.com
+                </a>
+              </li>
+              {/* <li>(555) 012-3456</li>
+              <li>Mon - Fri, 9am - 6pm</li> */}
+            </ul>
                 </div>
               </article>
 
@@ -284,12 +306,12 @@ const ContactPage = memo(() => {
                 </div>
                 <div className="mt-4 grid grid-cols-[1fr_auto] gap-2 font-raleway text-[16px] leading-6 text-[#615d58]">
                   <p>Monday - Friday</p>
-                  <p>9am - 6pm</p>
+                  <p className="text-[2D2D2D] font-semibold">9am - 6pm</p>
                   <p>Saturday</p>
-                  <p>10am - 4pm</p>
+                  <p className="text-[2D2D2D] font-semibold">10am - 4pm</p>
                   <p>Sunday</p>
-                  <p>Closed</p>
-                  <p className="col-span-2 mt-2 text-[14px] text-[#8c8c8c]">
+                  <p className="text-[2D2D2D] font-semibold">Closed</p>
+                  <p className="col-span-2 mt-2 text-[14px]  text-[#8c8c8c]">
                     All times in Eastern Standard Time (EST)
                   </p>
                 </div>
@@ -313,7 +335,7 @@ const ContactPage = memo(() => {
           className="pointer-events-none absolute right-0 top-0 hidden w-64 opacity-75 lg:block"
         /> */}
 
-        <div className="mx-auto text-center container">
+        <div id='Frequently-Asked-Questions'  className="mx-auto text-center container">
           <img
             src={Frequently_Asked_Questions}
             alt=""
@@ -367,7 +389,7 @@ const ContactPage = memo(() => {
         </div>
       </section>
 
-      <section className="relative px-4 py-20 sm:px-6 lg:px-48 lg:py-24">
+      {/* <section className="relative px-4 py-20 sm:px-6 lg:px-48 lg:py-24">
         <div
           style={{ maxWidth: 1536 }}
           className="mx-auto rounded-2xl bg-[#5c665b] px-6 py-14 text-center text-white shadow-[0_18px_40px_rgba(63,73,63,0.12)]"
@@ -399,7 +421,7 @@ const ContactPage = memo(() => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 });

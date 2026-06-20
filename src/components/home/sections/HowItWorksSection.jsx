@@ -23,7 +23,7 @@ const STEPS = [
 ];
 
 const StepCard = memo(({ step: { icon: Icon, title, text } }) => (
-  <article className='relative rounded-[1.75rem] border border-[#d3dccf] bg-[#edf1e8] p-8 text-center shadow-[0_18px_40px_rgba(63,73,63,0.08)]'>
+  <article className='relative rounded-xl border border-[#d3dccf] bg-[#edf1e8] p-8 text-center shadow-[0_18px_40px_rgba(63,73,63,0.08)]'>
     <div className='mx-auto grid h-12 w-12 place-items-center rounded-lg bg-[#464E46] text-white shadow-lg shadow-[#4f5b4d]/20'>
       <Icon size={28} />
     </div>
@@ -56,7 +56,7 @@ const HowItWorksSection = memo(() => {
         />
       </div>
 
-      <div className='mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8'>
+      <div className='mx-auto container px-4 sm:px-6 lg:px-8'>
         <header className='mx-auto max-w-2xl text-center'>
           <h2 className='font-serif text-4xl md:text-6xl text-[#201c18] sm:text-5xl'>How It Works</h2>
           <p className='mt-2 md:mt-4 text-base md:text-lg leading-6 text-[#606060] font-raleway'>

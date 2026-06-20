@@ -13,13 +13,13 @@ const CtaSection = memo(() => {
             <div className='mt-8 flex flex-wrap justify-center gap-3'>
               <a
                 href='#vendors'
-                className='rounded-sm bg-[#d0d8cd] px-5 py-3 text-sm font-medium text-[#3f493f] transition-transform duration-200 hover:-translate-y-0.5'
+                className='rounded-lg bg-[#a8baa8] px-5 py-3 text-sm font-medium text-[#3f493f] transition-transform duration-200 hover:-translate-y-0.5'
               >
                 Start Browsing Vendors
               </a>
               <a
                 href='#pricing'
-                className='rounded-sm border border-[#E0E0E0] px-5 py-3 text-sm font-medium text-white/85 transition-transform duration-200 hover:-translate-y-0.5'
+                className='rounded-lg border border-[#E0E0E0] px-5 py-3 text-sm font-medium text-white/85 transition-transform duration-200 hover:-translate-y-0.5'
               >
                 View Pricing
               </a>

@@ -16,7 +16,7 @@ export default function StorySection({ images = [] }) {
               Our Story
             </h2>
 
-            <div className="mt-6 space-y-5 font-sans text-[15px] leading-relaxed text-[#7c756e] sm:text-[16px]">
+            <div className="mt-6 space-y-5 font-sans text-[15px] leading-relaxed text-[#7c756e] sm:text-[16px] text-justify">
               <p>
                 Vow & Vendor was created by Brittani Risher after noticing a
                 clear trend in the wedding industry: brides were spending

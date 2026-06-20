@@ -139,7 +139,7 @@ const StepCard = memo(({ icon, title, text, theme = 'light' }) => (
     </div>
     <div className='flex flex-1 flex-col gap-3 text-center lg:text-left'>
       <h3 className='font-playfair text-[24px] leading-none text-[#2d2d2d]'>{title}</h3>
-      <p className='font-raleway text-[20px] leading-7 text-[#857f7a]'>{text}</p>
+      <p className='font-raleway text-[20px] leading-7 text-[#857f7a] text-justify'>{text}</p>
     </div>
   </article>
 ));
@@ -245,18 +245,19 @@ const HowItWorks = memo(() => {
           </Link>
         </div>
 
-        <div className='pointer-events-none absolute left-1/2 -bottom-20 z-10 w-65 -translate-x-1/2 sm:w-85 md:w-95 lg:w-80'>
+        <div className='pointer-events-none absolute left-1/2 -bottom-20 z-50 w-65 -translate-x-1/2 sm:w-85 md:w-95 lg:w-80'>
           <img src={FLOWER_SEPARATOR} alt='' aria-hidden='true' className='w-full object-contain rotate-180 opacity-90' />
         </div>
         
       </section>
 
       {/* Why Choose Section */}
-      <section className='relative overflow-hidden bg-[#f4f0ea] px-4  sm:px-6 lg:px-8 py-14 md:py-20 '  >
-        <div className='mx-auto max-w-384 '>
-          <h2 className='text-center font-playfair text-3xl md:text-4xl lg:text-5xl leading-tight text-[#2d2d2d]'>
-            Why Choose Vow &amp; Vendor
-          </h2>
+      <section className='relative z-20 overflow-hidden  px-4  sm:px-6 lg:px-8 py-14 md:py-20 '  >
+        <div className='mx-auto flex max-w-7xl flex-col items-center gap-11'>
+          <div className='flex flex-col items-center gap-3 text-center'>
+            <SectionBadge icon={VENDORS_PILL_ICON} label='For Vendors' />
+            <h2 className='font-playfair text-3xl md:text-4xl lg:text-5xl leading-tight text-[#2d2d2d]'>Grow Your Business</h2>
+          </div>
 
           <div className='mt-10 grid gap-5 lg:grid-cols-3 z-10'>
             {WHY_CHOOSE_ITEMS.map((item) => (

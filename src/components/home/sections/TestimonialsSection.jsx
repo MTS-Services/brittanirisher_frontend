@@ -53,7 +53,7 @@ const TestimonialCard = memo(({ testimonial }) => (
         <Star key={index} size={18} className="fill-current" />
       ))}
     </div>
-    <p className="mt-5 text-lg leading-7 text-[#6d655a]">{testimonial.quote}</p>
+    <p className="mt-5 text-lg leading-7 text-[#6d655a] text-justify">{testimonial.quote}</p>
     <p className="mt-6 text-sm font-semibold text-[#1C1917]">— {testimonial.author}</p>
   </article>
 ));

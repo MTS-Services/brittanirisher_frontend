@@ -5,7 +5,7 @@ import { ROUTES } from '../../config';
 export default function JoinCommunitySection() {
   return (
     <div className='mt-12 rounded-2xl bg-[#d6ded5] px-6 py-10 shadow-[0_14px_34px_rgba(63,73,63,0.08)] '>
-      <div style={{ maxWidth: 633 }} className='mx-auto'>
+      <div  className='mx-auto'>
         <div className='inline-flex items-center rounded-full bg-[rgba(255,255,255,0.65)] px-5 py-1.5 font-raleway text-[16px] font-medium text-[#615d58]'>
           Join Our Community
         </div>

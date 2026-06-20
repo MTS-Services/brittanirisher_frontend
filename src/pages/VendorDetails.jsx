@@ -794,7 +794,7 @@ const VendorDetails = () => {
           <h2 className='font-playfair text-xl font-semibold text-[#2a241e] md:text-2xl pb-3 border-b border-[#ddd6cd] mb-4'>
             About Me
           </h2>
-          <p className='text-base font-raleway text-[#4a3f35] leading-relaxed whitespace-pre-line'>
+          <p className='text-base font-raleway text-[#4a3f35] leading-relaxed whitespace-pre-line text-justify'>
             {vendor.aboutMe || 'No introduction written yet.'}
           </p>
         </div>

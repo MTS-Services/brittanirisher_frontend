@@ -152,7 +152,7 @@ const PricingPage = memo(() => {
 
   return (
     <div className='overflow-hidden bg-[#f4f0ea] text-[#2d2d2d]'>
-      <section className='relative h-150 overflow-hidden'>
+      <section className='relative h-100 md:h-150 overflow-hidden'>
         <img
           src={HERO_IMAGE}
           alt=''
@@ -177,7 +177,7 @@ const PricingPage = memo(() => {
       </section>
 
       <section className='relative px-4 sm:px-6 overflow-hidden'>
-        <div className='mx-auto container px-4 sm:px-6 lg:px-8 py-14 sm:py-20 relative z-10'>
+        <div className='mx-auto container  sm:px-6 lg:px-8 py-14 sm:py-20 relative z-10'>
           <div className='mx-auto w-full md:max-w-4/6 text-center '>
             <h2 className='font-playfair text-3xl md:text-4xl lg:text-5xl leading-none text-[#090909]'>
               Vendor Pricing
@@ -341,7 +341,7 @@ const PricingPage = memo(() => {
             </p>
           </div>
 
-          <div className='mt-12 space-y-3 mx-auto max-w-7xl px-4  sm:px-6 lg:px-8 '>
+          <div className='mt-12 space-y-3 mx-auto max-w-7xl  sm:px-6 lg:px-8 '>
             {FAQ_ITEMS.map((item) => (
               <details
                 key={item.title}
@@ -356,7 +356,7 @@ const PricingPage = memo(() => {
                   />
                 </summary>
                 {item.body && (
-                  <p className='mt-4 text-[18px] leading-[1.4] text-[rgba(60,60,67,0.85)]'>
+                  <p className='mt-4 text-[18px] leading-[1.4] text-[rgba(60,60,67,0.85)] text-justify'>
                     {item.body}
                   </p>
                 )}
@@ -364,7 +364,7 @@ const PricingPage = memo(() => {
             ))}
           </div>
 
-          <div className='mx-auto mt-20 container rounded-2xl bg-[#5c665b]  py-16 text-center text-white  lg:py-20'>
+          <div className='mx-auto mt-14 md:mt-20 container rounded-2xl bg-[#5c665b]  py-16 text-center text-white  lg:py-20'>
             <h3 className='font-playfair text-[48px] leading-none'>
               Become a Vendor Today
             </h3>
