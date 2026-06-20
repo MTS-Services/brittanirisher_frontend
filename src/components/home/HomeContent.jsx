@@ -5,8 +5,14 @@ import HowItWorksSection from "./sections/HowItWorksSection";
 import PricingSection from "./sections/PricingSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import CtaSection from "./sections/CtaSection";
+import { useSEO } from "../../hooks/useSEO";
 
 const HomeContent = memo(() => {
+    useSEO({
+      title: 'Home - Vow & Vendor',
+      description: 'Learn how couples discover and book wedding vendors.',
+      keywords: ['how it works', 'wedding planning', 'process'],
+    });
   return (
     <div
       style={{ backgroundColor: "var(--page-bg)" }}

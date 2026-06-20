@@ -20,7 +20,7 @@ const ProfileSkeleton = () => (
           <div className='h-5 w-40 rounded bg-[#ece9e2]'></div>
           <div className='h-4 w-52 rounded bg-[#ece9e2]'></div>
         </div>
-      </div>
+      </div>/
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
         {[1, 2, 3, 4, 5, 6].map((n) => (
           <div key={n} className='space-y-2'>
