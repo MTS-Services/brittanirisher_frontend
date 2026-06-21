@@ -21,6 +21,7 @@ import {
   CheckSquare,
   ChevronsRight,
   ChevronsLeft,
+  MapPin,
 } from 'lucide-react';
 
 const MENU_BY_ROLE = {
@@ -34,6 +35,7 @@ const MENU_BY_ROLE = {
     { name: 'User Management', path: ROUTES.ADMIN_USER_MANAGEMENT, icon: UserCog },
     { name: 'Payments', path: ROUTES.ADMIN_PAYMENTS, icon: CreditCard },
     { name: 'Settings', path: ROUTES.ADMIN_SETTINGS, icon: Settings },
+    { name: ' States & Cities', path: ROUTES.ADMIN_STATE_AND_CITY, icon: MapPin },
     { name: 'Profile', path: ROUTES.ADMIN_PROFILE, icon: UserCircle2 },
     { name: 'Messages', path: ROUTES.ADMIN_MESSAGES, icon: Mail },
   ],

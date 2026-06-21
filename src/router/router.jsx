@@ -104,6 +104,9 @@ const UserManagement = lazy(
 );
 const Payments = lazy(() => import('../pages/admin/payments/Payments'));
 const Settings = lazy(() => import('../pages/admin/settings/Settings'));
+const StateAndCity = lazy(
+  () => import('../pages/admin/stateAndCity/StateAndCity'),
+);
 const Profile = lazy(() => import('../pages/admin/profile/components/Profile'));
 const Messages = lazy(() => import('../pages/admin/Messages'));
 
@@ -297,6 +300,10 @@ const router = createBrowserRouter(
         <Route
           path={adminSeg(ROUTES.ADMIN_USER_MANAGEMENT)}
           element={<UserManagement />}
+        />
+        <Route
+          path={adminSeg(ROUTES.ADMIN_STATE_AND_CITY)}
+          element={<StateAndCity />}
         />
         <Route path={adminSeg(ROUTES.ADMIN_PAYMENTS)} element={<Payments />} />
         <Route path={adminSeg(ROUTES.ADMIN_SETTINGS)} element={<Settings />} />

@@ -32,11 +32,11 @@ export default function SubscriptionBanner({
           Subscription Active
         </div>
 
-        <h1 className="mt-5 max-w-xl font-playfair text-2xl leading-tight text-[#111111] sm:text-3xl font-semibold ">
+        <h1 className="mt-5 max-w-xl  text-2xl leading-tight text-[#111111] sm:text-3xl font-semibold ">
           Welcome back, {vendorName}
         </h1>
 
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-[#57534e]">
+        <p className="mt-4 max-w-xl text-base  text-[#57534e]">
           {description}
         </p>
 

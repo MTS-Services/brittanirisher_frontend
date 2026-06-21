@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 
 export default function PackagesGrid({ packages }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-playfair">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
       {packages.map((p) => (
         <div
           key={p.id}

@@ -113,6 +113,66 @@ const dashboardApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['WeddingStyle'],
     }),
+    getAdminStates: builder.query({
+      query: () => ({
+        url: '/state',
+        method: 'GET',
+      }),
+      providesTags: ['State'],
+    }),
+    createAdminState: builder.mutation({
+      query: (body) => ({
+        url: '/state',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['State', 'City'],
+    }),
+    updateAdminState: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/state/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['State', 'City'],
+    }),
+    deleteAdminState: builder.mutation({
+      query: (id) => ({
+        url: `/state/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['State', 'City'],
+    }),
+    getAdminCities: builder.query({
+      query: () => ({
+        url: '/city',
+        method: 'GET',
+      }),
+      providesTags: ['City'],
+    }),
+    createAdminCity: builder.mutation({
+      query: (body) => ({
+        url: '/city',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['State', 'City'],
+    }),
+    updateAdminCity: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/city/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['State', 'City'],
+    }),
+    deleteAdminCity: builder.mutation({
+      query: (id) => ({
+        url: `/city/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['State', 'City'],
+    }),
   }),
 });
 
@@ -134,4 +194,12 @@ export const {
   useGetAdminWeddingStylesQuery,
   useCreateAdminWeddingStyleMutation,
   useDeleteAdminWeddingStyleMutation,
+  useGetAdminStatesQuery,
+  useCreateAdminStateMutation,
+  useUpdateAdminStateMutation,
+  useDeleteAdminStateMutation,
+  useGetAdminCitiesQuery,
+  useCreateAdminCityMutation,
+  useUpdateAdminCityMutation,
+  useDeleteAdminCityMutation,
 } = dashboardApi;

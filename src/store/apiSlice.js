@@ -56,6 +56,8 @@ export const apiSlice = createApi({
     'BookingDetails',
     'VendorProfile',
     'Enquiries',
+    'State',
+    'City',
   ],
   endpoints: (builder) => ({}),
 });

@@ -283,7 +283,7 @@ const BrowseVendors = memo(() => {
       )}
 
       {/* Mobile Sidebar */}
-      <aside className={`fixed inset-y-0 top-20 left-0 w-72.5 z-50 bg-[#f0e9e1] shadow-xl border-r border-[#e8e0d8] transform transition-transform duration-300 ease-in-out md:hidden overflow-y-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 top-10 left-0 w-74.5 z-50 bg-[#f0e9e1] shadow-xl border-r border-[#e8e0d8] transform transition-transform duration-300 ease-in-out md:hidden overflow-y-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="sticky top-0 bg-[#f0e9e1] z-10 flex items-center justify-between px-5 py-4 border-b border-[#e8e0d8]">
           <div className="flex items-center gap-2">
             <SlidersHorizontal size={17} className="text-[#7a6050]" />

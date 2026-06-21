@@ -89,7 +89,7 @@ export default function HeroSection({
       <div className="px-8 py-7 space-y-4">
         
         {/* Vendor Name */}
-        <h1 className="text-4xl font-playfair text-gray-900 tracking-tight">
+        <h1 className="text-4xl  text-gray-900 tracking-tight">
           {name}
         </h1>
 

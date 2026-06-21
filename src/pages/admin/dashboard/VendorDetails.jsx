@@ -106,7 +106,7 @@ export default function VendorDetails() {
 
   if (!selectedVendorId) {
     return (
-      <div className="min-h-screen space-y-6 font-playfair">
+      <div className="min-h-screen space-y-6 ">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
@@ -120,7 +120,7 @@ export default function VendorDetails() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen space-y-6 font-playfair">
+      <div className="min-h-screen space-y-6 ">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
@@ -134,7 +134,7 @@ export default function VendorDetails() {
 
   if (isError || !vendorProfile) {
     return (
-      <div className="min-h-screen space-y-6 font-playfair">
+      <div className="min-h-screen space-y-6 ">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
@@ -147,7 +147,7 @@ export default function VendorDetails() {
   }
 
   return (
-    <div className="min-h-screen space-y-8 font-playfair">
+    <div className="min-h-screen space-y-8 ">
       {/* Top Navigation */}
       <button
         onClick={() => navigate(-1)}

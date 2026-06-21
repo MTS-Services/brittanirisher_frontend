@@ -26,6 +26,7 @@ export const ROUTES = {
   ADMIN_VENDOR_DETAILS: '/admin/dashboard/vendor/:vendorId',
   ADMIN_REQUESTED_VENDORS: '/admin/requested-vendors',
   ADMIN_USER_MANAGEMENT: '/admin/user-management',
+  ADMIN_STATE_AND_CITY: '/admin/state-and-city',
   ADMIN_PAYMENTS: '/admin/payments',
   ADMIN_SETTINGS: '/admin/settings',
   ADMIN_PROFILE: '/admin/profile',
