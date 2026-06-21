@@ -162,7 +162,7 @@ const StateAndCity = () => {
             states.map((state) => (
               <article
                 key={state.id}
-                className='rounded-lg border border-gray-100 bg-gray-50/60 p-4'
+                className='rounded-lg border border-gray-100 bg-[#fdfcfb] p-4'
               >
                 <div className='flex flex-wrap items-center justify-between gap-3'>
                   <div>
