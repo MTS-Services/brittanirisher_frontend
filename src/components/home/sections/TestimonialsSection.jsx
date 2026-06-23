@@ -4,43 +4,69 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 const ALL_TESTIMONIALS = [
   {
     id: 1,
-    quote: "Mehdi and his team did a terrific job on the engineered hardwood flooring installation and walk-in closet addition. Great eye for envisioning improvements that add value to the home.",
+    quote:
+      "Mehdi and his team did a terrific job on the engineered hardwood flooring installation and walk-in closet addition. Great eye for envisioning improvements that add value to the home.",
     author: "Richard J.",
   },
   {
     id: 2,
-    quote: "Outstanding job painting my entire house and replacing carpet. Completed quickly with exceptional professionalism. Highly recommend.",
+    quote:
+      "Outstanding job painting my entire house and replacing carpet. Completed quickly with exceptional professionalism. Highly recommend.",
     author: "Joseph G.",
   },
   {
     id: 3,
-    quote: "My kitchen was in desperate need of a makeover. They helped me choose perfect cabinetry, countertops, and flooring. The result is a fresh, updated kitchen my family adores.",
+    quote:
+      "My kitchen was in desperate need of a makeover. They helped me choose perfect cabinetry, countertops, and flooring. The result is a fresh, updated kitchen my family adores.",
     author: "Aaron P.",
   },
   {
     id: 4,
-    quote: "Ricardo and his team did an amazing job ahead of schedule! We love our new floor and will recommend American Carpet to everyone.",
+    quote:
+      "Ricardo and his team did an amazing job ahead of schedule! We love our new floor and will recommend American Carpet to everyone.",
     author: "Andrew K.",
   },
   {
     id: 5,
-    quote: "Absolutely thrilled with our bathroom renovation. The tile work is flawless and the team was courteous from start to finish. Will definitely hire again.",
+    quote:
+      "Vow & Vendor made wedding planning so much easier. Instead of spending hours searching social media, I was able to find local vendors, compare options, and reach out directly. Everything was in one place, which saved me so much time.",
     author: "Sarah M.",
   },
   {
     id: 6,
-    quote: "They transformed our dated living room into something truly stunning. The attention to detail was impressive and the project stayed on budget.",
+    quote:
+      "They transformed our dated living room into something truly stunning. The attention to detail was impressive and the project stayed on budget.",
     author: "James L.",
   },
   {
     id: 7,
-    quote: "From the first consultation to the final walkthrough, everything was handled with care. Our hardwood floors look absolutely beautiful.",
+    quote:
+      "As a bride planning from out of town, I loved having a directory of trusted vendors all in one spot. The platform was easy to use, and I found my photographer, florist, and hair & makeup artist within a few days.",
     author: "Emily R.",
   },
   {
     id: 8,
-    quote: "The crew was professional, punctual, and meticulous. Our basement flooring and wall paneling turned out better than we ever imagined.",
+    quote:
+      "This is exactly what the wedding industry needed. Vow & Vendor helped me discover vendors I wouldn't have found otherwise. The website was simple to navigate and made the planning process feel much less overwhelming.",
+    author: "Megan T.",
+  },
+  {
+    id: 9,
+    quote:
+      "The crew was professional, punctual, and meticulous. Our basement flooring and wall paneling turned out better than we ever imagined.",
     author: "Daniel W.",
+  },
+  {
+    id: 10,
+    quote:
+      "Joining Vow & Vendor has helped me connect with more engaged couples in my area. The platform is professional, easy to manage, and showcases my business beautifully.",
+    author: "Brittany K., Wedding Photographer",
+  },
+  {
+    id: 11,
+    quote:
+      "Vow & Vendor has been a great addition to my marketing strategy. I've received quality inquiries from brides who are actively planning and looking for trusted professionals.",
+    author: " Ashley D., Hair & Makeup Artist",
   },
 ];
 
@@ -53,8 +79,12 @@ const TestimonialCard = memo(({ testimonial }) => (
         <Star key={index} size={18} className="fill-current" />
       ))}
     </div>
-    <p className="mt-5 text-lg leading-7 text-[#6d655a] text-justify">{testimonial.quote}</p>
-    <p className="mt-6 text-sm font-semibold text-[#1C1917]">— {testimonial.author}</p>
+    <p className="mt-5 text-lg leading-7 text-[#6d655a] text-justify">
+      {testimonial.quote}
+    </p>
+    <p className="mt-6 text-sm font-semibold text-[#1C1917]">
+      — {testimonial.author}
+    </p>
   </article>
 ));
 
@@ -72,8 +102,6 @@ const TestimonialsSection = memo(() => {
 
   return (
     <section className="relative overflow-hidden pb-14 sm:pb-20">
-
-
       <div className="mx-auto container px-4 sm:px-6 lg:px-8">
         <header className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <p className="text-sm uppercase tracking-[0.20em] text-[#8a7d70]">
