@@ -10,16 +10,16 @@ const vendordashboardApi = apiSlice.injectEndpoints({
       providesTags: ['VendorProfile'],
     }),
 
-    getVendodasrhboarStatus: builder.query({
+    getVendorDashboardData: builder.query({
       query: () => ({
         url: `/dashboard/vendor-data`,
         method: 'GET',
       }),
     }),
 
-    getVendorChartData: builder.query({
+    getVendorAnalyticsChart: builder.query({
       query: () => ({
-        url: `/dashboard/vendor-chart`,
+        url: `/dashboard/vendor-analytic-chart`,
         method: 'GET',
       }),
     }),
@@ -200,8 +200,8 @@ const vendordashboardApi = apiSlice.injectEndpoints({
 });
 const {
   useGetVendorStatusQuery,
-  useGetVendodasrhboarStatusQuery,
-  useGetVendorChartDataQuery,
+  useGetVendorDashboardDataQuery,
+  useGetVendorAnalyticsChartQuery,
   useGetVendorPackagesQuery,
   useGetBookingsQuery,
   useCreateBookingMutation,
@@ -223,8 +223,13 @@ const {
   useDeleteVendorPackageMutation,
 } = vendordashboardApi;
 
+const useGetVendodasrhboarStatusQuery = useGetVendorDashboardDataQuery;
+const useGetVendorChartDataQuery = useGetVendorAnalyticsChartQuery;
+
 export {
   useGetVendorStatusQuery,
+  useGetVendorDashboardDataQuery,
+  useGetVendorAnalyticsChartQuery,
   useGetVendodasrhboarStatusQuery,
   useGetVendorChartDataQuery,
   useGetVendorPackagesQuery,

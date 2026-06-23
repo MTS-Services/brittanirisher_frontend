@@ -157,7 +157,7 @@ const ContactPage = memo(() => {
         />
         {/* <div className="absolute inset-0 bg-[rgba(45,45,45,0.38)]" /> */}
 
-        <div className="absolute inset-0 flex items-center justify-center  text-center text-white">
+        <div className=" max-w-6xl mx-auto absolute inset-0 flex items-center justify-center  text-center text-white px-4">
           <div className="space-y-3">
             <div className="mx-auto inline-flex items-center rounded-full bg-[rgba(255,255,255,0.47)] px-6 py-1.5 font-raleway text-[16px] font-medium leading-6 text-[#414141]">
               Get In Touch

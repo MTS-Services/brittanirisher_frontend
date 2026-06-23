@@ -37,6 +37,9 @@ const VendorDetailsAdmin = lazy(
 const VendorDashboard = lazy(
   () => import('../pages/VendorDashboard/dashboard/VendorDashboard'),
 );
+const VendorAnalytics = lazy(
+  () => import('../pages/VendorDashboard/analytics/VendorAnalytics'),
+);
 const VendorLeads = lazy(
   () => import('../pages/VendorDashboard/VendorLeads/VendorLeads'),
 );
@@ -338,6 +341,10 @@ const router = createBrowserRouter(
         <Route
           path={vendorSeg(ROUTES.VENDOR_DASHBOARD)}
           element={<VendorDashboard />}
+        />
+        <Route
+          path={vendorSeg(ROUTES.VENDOR_ANALYTICS)}
+          element={<VendorAnalytics />}
         />
         <Route
           path={vendorSeg(ROUTES.VENDOR_LEADS)}

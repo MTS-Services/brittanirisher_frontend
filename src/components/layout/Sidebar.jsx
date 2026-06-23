@@ -22,6 +22,7 @@ import {
   ChevronsRight,
   ChevronsLeft,
   MapPin,
+  LineChart,
 } from 'lucide-react';
 
 const MENU_BY_ROLE = {
@@ -92,7 +93,16 @@ const Sidebar = ({
   const user = useSelector(selectUser);
   const role = (user?.role || 'admin').toLowerCase();
   const normalizedRole = role === 'couple' ? 'user' : role;
-  const menuItems = MENU_BY_ROLE[normalizedRole] || MENU_BY_ROLE.admin;
+  const baseMenuItems = MENU_BY_ROLE[normalizedRole] || MENU_BY_ROLE.admin;
+  const isVendorAnalyticsUser =
+    normalizedRole === 'vendor' && user?.isAnalyticsUser === true;
+  const menuItems = isVendorAnalyticsUser
+    ? [
+        ...baseMenuItems.slice(0, 1),
+        { name: 'Analytics', path: ROUTES.VENDOR_ANALYTICS, icon: LineChart },
+        ...baseMenuItems.slice(1),
+      ]
+    : baseMenuItems;
   const dashboardLabel =
     normalizedRole === 'vendor'
       ? 'Vendor Dashboard'

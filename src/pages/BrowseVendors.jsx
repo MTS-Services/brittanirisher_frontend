@@ -277,7 +277,7 @@ const BrowseVendors = memo(() => {
   );
 
   return (
-    <div className=" max-w-[1400px] mx-auto min-h-screen flex items-start md:gap-10 relative font-serif">
+    <div className=" max-w-[1400px] mx-auto min-h-screen flex items-start lg:gap-10 relative font-serif">
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}

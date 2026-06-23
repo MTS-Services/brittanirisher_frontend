@@ -40,6 +40,7 @@ export const ROUTES = {
   ADMIN_JOBS: '/admin/jobs',
   ADMIN_PRICING: '/admin/pricing',
   VENDOR_DASHBOARD: '/vendor/dashboard',
+  VENDOR_ANALYTICS: '/vendor/analytics',
   VENDOR_LEADS: '/vendor/leads',
   VENDOR_BOOKINGS: '/vendor/bookings',
   VENDOR_AVAILABILITY: '/vendor/availability',

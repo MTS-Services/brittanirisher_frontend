@@ -98,7 +98,7 @@ const VendorResultsSection = ({ vendors, totalCount, isLoading, isError }) => {
         Recommended Vendors ({totalCount})
       </h2>
 
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
         {vendors.map((vendor) => {
           const rawImage = vendor.thumbnailImage;
           const isFullUrl =

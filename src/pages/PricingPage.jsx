@@ -178,7 +178,7 @@ const PricingPage = memo(() => {
 
       <section className='relative px-4 sm:px-6 overflow-hidden'>
         <div className='mx-auto container  sm:px-6 lg:px-8 py-14 sm:py-20 relative z-10'>
-          <div className='mx-auto w-full md:max-w-4/6 text-center '>
+          <div className='mx-auto w-full md:max-w-4xl text-center '>
             <h2 className='font-playfair text-3xl md:text-4xl lg:text-5xl leading-none text-[#090909]'>
               Vendor Pricing
             </h2>
