@@ -152,7 +152,7 @@ const router = createBrowserRouter(
     <>
       <Route
         element={
-          <Suspense fallback={<RouteSkeleton />}>
+          <Suspense fallback={null}>
             <Layout />
           </Suspense>
         }
@@ -278,7 +278,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.ADMIN}
         element={
-          <Suspense fallback={<RouteSkeleton />}>
+          <Suspense fallback={null}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -328,7 +328,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.VENDOR}
         element={
-          <Suspense fallback={<RouteSkeleton />}>
+          <Suspense fallback={null}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
@@ -364,7 +364,7 @@ const router = createBrowserRouter(
       <Route
         path={ROUTES.USER}
         element={
-          <Suspense fallback={<RouteSkeleton />}>
+          <Suspense fallback={null}>
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>

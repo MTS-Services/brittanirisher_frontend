@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback, useRef } from 'react';
+import React, { memo, useState, useCallback, useRef, Suspense } from 'react';
 import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { LogIn, Menu, X, ChevronDown } from 'lucide-react';
 import Footer from './home/footer/Footer';
@@ -170,7 +170,9 @@ const Layout = memo(() => {
       </nav>
 
       <main ref={contentRef} className='flex-1 min-h-0'>
-        <Outlet />
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <Footer />

@@ -129,6 +129,17 @@ const StateAndCity = () => {
     isCreatingState || isUpdatingState || isCreatingCity || isUpdatingCity;
   const isDeleting = isDeletingState || isDeletingCity;
 
+  if (isLoading) {
+    return (
+      <div className='space-y-8'>
+        <StateAndCityHeader />
+        <section className='rounded-lg border border-gray-100 bg-white shadow-sm overflow-hidden p-4'>
+          <SkeletonBlock className='h-64 w-full rounded-lg' />
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-8'>
       <StateAndCityHeader />
@@ -149,12 +160,7 @@ const StateAndCity = () => {
         </div>
 
         <div className='px-4 py-4 space-y-4'>
-          {isLoading ? (
-            <>
-              <SkeletonBlock className='h-28 w-full' />
-              <SkeletonBlock className='h-28 w-full' />
-            </>
-          ) : states.length === 0 ? (
+          {states.length === 0 ? (
             <p className='text-sm text-gray-500 py-6 text-center'>
               No states found. Add your first state to get started.
             </p>

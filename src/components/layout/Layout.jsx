@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
@@ -93,7 +93,9 @@ const Layout = () => {
         {/* Scrollable page area — data-lenis-prevent stops Lenis hijacking this scroll container */}
         <div className='flex-1 min-h-0 overflow-y-auto' data-lenis-prevent>
           <div ref={contentRef} className='w-full px-4 py-5 sm:px-8 sm:py-6  lg:py-8'>
-            <Outlet />
+            <Suspense fallback={null}>
+              <Outlet />
+            </Suspense>
           </div>
         </div>
       </main>
