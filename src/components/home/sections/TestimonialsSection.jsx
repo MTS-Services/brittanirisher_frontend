@@ -76,7 +76,7 @@ const TestimonialCard = memo(({ testimonial }) => (
   <article className="rounded-sm bg-[#faf8f5] p-4 md:p-6 lg:p-8 shadow-[0_16px_40px_rgba(58,49,39,0.06)]">
     <div className="flex gap-1 text-[#D4A574]">
       {Array.from({ length: 5 }).map((_, index) => (
-        <Star key={index} size={18} className="fill-current" />
+        <Star key={index} size={18} className="fill-current text-[#F9B90A]" />
       ))}
     </div>
     <p className="mt-5 text-lg leading-7 text-[#6d655a] text-justify">
@@ -127,23 +127,32 @@ const TestimonialsSection = memo(() => {
           ))}
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="mt-10 flex justify-center items-center gap-3">
-          <button
-            onClick={handlePrev}
-            className="w-11 h-11 rounded-full bg-[#e0d9d0] text-[#8a7d70] flex items-center justify-center hover:bg-[#d4ccc2] transition-colors"
-            aria-label="Previous"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            onClick={handleNext}
-            className="w-11 h-11 rounded-full bg-[#1a1714] text-white flex items-center justify-center hover:bg-[#2e2a26] transition-colors"
-            aria-label="Next"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
+{/* Navigation Buttons */}
+<div className="mt-10 flex justify-center items-center gap-3">
+  <button
+    onClick={handlePrev}
+    className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
+      page === 0 
+        ? "bg-[#e0d9d0] text-[#8a7d70] hover:bg-[#d4ccc2]" 
+        : "bg-[#1a1714] text-white hover:bg-[#2e2a26]"
+    }`}
+    aria-label="Previous"
+  >
+    <ChevronLeft size={20} />
+  </button>
+  
+  <button
+    onClick={handleNext}
+    className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
+      page === totalPages - 1 
+        ? "bg-[#e0d9d0] text-[#8a7d70] hover:bg-[#d4ccc2]" 
+        : "bg-[#1a1714] text-white hover:bg-[#2e2a26]"
+    }`}
+    aria-label="Next"
+  >
+    <ChevronRight size={20} />
+  </button>
+</div>
 
         <div className="absolute right-78 bottom-24 pointer-events-none hidden md:block">
           <img

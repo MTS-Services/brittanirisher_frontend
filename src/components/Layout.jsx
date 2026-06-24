@@ -103,16 +103,34 @@ const Layout = memo(() => {
             </Link>
           </div>
 
-          <button
-            type='button'
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            aria-controls='mobile-menu'
-            className='inline-flex items-center justify-center  p-1 text-[#4f5b4d] transition-colors duration-200 hover:bg-white/90 lg:hidden'
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+<button
+  type='button'
+  onClick={() => setMenuOpen((v) => !v)}
+  aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+  aria-expanded={menuOpen}
+  aria-controls='mobile-menu'
+  className='relative inline-flex items-center justify-center p-1 text-[#4f5b4d] outline-none lg:hidden w-8 h-8'
+>
+  {/* Hamburger Menu Icon */}
+  <Menu
+    size={24}
+    className={`absolute transition-all duration-300 ease-in-out transform ${
+      menuOpen 
+        ? 'rotate-90 scale-0 opacity-0' 
+        : 'rotate-0 scale-100 opacity-100'
+    }`}
+  />
+
+  {/* Close (X) Icon */}
+  <X
+    size={24}
+    className={`absolute transition-all duration-300 ease-in-out transform ${
+      menuOpen 
+        ? 'rotate-0 scale-100 opacity-100' 
+        : '-rotate-90 scale-0 opacity-0'
+    }`}
+  />
+</button>
         </div>
 
         {menuOpen && (

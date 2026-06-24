@@ -625,7 +625,7 @@ const VendorDetails = () => {
           <img
             src={`${API_CONFIG.BASE_URL}${heroImages[heroIndex]}`}
             alt={`${vendor.businessName} image ${heroIndex + 1}`}
-            className='w-full h-70 md:h-96 object-cover'
+            className='w-full h-70 md:h-100 object-cover '
           />
           <button
             onClick={prevHero}

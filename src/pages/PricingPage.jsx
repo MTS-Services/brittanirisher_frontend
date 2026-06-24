@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Check, X, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSEO } from '../hooks/useSEO';
@@ -23,10 +23,10 @@ const FEATURE_ROWS = [
 ];
 
 const FAQ_ITEMS = [
-  {
-    title: 'Where can I watch?',
-    body: 'Nibh quisque suscipit fermentum netus nulla cras porttitor euismod nulla. Orci, dictumst nec aliquet id ullamcorper venenatis. Fermentum nulla cras porttitor euismod nulla.',
-  },
+  // {
+  //   title: 'Where can I watch?',
+  //   body: 'Nibh quisque suscipit fermentum netus nulla cras porttitor euismod nulla. Orci, dictumst nec aliquet id ullamcorper venenatis. Fermentum nulla cras porttitor euismod nulla.',
+  // },
   {
     title: 'How do I list my services on this platform?',
     body: "Getting started is simple and straightforward. Create your vendor account, complete your profile with your services and portfolio, set your pricing, and you'll be visible to couples immediately. Our team is here to help you every step of the way.",
@@ -142,6 +142,7 @@ PricingCard.displayName = 'PricingCard';
 const PricingPage = memo(() => {
   const { data, isLoading } = useGetSubscriptionPlansQuery();
   const plans = data?.data || [];
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
   useSEO({
     title: 'Pricing',
@@ -341,27 +342,45 @@ const PricingPage = memo(() => {
             </p>
           </div>
 
-          <div className='mt-12 space-y-3 mx-auto max-w-7xl  sm:px-6 lg:px-8 '>
-            {FAQ_ITEMS.map((item) => (
-              <details
-                key={item.title}
-                open={item.open}
-                className='group bg-[#f0e9e1] px-6 py-4'
-              >
-                <summary className='flex cursor-pointer list-none items-center justify-between gap-6 font-raleway text-[16px] font-medium leading-6 text-black outline-none'>
-                  <span>{item.title}</span>
-                  <ChevronDown
-                    size={16}
-                    className='shrink-0 transition-transform duration-200 group-open:rotate-180'
-                  />
-                </summary>
-                {item.body && (
-                  <p className='mt-4 text-[18px] leading-[1.4] text-[rgba(60,60,67,0.85)] text-justify'>
-                    {item.body}
-                  </p>
-                )}
-              </details>
-            ))}
+<div className='mt-12 space-y-3 mx-auto max-w-7xl sm:px-6 lg:px-8'>
+            {FAQ_ITEMS.map((item, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={item.title}
+                  className='bg-[#f0e9e1] overflow-hidden' 
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    className='flex w-full cursor-pointer items-center justify-between gap-6 px-6 py-4 outline-none'
+                    aria-expanded={isOpen}
+                  >
+                    <span className='font-raleway text-[16px] font-medium leading-6 text-black text-left'>
+                      {item.title}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`shrink-0 text-black/70 transition-transform duration-300 ${
+                        isOpen ? 'rotate-180' : 'rotate-0'
+                      }`}
+                    />
+                  </button>
+
+                  <div
+                    className={`transition-all duration-300 ease-in-out px-6 ${
+                      isOpen ? 'max-h-[500px] pb-6 opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                   
+                  >
+                    {item.body && (
+                      <p className='pt-2 text-[18px] leading-[1.4] text-[rgba(60,60,67,0.85)] text-justify'>
+                        {item.body}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className='mx-auto mt-14 md:mt-20 container rounded-2xl bg-[#5c665b]  py-16 text-center text-white  lg:py-20'>
