@@ -44,12 +44,12 @@ const CONTACT_METHODS = [
 const FAQ_ITEMS = [
   {
     title: "How can I increase my profile visibility?",
-    body: "Adjust your profile visibility by completing your bio, uploading high-quality images, and choosing the right service category. Verified and detailed profiles tend to appear higher in search results.",
+    body: "Payments are made privately between the vendor and the couple. To keep the process as seamless as possible, vendors will use their own payment system.",
   },
-  {
-    title: "Is it possible to list services in multiple locations?",
-    body: "Yes, you can list your services in multiple locations. Simply add each location in your profile settings and manage your availability for each area separately.",
-  },
+  // {
+  //   title: "Is it possible to list services in multiple locations?",
+  //   body: "Yes, you can list your services in multiple locations. Simply add each location in your profile settings and manage your availability for each area separately.",
+  // },
   {
     title: "How do I handle payments with couples?",
     body: "All payments are processed securely through our platform. Couples can pay upfront or set up payment plans, and you will receive your payment according to your chosen payment schedule.",

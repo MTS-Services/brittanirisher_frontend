@@ -80,7 +80,7 @@ const PricingCard = memo(({ plan }) => {
         <span
           className={`pb-1 text-sm ${plan.featured ? 'text-white' : 'text-[#857F7A]'}`}
         >
-          /{(plan.validFor || 'month').toLowerCase()}
+          {/* /{(plan.validFor || 'month').toLowerCase()} */}/month
         </span>
       </div>
       <p
