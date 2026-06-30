@@ -2,68 +2,68 @@ import React, { memo, useState } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 const ALL_TESTIMONIALS = [
+  // {
+  //   id: 1,
+  //   quote:
+  //     "Mehdi and his team did a terrific job on the engineered hardwood flooring installation and walk-in closet addition. Great eye for envisioning improvements that add value to the home.",
+  //   author: "Richard J.",
+  // },
+  // {
+  //   id: 2,
+  //   quote:
+  //     "Outstanding job painting my entire house and replacing carpet. Completed quickly with exceptional professionalism. Highly recommend.",
+  //   author: "Joseph G.",
+  // },
+  // {
+  //   id: 3,
+  //   quote:
+  //     "My kitchen was in desperate need of a makeover. They helped me choose perfect cabinetry, countertops, and flooring. The result is a fresh, updated kitchen my family adores.",
+  //   author: "Aaron P.",
+  // },
+  // {
+  //   id: 4,
+  //   quote:
+  //     "Ricardo and his team did an amazing job ahead of schedule! We love our new floor and will recommend American Carpet to everyone.",
+  //   author: "Andrew K.",
+  // },
   {
     id: 1,
-    quote:
-      "Mehdi and his team did a terrific job on the engineered hardwood flooring installation and walk-in closet addition. Great eye for envisioning improvements that add value to the home.",
-    author: "Richard J.",
-  },
-  {
-    id: 2,
-    quote:
-      "Outstanding job painting my entire house and replacing carpet. Completed quickly with exceptional professionalism. Highly recommend.",
-    author: "Joseph G.",
-  },
-  {
-    id: 3,
-    quote:
-      "My kitchen was in desperate need of a makeover. They helped me choose perfect cabinetry, countertops, and flooring. The result is a fresh, updated kitchen my family adores.",
-    author: "Aaron P.",
-  },
-  {
-    id: 4,
-    quote:
-      "Ricardo and his team did an amazing job ahead of schedule! We love our new floor and will recommend American Carpet to everyone.",
-    author: "Andrew K.",
-  },
-  {
-    id: 5,
     quote:
       "Vow & Vendor made wedding planning so much easier. Instead of spending hours searching social media, I was able to find local vendors, compare options, and reach out directly. Everything was in one place, which saved me so much time.",
     author: "Sarah M.",
   },
+  // {
+  //   id: 6,
+  //   quote:
+  //     "They transformed our dated living room into something truly stunning. The attention to detail was impressive and the project stayed on budget.",
+  //   author: "James L.",
+  // },
   {
-    id: 6,
-    quote:
-      "They transformed our dated living room into something truly stunning. The attention to detail was impressive and the project stayed on budget.",
-    author: "James L.",
-  },
-  {
-    id: 7,
+    id: 2,
     quote:
       "As a bride planning from out of town, I loved having a directory of trusted vendors all in one spot. The platform was easy to use, and I found my photographer, florist, and hair & makeup artist within a few days.",
     author: "Emily R.",
   },
   {
-    id: 8,
+    id: 3,
     quote:
       "This is exactly what the wedding industry needed. Vow & Vendor helped me discover vendors I wouldn't have found otherwise. The website was simple to navigate and made the planning process feel much less overwhelming.",
     author: "Megan T.",
   },
+  // {
+  //   id: 9,
+  //   quote:
+  //     "The crew was professional, punctual, and meticulous. Our basement flooring and wall paneling turned out better than we ever imagined.",
+  //   author: "Daniel W.",
+  // },
   {
-    id: 9,
-    quote:
-      "The crew was professional, punctual, and meticulous. Our basement flooring and wall paneling turned out better than we ever imagined.",
-    author: "Daniel W.",
-  },
-  {
-    id: 10,
+    id: 5,
     quote:
       "Joining Vow & Vendor has helped me connect with more engaged couples in my area. The platform is professional, easy to manage, and showcases my business beautifully.",
     author: "Brittany K., Wedding Photographer",
   },
   {
-    id: 11,
+    id: 6,
     quote:
       "Vow & Vendor has been a great addition to my marketing strategy. I've received quality inquiries from brides who are actively planning and looking for trusted professionals.",
     author: " Ashley D., Hair & Makeup Artist",

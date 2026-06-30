@@ -787,7 +787,6 @@ const VendorDetails = () => {
         </section>
       </div>
 
-      {/* Grid: About / Calendar / Enquiry */}
       <section className='grid grid-cols-1 md:grid-cols-3 pb-14 gap-6'>
         {/* About Me */}
         <div className='bg-[#faf9f6] rounded-md shadow-sm p-4 md:p-6 border border-[#eadfcd]'>
