@@ -30,7 +30,7 @@ const VendorPricingCard = memo(({
     <div className='mt-3 flex items-end gap-1'>
       <span className='font-playfair text-5xl font-bold leading-none'>${plan.priceMonthly}</span>
       <span className={`pb-1 text-sm ${plan.featured ? 'text-white' : 'text-[#857F7A]'}`}>
-        /{(plan.validFor || 'month').toLowerCase()}
+        {/* /{(plan.validFor || 'month').toLowerCase()} */}/month
       </span>
     </div>
     <p
