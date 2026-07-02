@@ -158,20 +158,36 @@ const HeroSection = memo(() => {
           vision to life.
         </p>
         <div className='mt-7 grid grid-cols-2 gap-3'>
-          <a
+          {/* <a
             data-hero-cta
             href='#couples'
             className='flex items-center justify-center gap-2 rounded-md bg-[#A7B9A6] px-5 py-3 text-sm text-[#464E46] transition-all duration-200 hover:bg-[#7d947b] hover:-translate-y-0.5'
           >
             I&apos;m a Couple <ArrowRight size={16} />
-          </a>
-          <a
+          </a> */}
+
+           <Link
+                data-hero-cta
+                to='/signup?audience=couple'
+                className='flex items-center justify-center gap-2 rounded-md bg-[#A7B9A6] px-5 py-3 text-sm text-[#464E46] transition-all duration-200 hover:bg-[#7d947b] hover:-translate-y-0.5'
+              >
+                I&apos;m a Couple <ArrowRight size={16} />
+              </Link>
+          {/* <a
             data-hero-cta
             href='#vendors'
             className='flex items-center justify-center rounded-md border border-[#000000] bg-transparent px-5 py-3 text-sm text-[#1b1815] transition-all duration-200 hover:bg-[#1b1815]/5 hover:-translate-y-0.5'
           >
             I&apos;m a Vendor
-          </a>
+          </a> */}
+
+           <Link
+                data-hero-cta
+                to='/signup?audience=vendor'
+                className='flex items-center justify-center rounded-md border border-[#000000] bg-transparent px-5 py-3 text-sm text-[#1b1815] transition-all duration-200 hover:bg-[#1b1815]/5 hover:-translate-y-0.5'
+              >
+                I&apos;m a Vendor
+              </Link>
         </div>
       </div>
 
